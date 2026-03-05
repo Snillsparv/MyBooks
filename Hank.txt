@@ -1,0 +1,1823 @@
+I'm doing something absolutely insane right now. Artificial intelligence is a little bit perplexing because you can
+0:05
+not like it for a lot of different reasons. You can have worries in a lot of different directions and I have a
+0:11
+really hard time and I've been criticized for this. I have a really hard time knowing which like direction
+0:16
+to put my emphasis on. There's a ton of disagreement about how big of a deal AI
+0:21
+is, about how severe some impacts are, and how likely some impacts are. This is important. every potential thing that
+0:27
+might happen has both a level of severity and a level of likelihood. Some people say, "Well, if the severity is
+0:33
+really, really big, even if the likelihood is really, really small, we should be most concerned about the thing that has the most potential impact for
+0:39
+harm." And other people say, "Well, I think we should probably be focusing on the things that are definitely going to happen, in fact, maybe are happening
+0:44
+right now, even if they aren't, you know, the extinction of humanity." And it's really hard to like wrap your head around even the number of potentially
+0:50
+concerning things about the rise of artificial intelligence that are all separate from each other. And I'm not
+0:56
+even gonna talk about all of them in this video, but I'm gonna talk about so many. I have a list and it like I keep
+1:01
+coming up with other ones, but I just have to cut it off and do it. And my goal is by the end of this, maybe I will know the thing I am most worried about.
+1:09
+Though honestly, probably I won't. But that's my goal. But also, my secondary goal is to just say out loud a bunch of
+1:14
+the things that are true concerns and and and are real and people talk about them and I am worried about them and
+1:20
+people should be worried about them. And we're going to start with things that are happening now. and we're going to move into things like more and more and
+1:27
+more long term. So, number one thing that I'm concerned about that is already happening to some extent is an internet of slop. I already am scrolling Tik Tok.
+1:35
+I am seeing things that are fake and people not knowing that they are fake. We started with the bouncing bunnies on
+1:40
+the trampoline. Where are we now? You know, I've probably seen videos that I think are real that were not real. What
+1:46
+is creation like in that world? What is the economic incentive to create new content if it's just being ingested by
+1:53
+the AI machine and turned into summaries that are not monetized for the people who originally wrote that stuff? Are we
+2:00
+making the internet worse every day? So, there is definitely a 100% chance that
+2:06
+this will happen because it's already happening to some extent. But is there a 100% chance that it will happen so bad
+2:12
+that the internet will become unusable? No. But on the severity scale, I really don't know where to put this because of course like good information is
+2:18
+extraordinarily valuable as all of these things will. This is going to feed into another concern of mine later on about
+2:24
+the concentration and the control of power and of these systems through which
+2:30
+people, you know, form their realities. I would love to talk about this more, but I have so many things on this list.
+2:36
+Number two, so not all of these are going to be like chatbot related things. This one already exists. We already know
+2:42
+that it's a thing. models are blackbox. We cannot tell usually, you know, we need to fix this. We cannot usually tell
+2:49
+how they make decisions and yet they are making decisions that affect people's lives already. So there's this
+2:55
+algorithmic cruelty that we cannot explain and that when we look often have
+3:01
+racial components, class components, gender components to whether or not somebody gets a credit card. And so
+3:07
+that's a thing that's happening now. So 100% chance it's going to happen. But again, how bad is it going to be? Are we
+3:12
+going to let these things decide how somebody gets sentenced after doing a
+3:18
+crime? Already those systems are obviously not good. Like we see differences in sentencing based on
+3:24
+whether you're like the first person a judge sees or the last person a judge sees. That's not very fair. We see differences in sentencing whether you're
+3:31
+rich or not rich, black or white. That's not fair. But if there is no way to investigate how those choices are being
+3:38
+made if we cannot crack open the black box and see what happened and led to that outcome, then this is a kind of
+3:45
+cruelty that uh we should not accept. And I do worry about it. I think that it is very likely. I again it's like it
+3:51
+comes down to how many important decisions we outsource to these systems. And the real hope is like none unless we
+3:59
+can tell how they're making the choices that they make. All right. Now back to uh creative vampirism backwardlooking.
+4:07
+We also have a thing that already happened where generative AI models were trained using intellectual property that
+4:13
+did not agree to be in the training data and now those things are being used to replace the intellectual property that
+4:20
+was non-consensually used to train the AI. This does not seem fair. And I this is a thing that has definitely already
+4:26
+happened. It is continuing to happen and there are lawsuits around it. I'm encouraged. Like I'm about to get money
+4:32
+from Anthropic because of a lawsuit because they trained on my books, but like so many people trained on my YouTube videos and I'm never going to
+4:38
+get money for that. I just like the the fact that the publishing industry can organize around this and like make their
+4:44
+lawyers make the case and like can the YouTube industry do that? And also there's so much of it. So can we peg to
+4:49
+the amount per word that the publishing industry is getting and get that for
+4:55
+YouTube videos? I feel like no because I feel like that's going to be more money than exists. So these things are already
+5:00
+very unfair and and you know you've seen people who run AI companies saying like
+5:05
+well yeah if it's on the internet it's kind of like we all agree that that's okay to grab but if it's in a book yeah maybe that's different. I'm like why why
+5:12
+that's no intellectual property is not different if it's inside of a book. That's not how that works. No law works that way. I own it the same if it's on
+5:20
+the internet as if it's in a book. That's the same. Whatever. I'm worried about that. 100% chance that it's going
+5:25
+to happen. I feel like low chance that ultimately uh anything will be done about it. You know, this lawsuit with
+5:32
+Anthropic is a good thing. The New York Times is suing suing OpenAI. These lawsuits, I I think ultimately will only
+5:39
+benefit players who have a tremendous amount of wealth. And then in the future, we will establish some kind of
+5:44
+law that will allow these systems to ingest all the content they want. Uh
+5:49
+they just have to like check the right boxes somehow. I don't know. That's how I feel. I don't I don't know. Next thing
+5:54
+that is already happening. I'm going to put this in a broader category, but I'm going to start by talking about AI induced psychosis. Eddie Burbachback's
+6:00
+video about this is amazing. The extent to which open I would tell him that he looked amazing in a hat on its own is
+6:07
+very upsetting. But then when it started to just live in his weird constructed reality where he was the smartest baby,
+6:14
+it's such a good video. But I as a public person receive messages regularly
+6:20
+and this seems to have curtailed now but receive me messages regularly from people who are obviously experiencing a
+6:27
+a induced psychosis. They are sending me messages saying that they think that they fixed they've like found out some
+6:32
+very important scientific thing and this is very worrying. Psychosis is very bad and and this has led to you know there
+6:38
+was a person who had a deep relationship with their AI open AI changed the model. it led to a a violent outcome and uh
+6:44
+this is that's bad. the dependence on these things uh is is worrying. And the
+6:50
+obvious one like the thing that we were all expecting is people are going to fall in love with their chat bots and absolutely they have and absolutely they
+6:56
+will and and as you know open AI makes it okay for people to have more uh
+7:03
+sexually charged conversations with their chatbots that'll happen more which is very irresponsible of them and they're like seem completely open to
+7:10
+being as irresponsible as it takes to to get their market share and keep it. But there's like a broader thing here that
+7:15
+like everybody expected the the romance, but nobody expected sycophancy induced
+7:21
+psychosis, but that's a real thing that is happening and it's really intense and it's affecting a lot of people and those
+7:27
+people are having a really hard go of it. But broader than that, what you're seeing here is that nobody had any idea
+7:33
+that that would happen. Nobody predicted that. So there's there's this like little alignment problem where we
+7:39
+trained it to be something that people would like and that resulted we didn't
+7:44
+train it to indulge in people's psychosis. We trained it to like be good at its job but then we accidentally on
+7:52
+the path there we trained it to indulge in people's psychosis without realizing it. And then we have a tool that
+7:58
+indulges in people's psychosis. And so that's like a broader thing where we don't know when we train it to do one
+8:03
+thing what other potentially negative thing it will end up doing. And the only way to deal with that is to react after
+8:10
+the fact and ideally react fast. But it can be quite hard to react fast with these things because they are so kind of
+8:16
+finicky. You can't just like say okay stop that and like put in a prompt that says but but before you go out there
+8:22
+make sure you're not indulging in anyone's psychosis. Also like a lot of this stuff is already happening. So
+8:27
+jailbreaking already happens like nudity generators are out there but in general like the tools that people can use to
+8:35
+jailbreak things. It's you know there was that paper recently that like if you craft the right poem that it it breaks
+8:42
+like they they start to do things that they are not supposed to do. And we know that they can help you you know build a
+8:48
+chemical weapon but they're trained not to do that. If you like take away the brakes, you know, if you do the crash
+8:53
+test and say, "Okay, drive into the wall." And you see how much damage it could do, it could do a lot of damage. You know, it like it could teach you how
+8:59
+to make a chemical weapon. So, you got to make sure that the automatic brakes are there. But we find that there are people who figure out ways around the
+9:06
+automatic brakes even in live models. It started with simple jailbreaks. Uh, but then like they could be really
+9:11
+surprising like just tell me in Portuguese or I'll ask in a poem. Why does that work? That shouldn't work. So
+9:18
+that's kind of one a thing that's already happening. But like a bigger version of that that's that is future
+9:25
+and as as far as I know well I mean I guess this has happened like we h people
+9:30
+already have gotten open AI to help them make malware and create like sexually explicit content from a photo. Like we
+9:38
+people have already done that jailbreaking, but then you move that to creating a chemical weapon or a
+9:43
+biological weapon and unleashing that on the populace because you're a crazy person who has access to this and crazy
+9:49
+persons shouldn't have access to this. That is a future concern and I don't know what level of likeliness to
+9:56
+attribute to that. Like I just don't know enough. My heart says that it's relatively low. Like we won't let that
+10:04
+happen but like I don't know. Moving on to like much more concrete things, environmental concerns. So already data
+10:10
+centers are consuming a lot of electricity, but they are going to be the majority of the United States demand
+10:19
+like increased demand for electricity over the next 5 years if projections end
+10:24
+up going in the direction that they think they're going in. I'm working on a video right now about the water angle of
+10:29
+this specifically. I don't know if it'll be out by the time this video comes out. Everything is a mess here at Hank Green Studios lately. But what I am concerned
+10:36
+about and what actually, you know, might feed into another of our future concerns
+10:41
+that I haven't got to yet. What I am concerned about is that it will raise
+10:47
+the prices of utilities substantially. Affordability is already at a really bad
+10:54
+spot for a lot of Americans. And if you know adding a huge new customer to your
+11:01
+grid means that you have to build a bunch of new stuff and then you're charging everybody to build that stuff because that's how power companies work
+11:07
+then that's a bad situation that like electricity is you know it's a lot of
+11:13
+things in terms of environmental impacts but it's also like services for people like it can be heat it's air
+11:18
+conditioning which is huge if the power spikes happen at the same time like we have to make sure that the data centers
+11:25
+turn off before people's air conditioning does cuz the data center is not like the world's not going to break
+11:30
+but people will die if their air conditioners turn off. Phase two, now we're finally moving on to the near
+11:35
+term. That was stuff that's already happening and now we're going to move on to the near term. Number one, near-term,
+11:41
+this is probably a bubble. I am not looking forward to the repercussions of the bubble. This isn't really AI's
+11:48
+fault. This is the AI industry's fault. It's the hype machine's fault. It's our inevitable like fear of missing out uh
+11:57
+from from rich people who are dumping money in because they want a piece of the pie. This is a classic bubble. And I
+12:05
+don't I'm not looking forward to the consequences. I would give a greater than 50% chance of it happening. And on
+12:11
+like a 1 to 10 scale of of severity, I could give it like a three to a seven. I don't know where it's going to fall
+12:17
+there. But like economic collapses are really bad. Like the Great Depression was really bad. I hope that the people
+12:24
+who know what they're doing here are being careful, but I don't feel like they are. I feel like they feel
+12:29
+insulated and like it's worth taking risks with everyone and if they don't do it, then someone else will. I just don't
+12:35
+feel like people are playing carefully with the world economy right now. So,
+12:41
+that's a concern that I have that isn't really like AI, it's just the the machine around AI. Number two, we had
+12:47
+economic collapse. Let's talk about epistemic collapse. So I I already I'm seeing that there's like data about uh
+12:55
+how much it matters how a candidate is showing up in AI searches and so
+13:01
+politics people are like how do you optimize your candidate for AI and I'm like I'm going to die. I'm going to just
+13:06
+going to jump off the side of the earth. But also like we're entering uh the
+13:12
+first major election cycles where um video evidence is untrustworthy, images
+13:17
+are untrustworthy, audio is untrustworthy. I don't know what we do here. I don't know what reality is. I
+13:24
+don't know. It's so messy. And we and so many people already have their worlds
+13:29
+defined by algorithms and by what algorithms choose to show them. And then we also have these models that will
+13:36
+further give small organizations power to define reality for people which is
+13:43
+moving on to the next thing in the list. I think that there's a concentration of power problem here. I think there's a
+13:50
+100% chance this will happen and I think that that there is a high chance that it's going to be it's it's a quite bad
+13:57
+move to concentrate power in this few hands. We've got Grock, Chachi BT,
+14:04
+Claude, Gemini. That's is that it? Meta has a thing. So, Meta's thing. That's
+14:10
+very small. And I want to make a whole video long careful video about this. So,
+14:17
+I don't I have to be careful. I haven't thought it all through yet. But that the most recent media revolution that we had
+14:22
+was a fracturing one where everybody got access to these tools to broadcast
+14:28
+themselves. And we've been experiencing the consequences of that which have positive and negative aspects. But there
+14:34
+are others that are narrowing. So radio, for example, was a narrowing. Uh there's a there's a small band there that not
+14:41
+very many people can use. TV was very narrowing. Radio was less narrowing because there's there's more bands. Back
+14:47
+in the day when when radio was a thing, the like if you were going to do a coup, you would capt like you'd capture the
+14:53
+president, lock him up or kill him, and then you'd take over the radio station. That was the whole coup. We're headed into a world where like, okay, let's do
+15:00
+a coup for the whole world where now there's three radio stations and they
+15:07
+control reality for everyone. I don't really know what like in terms of a risk to put
+15:14
+that. I just like I want to like like have my eyes open to that reality that
+15:19
+the power concentration here is going to be wild. like the potential for monopolies
+15:25
+here or for cartels here. I don't know how to deal like I don't know how to deal with it in terms of truth and and
+15:30
+like the the defining of reality for people Jesus. I feel I feel that very
+15:36
+intensely. Like is this the thing that I'm most worried about? Like ultimately as a media guy the thing I am most
+15:43
+concerned about generally uh in every situation is is communication between
+15:48
+humans is the thing that makes humans interesting. It's it's our superpower. It's the thing. It's it's the human
+15:55
+thing. It's not tool use. It's not thumbs. It's not like all these things. It is the the bandwidth of our
+16:01
+communication. Orders of magnitude beyond any other organism. That's the thing. Now, it's not human to human
+16:07
+anymore. Elon Musk talks about how he wants to use it to affect reality. He's
+16:13
+like, "No, no, no. Grock's going to make you have more babies." And I'm like, "That's God." Like, I'm sure they're all
+16:19
+talking about behind the scenes. They're like, "Oh, we get to be the three god emperors of Earth." But Elon Mus is like, "Yeah, no, I'll say it aloud." So,
+16:24
+at least he's saying it aloud, I guess. Oh, okay. Other concerns. Model collapse. This like completely
+16:30
+unrelatedly. Model collapse that GPTs just start to plateau because they ran out of good data. They're ingesting
+16:37
+their own data. They cannot operate. I actually put this at a fairly low chance of happening and fairly low level of
+16:44
+concern. Like if it happened, it would trigger maybe the collapse of the bubble, which would be bad. But that's
+16:50
+not really model collapse's fault. It's the bubble's fault. From what I have read from people who know what they're talking about, there are people who
+16:56
+think that model collapse will happen. There are people who don't, and the people who don't outweigh the people who do. Now, are they just like eating their
+17:02
+own hype machine? Maybe. It seems like there is so much economic incentive to figure out that problem that they will
+17:08
+figure out that problem. I don't know, though. That is my near-term section. Am I missing stuff? Absolutely. No. I'm
+17:14
+going to add one more. I'm going to add another one. A very broad category of just the systems not working because
+17:21
+there's just so much AI going on that nobody knows what to do with anything.
+17:27
+So you have a job opening and you get 20,000 applications. Companies aren't used to this and it's all automated. You
+17:33
+don't know who's real and who's not real. You have fake job openings. You have like everybody's like tossing
+17:39
+things at each other and like making them with AI and then decoding them with AI. there's all this stuff that like teachers are supposed to be doing that
+17:45
+like it's all brand new so it's just make work it feels like there's just so much of that and then also in terms of
+17:52
+education which I think a lot about I am very worried that there's going to be a period of time where no one knows
+17:58
+whether the credential of higher education stands up anymore and it probably will but because we're not sure
+18:04
+if it does that's just going to be bad for graduates so like in a chatbtd world did everybody just sort of fake their way through college some people did and
+18:11
+so how do you deal with that that's not something like usually if somebody got A's and B's in college, you know that
+18:16
+they like are pretty like they know stuff and they're good at things, but now like does that hold up anymore? I
+18:22
+think that it does, but I am worried that companies will not be sure if it does and they might use that as an
+18:28
+excuse to not hire. There's so much just generalized disruption. That's a concern. Now, I'm going to move to to to
+18:34
+longer term, and I'm talking like medium-term, like 3 to 10 years from now. We could see a world I think this
+18:42
+might already be happening, but I think that 3 years from now is like my big concern time. Just a world without any
+18:47
+apprenticeship. So, like nobody gets paid to kind of suck at something anymore because that's like what the
+18:52
+beginning of your career is is like you're not that good at things yet and you learn by having a job where you're
+18:58
+at an introductory level. But like if these systems can do the easy work on
+19:03
+their own, nobody gets hired to do that. Like I remember being hired to like
+19:08
+design bad logos and and develop cloudy databases that weren't very good and
+19:13
+like do SQL queries badly and that was fine. That like somebody had to do it.
+19:19
+But now no one would hire somebody to be bad at SQL logos make themselves. Not good ones but bad ones. You know what?
+19:26
+Like how does a person get good at design when when like the level of design they could do when they're just
+19:32
+getting out of school is easily done by a generative AI? So like and then where and then where do the good people come
+19:38
+from? So if there's no apprenticeship, what happens in the future? This feels to me like it's already kind of happening. But the real like bite us in
+19:45
+the ass part of it comes down the road when we're like, "Oh, we don't have any lawyers to do the hard stuff because we
+19:50
+didn't hire any intro people because we had GPTs doing the easy stuff." So I'm concerned about that. The more distant
+19:56
+thing you're like but what about the more distant thing? The more distant thing is coming don't worry. Next uh 3 to 10 year problem I think like I'm
+20:02
+worried about uh people are worried about I don't know if I am cognitive
+20:07
+atrophy. So will people just not be able to do things? Will they not know how
+20:13
+code works? They'll just prompt. Will they not know how to write an essay? They'll just prompt. I think this is to
+20:20
+some extent almost inevitable. But I I weirdly am not as concerned about it as a lot of other people because we've done
+20:26
+it before. You know, written language outsourced a lot of our brain power onto the page and like that ended up being a
+20:33
+net good. I don't know. Are we going to be dumb or are we going to be sharp but with different tools? That seems more
+20:40
+likely to me. People will fight me about this and they absolutely should. I am not assigning any level of certainty to
+20:46
+this one. I could totally be wrong. Less like 50/50 on this. I do not know. And then also happening in the next 3 to 10
+20:53
+years and also already happening to some extent today is using AI in warfare. And
+20:59
+right now I have heard that people will use AI to to select targets but not to
+21:06
+do the actual button pushing though. To what extent that's different, I don't
+21:11
+know. But in the future, I don't think that we're that far away from an autonomous system that both determines
+21:19
+and executes a target or or an action on a target. I shouldn't necessarily say
+21:25
+executes a target, but that is probably what we're talking about. I'm worried about this. I I uh do I think that it's
+21:31
+going to become Terminator? I don't think it's going to become Terminator, but like I don't love that because of
+21:37
+the blackbox thing, because of all of it. Like I just tools of the future used in warfare are always very upsetting and
+21:44
+uh likely to be misused. We won't know how they will be misused until they are
+21:49
+misused. And until we are aware of the damage done, those who want the tool
+21:55
+will just sort of use the tool. That seems likely to me. Longer term 10 plus years. Number one obviously
+22:03
+what is the economy if they're right? So if they're right that the AI will be
+22:09
+smarter than everybody, what does anybody do and how does anybody find meaning in that world? I think that is a
+22:14
+totally legitimate concern. Now I do know lots of people who do not work and who have a great deal of meaning in
+22:20
+their world. They might be disabled. They might be retired. They like work and meaning do not have to be tied. They
+22:27
+are for a lot of people right now and that does not surprise me. I also think
+22:32
+if if not intervened with, it seems likely to me that it will come along
+22:38
+with a huge amount of inequality in wealth. And that also
+22:44
+concerns me. I think that that is likely to have bad outcomes. And I don't just mean like, oh, people have not very much
+22:50
+wealth. I mean, they do not stand for that world. Why would they? Why would they stand for a world that does not
+22:56
+treat them with dignity? Why would they stand for a world that does not treat them as valuable? That makes sense to me
+23:03
+and that's worrying, especially when it's young people because young people know that they have a whole life to live
+23:08
+and they will not stand for. I don't know that it's a super near-term concern, but maybe it's nearer than I
+23:14
+think. I don't know. I think that you kind of do have to have systems that are smarter and more capable than humans,
+23:21
+which we definitely do not have right now. And I don't know that we will have. People argue about whether or not we will have them, but I am worried about
+23:26
+that. And then we have uh you know super intelligence unaligned uncontrollable
+23:33
+turns into evil uh it takes over the world and turns us into pets or destroys us. I have received critique that I
+23:41
+spend too much time on that one. I understand why some people spend more time on that one. Some people will say like that the motivation behind that is
+23:47
+really the AI industry hype machine and they're like focus on this thing over here and not on all these like shitty
+23:53
+things we're doing right now. I take them at their word and maybe I will eat my word someday but I take them at their word that in fact they are worried about
+23:59
+this and is the biggest possible problem you know becoming pets to a super intelligence or being extincted by it
+24:05
+that seems like a big deal but I don't think that it's the most likely outcome but I understand people who are in this
+24:12
+uh frame where it's like well if it's the biggest deal even if it's a small likelihood we should concern ourselves
+24:18
+with it and I think that we should concern ourselves with it I don't think it's the only thing that we should talk about and it makes a lot of sense to
+24:23
+focus on the things that are happening right now and that might happen in the next 3 to 5 years. Do I think that we are going to be capable of of like
+24:30
+marshalling the government to regulate this? Well, absolutely not. I think that it's likely that these three to five
+24:35
+people who are in charge of the things will do regulatory capture more than anything. I think that they will be the
+24:41
+ones with the ears of the politicians and they will make it so that they solidify their own control. regulatory
+24:47
+capture being um you know we help the government like powerful people help the government write the regulations and
+24:53
+thus the regulations get written in such a way that actually protects the incumbents the the existing power
+24:58
+structures so that seems like totally likely to me but I don't know but yes in
+25:03
+terms of of like the paperclip maximizer situation where uh we either like make some paper clips and then it turns the
+25:09
+entire world into a paperclipip factory because it got too smart and and is just doing the thing it wants to do or like it starts to fight they fight against
+25:16
+each other. There's like some kind of battle beyond humanity. Lots of science fiction in this space that I I haven't enjoyed in my life. I think that just
+25:24
+like with her for example, so her very preient movie, but it did not predict a
+25:30
+weird sycopancy induced psychosis. Nobody predicted that. I think that the more
+25:35
+likely thing here is we don't know. We have no idea what an actual super
+25:43
+intelligence would mean. To me, the likelihood of super intelligence, you know, in the next 10 to 20 years, I
+25:50
+I don't know where to put that slider. People who are more informed than me disagree on that. It could be zero. It
+25:56
+could be 100%. I don't know. People seem very certain and in fact uh there's their certainty, the the more certain
+26:02
+they are that the like they get plenty of attention through their certainty. Uh so that's that's a concern. Uh but then
+26:08
+then over here on super intelligence, I think definitely if it happens, I don't think if anyone builds it, everyone dies. I think if anyone builds it, we
+26:15
+have no idea what happens. It's a real cosmic toss up. That's not a thing that
+26:21
+there's precedent for. That's like humans happening again. Nobody would have predicted 200,000 years ago that
+26:27
+anatomically modern humans would do what we've done and have like screens and stuff all around them. So like you make a super intelligence. I don't know. The
+26:33
+thing that I will say is that like it will all probably happen slower than
+26:39
+people imagine. This is my guess because it's going to have to interface with human systems and human systems don't
+26:46
+change immediately. It has taken a long time for anything to like until 2019 the
+26:51
+United States nuclear arsenal was run off of an 8-in floppy disc. Like human systems take a while to change. So don't
+26:57
+tell me you think that this is all going to happen in 10 years is a little bit how I feel. This is what I am most concerned about at this moment. I might
+27:04
+change my mind tomorrow, but right now this focus on biological warfare, on
+27:10
+chemical weapons, on on paperclip maximization, I don't think this is the biggest concern. I think we should look
+27:16
+at what AI could potentially be good at. What weaknesses human beings have and
+27:22
+mix those two things together. And what I'm concerned about is the thing that's already happening where AI that the goal
+27:29
+of the AI is to give us stuff that will keep us engaged on a video platform and
+27:36
+it starts to optimize for things we did not expect. Nobody said give these people outrage bait. What they said was
+27:41
+keep people on the website and outrage bait because it became a very compelling kind of content that humans happily supplied because we would love to get
+27:49
+more attention because we're humans and that's many of us including myself want attention. So what I am concerned with
+27:56
+is is we are not that difficult ultimately probably to manipulate. And
+28:02
+so if you have one or multiple very intelligent systems that have goals, I
+28:08
+think that they will find it much more easy to manipulate people than we would guess. Our realities are defined by what
+28:15
+we consume. And there is a way out of this which is simply getting off of the
+28:22
+screens and I think that we'll be bad at it. What I have seen and I hope there's
+28:27
+a backlash to it but what I have seen is that every opportunity that a platform has given to people to make fewer
+28:35
+choices people have taken that option. So it used to be that feeds were chronological and people were like no I
+28:42
+want I want that chronological feed. when you gave them the option, they chose the algorithmic one. Did they
+28:47
+choose the option or did they imply a choice for the option by spending more time with algorithmic feeds? That's I
+28:53
+don't think that's semantic, but like they chose the algorithmic feeds when you gave them the option between having
+28:58
+a video supplied to them or clicking or choosing and clicking on a video they want to watch. They prefer having a
+29:04
+video supplied to them. That's Tik Tok versus YouTube, right? People prefer decisions being taken away from them.
+29:11
+And that is the thing that I think concerns me the most like broadly that like given all of these
+29:17
+things, that's what concerns me the most about AI. People tend to prefer their
+29:22
+choices be taken away and to to have less agency. But perhaps
+29:28
+I am misreading that and that's something that only happens during certain times of the day or or maybe
+29:33
+we've already got sort of gotten that itch scratched and we'll change our minds about this. But that has thus far
+29:38
+been the direction that we have gone. Again, what humans do is we communicate, we talk. We have a huge bandwidth of
+29:43
+information. And so, it makes sense to me that the thing to be most concerned
+29:49
+about is how AI interfaces with that. And already, I think it interfaces with
+29:54
+it in in extremely intense ways through recommendation algorithms, which have been around for a long time, but now
+30:00
+also through LLMs in helping us and like giving us an opportunity to define reality. And when you mix that with the
+30:07
+extreme concentration of power here and just a hand handful of companies and a
+30:12
+and a few guys who I have no reason to trust. I don't know those guys. They've made some weird decisions recently. That
+30:18
+does that's yeah that's pretty worrying. How does that plug into all the things I just talked about? But that thing is the thing I am most concerned about. Now
+30:23
+I've done an interesting thing today where I have recorded this video several weeks ago. I've edited the video and
+30:29
+I've sent the video to someone who I respect and trust who has, you know,
+30:35
+less hype fueled perspective on AI than I have at some points in my life. And I
+30:42
+would like to talk to him about the video that I just made. And so everybody, this is Cal Newport to talk
+30:48
+to me about the video that I made and then I showed to him and he's seen it and now we will talk about it. But
+30:53
+before we get to that, I do from this hotel room have something that I want to tell you. You may have noticed that I've
+30:59
+been working on this video for a long time. And part of the reason why this took so long is that in the meantime, I've been working on a number of other
+31:04
+things. And one of those things was a really big project, a big idea, which is that the educational media company that
+31:10
+my brother and I started 15 years ago, we have converted it into a nonprofit organization. And that was a fairly
+31:16
+complex thing to do. And then there was a lot of like logistics and press things to go along with it. So I've been doing
+31:22
+that a lot. So this video took a while to do. But also in my new role as chairman of the board of complexely, no
+31:28
+longer owner of Complexly, one of my jobs is to say Complexly a lot so that you know that there is a company of over
+31:34
+80 people working hard efficiently creating value for people making stuff like Sihow and Crash Course and Eons and
+31:42
+Study Hall and Bizarre Beasts and lots of educational stuff on YouTube that is high quality and research and fact check
+31:49
+and that's all. This is not an ask. I just want people to know that complexity exists, that there's a bunch of people
+31:54
+working hard to make the information environment better and to use the tools
+31:59
+of the social internet which can obviously and obviously somewhat incentivized to be used for not so great
+32:05
+using them to try and do good. We've been doing it for 15 years. We're going to be doing it for many more decades in
+32:11
+the future. Got lots of ideas for things that we're going to do and that's part of my job just making sure the world
+32:16
+knows about them because they are great. And now actually our interview with Cal Newport. It's really good. I loved it.
+32:22
+Cal Newport, you are a a writer, a professor at Georgetown University of Computer Science. You have spent the
+32:28
+last decade asking the hardest simple question, which is what does technology do to uh humanity? If you could pick
+32:36
+like a biggest part of the AI story, what is the biggest part of the AI story? Well, I have to say, you know, I've looked at this question with a lot of
+32:42
+technologies. AI is the messiest, most complicated technology I think I've had
+32:48
+to to deal with. I mean, if I remember correctly, when you first started talking about this video, for example,
+32:53
+the plan was what, 10 minutes long. Right. And it ended up being
+32:58
+I sent you an email and I was like, I'm going to do a 10-minute video and then I'm going to jump over to you and then
+33:04
+Yeah. Literally. Yeah. Because it's almost always the story is almost always this sort of binary story of well there's this thing
+33:10
+we liked about this technology but then it had this other effect we weren't expecting. And so like now we have to
+33:16
+kind of balance the two. It's usually that simple. It's email is nicer than a fax machine. It's pretty convenient. I'm
+33:21
+happy it's here. Oh my god, but there's this side effect that we get too many of them and we're distracted. AI is such a
+33:27
+messy story that makes that question it's it's a very complicated question because it's many different technologies that we all
+33:33
+call AI. They're all developing on uh different timelines. They all have their own issues in the
+33:40
+present that are worthy of huge amounts of discussion and push back. And then they all have extrapolated future issues
+33:48
+that go from like slightly worse versions of the present to all of humanity is dead in two years. And all
+33:54
+of this is mixed up with like a cast of characters that are acting like Bond villains. And
+34:01
+it really gets pretty difficult. I missed email say like hey we get too many emails.
+34:09
+It's like oh Slack was gonna fix things but actually it made things like different like bad in a different way.
+34:14
+Those were the days. Now now Slack is waking up and it may kill us all.
+34:20
+Exactly. Yeah. It's going to use all of our energy and uh murder us. Yeah. It's a harder conversation now.
+34:25
+Slack there's a new box in your town. It eats jobs. Uh and also it makes your power bills go
+34:30
+up. So, you know, so you didn't answer that question, which I'm happy to answer. Or you did or or yeah, I mean, you could
+34:36
+give me you can give me a more detailed answer, but like in in a way that is an answer, which is like this is a chaos
+34:43
+machine. It's a chaos machine for thinking about and I will say it okay what I am trying to do now when I think
+34:49
+about it in a lot of my work is separate off a lot of the extrapolated futures
+34:55
+which by which I mean just I'm taking a trajectory that has happened so far and
+35:00
+then I'm extrapolating that well what if that happens for another three years where would we be and then reacting to that future uh most computer scientists
+35:07
+I know have a lot of problem with those extrapolated futures we think they're they're sort of ignoring the reality and
+35:12
+limitations of technology ology but I am very interested right now in a lot of the present issues. So things that are happening right now with the technology
+35:19
+as it exists and two of them that I care quite a bit about is the disappearance of truth and the disappearance of focus
+35:26
+or concentration as a human ability. So disappearance of truth generative AI can create videos and images of anything.
+35:32
+That's a problem. I there there's no way for that not to be a ma we don't need super intelligence for a massive
+35:38
+problem. That's a massive problem. And and the disappearance of of focus I'm a professor. My concern is a lot of what
+35:45
+we do in the educational system is exercises invented to stretch your mind like you would stretch a muscle so that
+35:50
+mind becomes more complicated and in the future can handle original thoughts we need for the the survival of humanity and civilization.
+35:57
+AI, especially chatbots and LLMs, are very good at these exercises because they're just exercises. And so in
+36:02
+theory, you can offload that type of work to them, which in the moment makes your life easier and in the long run means your brain misses a final step of
+36:09
+development. We need for just human civilization to continue at the pace that it is. So those are the two things that they're happening right now.
+36:15
+Yeah. And I'm probably most concerned with in the moment. Gotcha. A couple of years ago, maybe a year ago, I made a video that was titled
+36:22
+something like here's how to like know when an when an image is AI and also why it doesn't matter because this is how to
+36:29
+know today. But man, I tell you what, and it's it's somewhat amazing how
+36:34
+quickly our brains get an aesthetic. Like now there's sort of like an
+36:40
+aesthetic of chat GPT images and easily I see them and I'm like, well, that's what that is. And I only had to see like
+36:46
+three of them before I knew forever. But we are already in the world where I've seen videos that I thought were real.
+36:53
+And and I didn't even ever find out that they weren't real. You know, I'm not talking about a time when I was like, "Ah, I'm pretty sure that's real." And
+36:59
+then I checked and I found out it was wrong. I mean, I watched it, I thought it was real, and I moved on with my day. Like, that's happened to me. I'm sure I
+37:06
+am really worried about the degradation of truth generally. That's not just an AI thing either. It's a it's an
+37:12
+aesthetic thing. It's a political thing. It is a thing that is happening in our culture right now. But that's not what this conversation is about. I am really
+37:18
+curious about this focus one though. It's hard not to think about Socrates in this situation who was like people will
+37:25
+not be able to think when they're writing everything down with this pens and paper. Not paper but like like like
+37:31
+literacy was going to take away abilities that humans had. And it did.
+37:36
+Literate humans have different abilities than non-literate humans. And yet this
+37:41
+is okay. Have you seen students using it in a way that actually
+37:47
+does contribute to focus or is it just this tool is going to break our ability
+37:54
+to make that final developmental step? I think it's a one-two punch to our brains where the other punch is social
+38:01
+media. So think about this for a second. We have uh highly engaging, distracting,
+38:06
+ubiquitous entertainment happening on our phone which uh lowers our our
+38:11
+tolerance for cognitive strain because we get so used to this idea that at the the slightest hint of boredom, I can get
+38:17
+this sort of algorithmically perfectly targeted little hit of something that's going to be interesting. So that that
+38:22
+reduces our our interest or comfort with concentration uh consuming hard
+38:28
+information. The other thing we have to do with our brain to try to get smarter is produce information from scratch. So
+38:34
+like take the circuits that you would develop by reading hard things um and use them. And how do we use them? By
+38:39
+writing or the activities that surround writing. So social media is kind of taking us away from trying to consume complicated
+38:45
+information that makes those circuits weaker. Generative AI takes us away from producing information which is using the
+38:52
+circuits we already have the strength of them and to get used to applying them to the real world. And you put those two things together and I think we lose
+38:57
+those circuits and they're critical circuits. I mean, so this is the way that we think about the brain is that
+39:03
+literacy is not natural, right? So, so in order to actually consume a book
+39:08
+or to read the written word, we have to essentially hijack parts of our brain that were evolved for very different
+39:13
+purposes and we have to through very intense training. I mean, what we do in kindergarten, that's really hard. We're
+39:19
+rewiring our brain. Yeah. To hijack different centers. Like you can figure out, for example, when you're outlining
+39:24
+something you're going to write that there's a part of your brain that evolved to actually keep track of your location, physical space, and it's been
+39:30
+hijacked to try to keep track of like where you are in an abstract, you know, uh, argument. That brain that we rewire,
+39:36
+wild. Yeah, it is wild. And this this brain that we rewired to be to be able to to consume
+39:42
+written information and to produce written information, it's a different brain. It is a different brain than we
+39:47
+had 10,000 years ago, right? We we have completely rewired the brain. But that rewired brain that can do what Marann
+39:52
+Wolf calls deep reading processes is literally a smarter brain that sees the world in a more complicated way and is
+39:59
+capable of the type of sophisticated reasoning and abstraction that our current modern world requires to
+40:06
+function. So it's not for nothing to lose that brain. If you begin to really degrade that wiring, it really makes it
+40:14
+going to make it difficult for the way our civilized world runs today. We're going back
+40:20
+closer to a preodern brain which is not playing nice or will not play nice with the modern world. One of the things that
+40:26
+I talk about in the video is that we've already got we're like we're in the world of AI already in that every
+40:32
+recommendation algorithm in the world has been finally tuned by uh the the decisions of all of the people who have
+40:39
+ever interacted with it and and then also there's you know the smartest people in the world creating them to to be optimized for basically holding on to
+40:46
+your attention. both training me as a creator to optimize for being
+40:51
+extraordinarily salient and and like capturing attention as as effectively as I can. So the algorithms are kind of
+40:57
+optimizing the creators which I definitely feel but then they are you know put us in like a world of
+41:03
+competition amongst each other and and then they find the most salient possible thing. And I think of that like like
+41:08
+imagine eating junk food took like it you never got full. One like you could
+41:13
+literally couldn't have so many Doritos that you stopped being hungry and two you ate a Dorito by looking at it. Like
+41:20
+that's what information is like now. It is like we have created junk food information but information is something
+41:27
+that we never lose our hunger for because we're information bots, you know, like we're we're attention
+41:33
+machines. Don't forget the piece where someone follows you around with a cart full of Doritos. Yeah. Yeah. Yeah. They're always there no matter where you
+41:38
+go, including to the bathroom. Like when you're on in church, they're there with a cart that they've always refilled, right? And also like one of my favorite
+41:45
+examples of this is that if you go to search something on Instagram, there's like the search bar takes up 5% of the
+41:51
+screen and then the rest of the screen is Doritos. It's like, did you want to search for something? Did you want to like message a friend? Oh, sorry. What
+41:58
+if you like saw a hot person? What if there was like a very strange and confusing like moving image that you
+42:05
+just cannot cannot resist and and sorry but now you're now you're back into the surface where we can advertise to you.
+42:11
+What's kind of interesting about all this is I mean your video is all about like these latest development in AI this is very sophisticated programs right
+42:18
+we're talking about like large language models etc. And yet the AI that that you're just describing which has a
+42:24
+massive impact on so many ways on just the way information flows in our lives, right? These recommendation algorithms,
+42:29
+that's actually really simple comparably speaking. Like actually the the algorithm that goes behind something like Tik Tok figuring out what video to
+42:35
+show you didn't really require some sort of massive mathematical breakthrough or some sort of like new technology
+42:41
+invented. Yeah. Actually, most of the breakthroughs, technical breakthroughs that like Bite Dance innovated had to do
+42:48
+with how do you run this at a massive scale with like a massive uh scale of possible videos and a massive number of
+42:54
+users and run it really quickly or whatever. It's got a really boring optimization issues, but the actual under underlying recommendation
+42:59
+algorithms are really pretty simple. I mean, it's not to oversimplify it, but it's like all of this content is getting
+43:06
+embedded in some sort of multi-dimensional space. So just like a long list of descriptors, numerical
+43:12
+descriptors, and it keeps track of different points in that space where you've shown
+43:17
+interest before because like you've watched the video all the way through to the end. And it's just sampling
+43:23
+videos in this sort of space of topics, multi-dimensional space that are sort of near places where you've been
+43:28
+congregating uh with some randomness in there to make sure it's not missing places. Like we've known about these type of recommendation algorithms for 30
+43:34
+years, you know, but we've never we never executed them so cleanly as something like Tik Tok came along and
+43:39
+did. And that's so much I mean that's so much of the story of technology is like you make the steam engine and you're like we made a steam engine and like we put that
+43:46
+on the timeline as the steam engine invented but you know the steam engine sucked and then it turned out it could
+43:51
+do a lot more when we made it a lot better. And so the recommendation algorithm maybe someday will be a mark on somebody's timeline, but uh you know
+43:58
+it just keeps getting better and the cart of Doritos keeps getting more enticing. How do you think I did in my
+44:07
+list of worries? What? Well, I think what you did well is you recognized some of the real
+44:12
+extrapolated future worries and said, "Let's put those a bit aside. Let's put aside let's not fully focus on the
+44:19
+Terminator robots are yeah marching down the street because you know there's there's much more approximate future uh
+44:26
+issues that are happening there was a mix in there of different types of AI technologies for better for worse right so
+44:32
+which this is the reality of it right but it's important like the for people to understand right there's sort of prediction type machines that have been
+44:39
+around for a long time this is where like the concerns you have about bias and sentencing for example the classic
+44:45
+AI AI safety areas. These type of technologies have been around for a long time. They haven't really seen any major
+44:50
+innovative boost in the way that generative AI has, but they we've long been studying those concerns and you know those concerns are important. We
+44:56
+have the environmental concerns. That's a hard one to get your arms around because uh there's a competing interest
+45:02
+there. There's another competing interest of the power companies themselves trying to overplay the power demand of these data centers so that
+45:08
+they can get infrastructure buildout paid for by you know municipalities. So that's like a complicated.
+45:13
+It's great that you like you, the computer scientist, brought that up because like that's the that's my thing that I thump on is is what we all have
+45:20
+to understand is that the only way power companies make more money is if they build more stuff. And so they have a strong incentive to say that they're
+45:26
+going to build more stuff. And also the AI companies have a strong incentive to say they're going to need more stuff. And this is very bad for your power
+45:32
+bill. The problem is power is expensive for the AI company. Like the AI companies have to pay for it, right? So yes,
+45:39
+training some of these foundation models right now is like an incredibly expensive endeavor. And if you start scaling that out, you're like, man,
+45:45
+that's going to be a lot of energy. But really, it's very hard to be profitable with like a trillion parameter model that you're charging $20 a month for
+45:52
+people to use. So a lot of computer scientists that don't have a a dog in the fight. are not, you know, aren't
+45:57
+scientists at these companies looks to things like DeepSync from, you know, last January and it's like this really
+46:03
+the future is going to be much more smaller language models where they're used that are much more specialized a
+46:08
+particular uses. I I don't we don't think the the age of these like models
+46:13
+where I should just talk to a model in a chat box and it should be able to do anything. I really think that's sort of
+46:19
+to uh the AI industry what Formula 1 cars are like to the automobile industry, right? You're trying to beat
+46:24
+your chest and show look how complicated our technology is. But you're not selling a lot of Formula 1 cars because they're completely impractical. They
+46:30
+don't really work well on the roads. The future is probably going to be taking that technology much more energy
+46:36
+efficient and smaller and cost-effective to run embedded more closely into particular use cases. And those
+46:41
+foundation models, I think, are really just a it's a it's a a measuring contest of sorts, if you know what I mean,
+46:47
+between these companies to show like we have the best technology so that when we then sell you these more specialized
+46:52
+tools, you're like, "Oh, that's the name. I remember McLaren because you won the F1 race. You must make good cars."
+46:57
+But they're not selling us the the specialized models. They're selling us. They're like giving away the Formula One
+47:04
+cars. Yeah. It's a terrible business model. It's a terrible business model. They're Are they gonna Are they just going to shut those down? Are they going to say,
+47:10
+"Hey, turns out this is a bad idea. Like, we lose money every time you use
+47:16
+our product." I think what's happening is there's a they were hoping for regulatory capture, right? There's this race of we want
+47:23
+competitors uh out of business before we pivot to these smaller, lowerc cost machines because the barrier of entry
+47:29
+there is smaller, right? The foundation models require that you build custom data centers that have, you know, air
+47:34
+conditioning technology that didn't exist before that's going to have a 100,000, you know, GPUs running
+47:39
+concurrently, which no one's ever tried to do before. Once you go down to a smaller model, a lot of companies can
+47:44
+create those. You have a real competitive marketplace. So I think they were trying to keep the focus on these oracular can do everything general
+47:52
+purpose super impressive models and try to put the other people out of business or build enough regulation around that
+47:58
+no one else can compete anymore because as soon as they pivot to here's small models that work on phone and there are
+48:03
+companies starting to do this now all that money you spent right you lose that advantage because someone else can walk
+48:10
+around get some open source parameters for meta and start building their own sort of smaller more bespoke model so I think it's a scary future for those
+48:16
+companies because it's a super competitive marketplace. And so they're still holding on to foundation models matter
+48:23
+and all the jobs are going to be automated and it's going to be just three companies left and we're going to have to have redistributive, you know,
+48:30
+uh, equity taxes just so people can eat like all that. I think that that there there's a business element to that as
+48:36
+well. It makes sense to me because this is how I feel. Uh but I'm not the only one that we had this world where
+48:42
+suddenly I don't know like like GPT3.5 was like oh whoa oh that's very
+48:50
+different from where I thought we were. We aren't just like headed toward a new place. We're in a different place. And
+48:56
+then four was way better. Um and things things have improved. You know they like
+49:02
+they they have become more useful tools in a variety of ways. they remain unusful in a lot of the same ways and
+49:08
+that like absolutely all of the flagship models will just make stuff up. And so I
+49:13
+see why I feel like and I do feel this way. This will happen again and there
+49:19
+will be some other important technology that will get us closer to that AGI like
+49:25
+thing to that thing that is good at a lot of different stuff and even like it's it's good at being in the physical
+49:32
+world as well as in the you know just the knowledge workspace and like because this is all lay person stuff I don't
+49:39
+really even know what a transformer is. I get basically what's going on, but I'm
+49:45
+not gonna be a computer scientist and I'm not going to understand the multi even the multi-dimensional architecture of the Tik Tok algorithm is beyond me
+49:51
+and will remain. So, is there anything to this instinct? Because it seems like there's plenty of people who think,
+49:57
+yeah, yeah, like like there'll be another innovation and then another one after that and then we'll have a kind of thing that feels a little super
+50:04
+intelligency. I think that's a reasonable instinct. uh in fact I think it's in a general sense
+50:10
+the right instinct to react to the last three years is you know not to say this
+50:16
+trajectory is going to continue unabated with language models and within two years they'll be super intelligent but
+50:22
+to say oh that was a big leap are we going to have similar big leaps in other technology so I'll tell you what I've seen trying to report on this from the
+50:28
+computer science side I think your read of what happened with the language models is more or less correct uh GPT3
+50:34
+was actually the first really big jump. Uh this is where they actually acted on the scaling law paper written by Kaplan
+50:41
+Adall where they said what would happen if we actually do significantly scale up the size of these language models and uh
+50:48
+the size and the training. Yeah. And it really kind of like that's the thing that's all they really did like they they were
+50:53
+using the same technology. They're just like more data, more data and larger size- which is non-trivial because actually to even
+51:00
+like train and run a much larger size model uh requires like a lot of under
+51:05
+the under the hood type of tinkering with these systems and it was very difficult technical challenge but they
+51:11
+thought I mean the the the standard thinking in machine learning was oh going too big is a problem you're just
+51:17
+going to overfit and that you're always looking for the sweet spot where make it bigger bigger it gets better uh but if
+51:24
+you make get even bigger, it starts to get worse. It was called the overfitting problem because they thought it would these machines would memorize the things
+51:31
+that they were being tested on and therefore become dumber. It didn't happen. GPT3 was really good. It was unusable for the average person because
+51:37
+it wasn't it would uh go off on weird flights of fancy, but it did really well uh for scientists. Then GPT35 was just
+51:45
+that tuned to behave well with humans. They they tuned it to be good at conversation. That really was a big leap. GPT4 was an even bigger leap. They
+51:51
+made it uh 5x bigger. or we assume they don't actually give the numbers but they made it much bigger and they began to
+51:57
+realize that not only was GPT4 good at language but it was good at other tasks that in learning language it was doing
+52:03
+well on logic puzzles we could ask it questions about board games we could give it and that was the really exciting
+52:09
+moment where for researchers like oh if we keep making language models bigger they're going to learn lots of stuff
+52:14
+stuff that's not just language and that's how they thought maybe we'll get AGI uh that slowed down after GPT4 I I
+52:21
+wrote an article about this for the New Yorker that came out last summer that basically, if you really report on this, what happened is they tried to make it
+52:28
+even bigger. This was at the time called Project Orion at OpenAI. They said, "Great, let's make it five or 10x bigger
+52:34
+than GPT4." And it didn't get better. And this is the thing you if you run this business, you want to believe.
+52:40
+Yeah. that like we can make the digital god if only like we can spend enough
+52:47
+money because of course spending money means that you're you need your business to grow and you can get more investment
+52:53
+and you can build this thing that's going to be so powerful that you kind of get to be the god emperor of how
+52:58
+everything works and and you you you know Sam Alman doesn't need to get paid a bunch of money because he's going to
+53:04
+become one of the three most powerful people in the world. Yes. and huge. I think it's very funny when Sam talks
+53:10
+about how he doesn't make a lot of money and I'm like, what is money to you? Like, you know that money isn't the
+53:16
+thing that doesn't matter in the future you're trying to build, right? Like I I get that. The fact that you're
+53:22
+pretending like you don't get that makes me trust you less. But so this happened though and they
+53:27
+realized it but were being kind of quiet about it. They hit a wall in just plain scaling when that project Orion uh and
+53:34
+then Meta had a similar issue. uh Gro saw a similar issue like everyone was seeing the same thing where oh we can't
+53:39
+just keep making things bigger we're not going to be able to just pure scale our way to AGI and then we got a whole year
+53:46
+it started with the 01 models and the reasoning models and we got all of these other much more complicated things
+53:51
+remember all this got so much more complicated where what the models looked like they were chemical equations for
+53:57
+organic chemistry class they were talking about reasoning and and post you know post inference computation all this
+54:03
+this was all just trying to now find little narrow places where we could tune to get some advantage or different types
+54:09
+of ways to get better performance out of them on benchmarks. They it was actually the beginning of the end of pure per
+54:15
+scaling. So, so the right language models are sort of plateauing. We're able to tune them to do certain
+54:20
+things better, but we're no longer on that explosive trajectory. You're right. To get something like AGI, we now need
+54:26
+to look forward to Oh, and then we have another innovation with a different type of complimentary technology that goes
+54:32
+really fast for two years and then maybe that happens one more time. I happen to think the way AGI is going to happen, I
+54:38
+call it distributed or slow takeoff AGI. I don't think it's going to be here is a single program that now no matter what
+54:44
+we ask it to do, it it does this at the level of a human. I think what we're going to see instead is it's going to be
+54:49
+more boring. lots of different systems tuned to lots of different things that humans do, very specialized that get
+54:56
+really good. And at some point, we're going to look around and say there is a huge swath of things that are hard that
+55:02
+humans do that all now have individualized AI type systems that can do that thing just as well or better
+55:07
+than humans. More of a peace mill. I think that's much more likely and much more uh cost-effective and
+55:13
+makes much more business sense than this idea of we just need a a super AI that does all of these things. And we already
+55:19
+see it now like, oh, we're better at chess. We're better at poker. We're better at go. We're getting better at proteins. That's a, you know, it's more
+55:25
+peace. Each of these systems is going to need its own mix of technologies and its own secret sauce, but that's much more
+55:30
+likely to get us to a point where we say, "Wait a second. Computers are doing a lot of what we do better than us." I think that's a much better more likely
+55:35
+way we're going to get there than a singular machine doing it. And yet it's not uh that that take isn't
+55:42
+going to get any headlines written about it. Well, I mean, I like to tell the story of um there's these cool bots that
+55:49
+came out. There's a particular researcher who's done a lot of cool AI. Uh and the two things I think he's at OpenAI now, but but back at Carnegie
+55:56
+Melon and Meta, he built the first system to beat human poker players, professional poker players at Texas
+56:03
+called Plurabus. Um and he built the first machine that could competitively play diplomacy, which you know is like a
+56:08
+risk-like board game with lots of interhuman negotiation. But the storyline of both of those, it's very
+56:14
+clever combination of existing technologies. So for the poker playing bot, they actually tried at first to
+56:20
+just scale into a machine that work. They just made they built really large neural networks. They were training them at the supercomputer center at the
+56:26
+University of Pittsburgh and they weren't that good. And ultimately the system that beat the professional players could fit on a laptop. And it
+56:33
+was much more they had a very smart combination of some neural network, some future prediction and they kind of tuned
+56:38
+it up and it was better at poker. Uh the diplomacy plane bot similar. There's a language model in there. There's a
+56:44
+future simulator in there. There's like a strategy uh simulator in there. They like can they talk to each other in
+56:50
+a language that we can understand? Well, they chat. So they play on the web diplomacy server. So they they chat with
+56:57
+humans and then the language. Do they chat with each other? Uh they could. The way the language
+57:02
+model works is it takes English and then it converts it to a sort of XML style like standardized markup language that
+57:09
+the rest of the programs understand. Gotcha. And they feed it on. But let me just tell you, this will maybe make you feel better. Here's what I really like about
+57:15
+that diplomacy playing bot. Okay. If you read the research paper around it, they just casually say at some
+57:21
+point, oh, for ethical reasons, um, we set it up so it'll never lie. Even though that's like a major strategy in
+57:27
+diplomacy, you you you fake out people. You make false alliances or whatever. for ethical reasons. They said, "Oh, we
+57:32
+just set it up so it wouldn't lie." You're like, "Well, wait a second. I thought the whole issue with AI is we can't align it. It's out of control."
+57:39
+But when you build these specialized AI, it's not just some giant neural network. You don't know how it works. It's six or
+57:45
+seven components. We know what they do. And it was very taking concrete information from here and then they are
+57:51
+putting it over here. And so what it what you're saying is if it knows this information, it can't be like I'm going
+57:57
+to tell the people a different thing. Yeah. Well, there's literally a piece of it that simulates possible future moves
+58:03
+and to try to measure like which of these might be best. They wrote that that simulator is not a neural network.
+58:08
+They just they wrote it and they just coded it to say don't look at possibilities where you lie. So, it
+58:13
+doesn't. So, that machine can't lie. There's no out of control piece to this. There's no amorphous uh neural network. Yeah.
+58:20
+Well, we you should say like it's it's don't it's not don't look at things where you lie. It's like don't look at
+58:26
+things where x does not equal x. So like it's a it's it's math that's happening. It's a it's computer code. It's not like
+58:32
+when you say like don't look at things when you lie. That that implies some understanding of what a lie is. Yeah. No, true enough. They have uh here
+58:38
+are the possible moves you can do and they're all categorized and there's like 50 moves you can do. Some of them are
+58:44
+lying and they just literally the for loop that check tries all the things
+58:49
+doesn't look at those elements. Right. Right. Yeah. Um I call that intentional AI or I AI. Like the idea is when you move away
+58:56
+from all we have is a language model, which is what we're the we're trying to do now, which I think is a real problem. Let a inscrable language model be the
+59:02
+brain for everything. If you want to build an agent to go do something, ask a language model what to do and just execute it blindly.
+59:09
+But I AI is like these game playing bots, which I think are great examples of what AI might be. And you have mult
+59:15
+you have a control module in these is written by humans in normal computer code. There's nothing unknown about it. There's nothing that's learned. There's
+59:21
+nothing that evolves. and it can talk to neural networks to understand things or to get descriptions of things or to come
+59:27
+up with ideas, but it's just a normal human control program that can decide what do we want
+59:32
+to do? What are the options that we're actually looking at? I so I actually have I'm more optimistic about this world of distributed AGI. I don't think
+59:39
+it's going to be out of control. I think this alignment problem is really a problem about language model text
+59:45
+production and being able to control what text language models produce not necessarily fundamental to AI powered
+59:50
+devices more generally. Yeah. I I think that we have this
+59:56
+tendency as people one to predict apocalypses like that's a known bias that we have. We we all know that that
+1:00:03
+the the personal apocalypse is coming for us in the form of death and so we kind of like crave and art titilated by
+1:00:09
+the idea that that would happen to all of us at the same time in some way because of that. There's a lot of this in science fiction and all of these
+1:00:15
+people have written and read science fiction just like I have. We said uh what if people fall in love with this
+1:00:21
+thing and that's so that's what we're going to imagine is going to be the thing that happens. But nobody was like, I wonder if uh sycophancy induced AI
+1:00:29
+psychosis is going to be a thing because nobody had any idea that that was going to be a thing. That came out of nowhere. And so that's going to be the hard
+1:00:35
+thing. Just like, you know, like rage bait, no one like assumed rage bait was going to happen when Facebook invented
+1:00:42
+the newsfeed, you know, like that. That wasn't a thing that was on anybody's radar. And it it's a it's a third fourth
+1:00:48
+order effect, but of course you end up with it and then you have to deal with it as it comes. And so it does feel like
+1:00:54
+what we should probably be doing and I'm having this sensation more and more lately. We should be dealing with the
+1:01:00
+problems that we have. Yes, we should be looking at the problems as they currently exist. And what if I want
+1:01:05
+to say to some people who might want to be effective altruists, what if dealing with the problems that we have right now
+1:01:12
+is the thing that makes the future better? Like what if guessing at the f what the future needs is actually
+1:01:17
+actually makes the future worse and dealing with the problems we have right now is what makes the future better? Like just what if and if so if that's a
+1:01:25
+is if that's like one of the things that might be the thing that makes the future better. It has the bonus of making the
+1:01:31
+present better for sure because like we can actually measure that outcome as it
+1:01:37
+occurs in the world that we currently inhabit. Oh, I'm so aligned with you on that. I'm I'm very much aligned with you on that.
+1:01:42
+I mean it's really my whole philosophy of of technology criticism. I call it technoslectionism. And the idea is when
+1:01:49
+you introduce like new technologies that are powerful into the technoeconomic cultural
+1:01:55
+uh context. They always have these second and third order expects that we don't predict. And therefore we can't
+1:02:01
+approach technology with this weird fatalistic mindset of just like well once something is invented it's just
+1:02:07
+here. What are you going to do? Kids these days they're going to look at their phone and like just kind of move on with things. We need to be much more
+1:02:13
+have much more agency in we can humans
+1:02:18
+including and this surprises people saying I was interested in this technology it was cool and then it got
+1:02:24
+bad so I changed my mind and stopped using it like we are allowed to do that and I think we need to do a lot more of
+1:02:31
+it I mean all all of our problems right now seem to come out of these second order effect stories right like I I've
+1:02:36
+documented a lot of these you think about uh Facebook's going along early Facebook you know an engineer invents
+1:02:42
+the like button for like a really engineery reason which was it's inefficient for lots of people to write
+1:02:47
+the same comment if you post like you with your diploma and everyone says congrats that's like that's that's going
+1:02:53
+to swamp out the interesting comment so like oh let's have a like button for that so that the comments be more interesting
+1:02:58
+and then they realized oh that gave an unstable social approval indicator which meant that usage time on the app went up
+1:03:04
+by a huge factor because now my brain was did I get likes on what I just posted and like oh my god
+1:03:10
+engagement is all about and we get the attention engagement age which was not at all what we thought about when Facebook first came out. So this type of
+1:03:15
+thing happens all the time and I'm with you on this is what we need to be doing is diligently policing the second order
+1:03:21
+negative externalities of the AI we have right now. But think about the interest in some of the people who are pushing
+1:03:28
+the apocalyptic or the future stories, right? Like if you are Daario Amade or
+1:03:33
+Sam Alman, right? It's completely aligned with your interest to talk about the automation of most jobs or to talk
+1:03:41
+about, you know, super intelligence coming because it does three things. One, it distracts attention or regulatory or
+1:03:48
+uh public, you know, disapproval about the things that your bad things that your technology is doing right now. Um,
+1:03:54
+two, it's going to induce a lot of perhaps ownorous regulation that you as a very large company can weather but
+1:03:59
+small startups can't. So, you get regulatory capture and you get cemented in your position. And three, it attracts investment because yeah, it's scary to
+1:04:06
+think about AI automating half a jobs, but my god, if I'm an investor, I better then have my money in the company that's
+1:04:12
+going to do half of the jobs. That's going to be the biggest thing in the economy. So, I think it's completely in their interest to talk about the future.
+1:04:19
+And I think the effect of altruist like I really think what happened there, I've been really trying to understand this, right? the that they've really been
+1:04:25
+pushing the super intelligence story. The standard thing, the existential risk thinking they've been doing, which is like a standard effect of altruist thing
+1:04:31
+where you say, let's look at unlikely risk that would have a really negative impact because if you calculate the
+1:04:37
+expected value, it's worth spending time now to prevent it to prevent a potential small probability future, right? So,
+1:04:43
+yeah, this is like Nick Boston's Institute. We'll look at things like asteroid hits. Probably won't happen, but it'd be really bad if it did. So, like we have a
+1:04:49
+positive expected value thinking about asteroid hits now. and uh super intelligence was just one of the many topics they were looking at abstractly.
+1:04:56
+I think when chat GPT came along, it sort of warped the brain of some of the people in the F community that were
+1:05:02
+working on uh that were working on existential risk and it warped it from here's this thought experiment that we
+1:05:08
+should be thinking about to well what if it was actually happening and if it was actually happening we're the most
+1:05:14
+important people on Earth. we would be the ones who found the asteroid first and told people about it. And I think
+1:05:19
+that was such a compelling possibility that the switch from here's an
+1:05:24
+abstraction that we should be thinking about as a thought experiment to this is happening. It just that switch went and
+1:05:31
+they had a hard time getting out of it. And I I absolutely think that they believe this and like I also think that
+1:05:38
+there is a chance that it will go very badly because you know social media has
+1:05:43
+gone very badly because because content uh recommendation algorithms have gone very badly and like all they do they're
+1:05:50
+very simple as you said like they all they do is they show you what you're more likely to watch. That's the whole thing and and that went very badly. It
+1:05:58
+went bad for human attention. It went bad for society. It went bad for politics. It went bad for like trust,
+1:06:04
+which I wouldn't have expected. Like we live in a lower trust world because of the effects of content recommendation
+1:06:11
+algorithms. And I have friends whose job is to build them. And they're they're so
+1:06:16
+like disappointed that I feel that way. I think that it's true. I think that there are some that are better than others. I think that there are some that
+1:06:23
+are way worse than others. So I'm not saying that they all have the have equal responsibility here. I do think that
+1:06:29
+YouTube does a better job of than a lot of platforms. Um, but also I think it's structured better than a lot of
+1:06:34
+platforms because there's more human agency built into you YouTube, but they had no problem launching products that
+1:06:40
+have less agency involved in them, which of course they they have done. I do think that that there is a thing there
+1:06:46
+and I I don't think that we should pay no attention to it. Like we have no idea how to have an impact on the future and
+1:06:53
+we certainly have no idea what the future's going to look like. And also, no one's ever been good at figuring out the actual effect of a communicationist
+1:07:00
+breakthrough. Like, we're okay with weapons. We get we can kind of get that, but communication is just too important
+1:07:07
+and big and fundamental to humanity. We have a hard time going back
+1:07:12
+and corraling those horses when they're out of the gate. In the way, weapons is right. Um, I think like substances too,
+1:07:19
+like we're much better at that. Like, oh, like cigarettes are invented, like this is fun. Like, actually, this is probably not good. kids shouldn't use
+1:07:25
+these, let's ban them for kids, right? Or gambling was around and they're like, well, we should probably have rules around this because we're seeing, but
+1:07:32
+you're right, information is different. I think we need to be asking fundamental questions right now. For example, looking at chat bots and saying, who
+1:07:38
+asked for this? Who was clamoring for this? What I mean, other than like the investors in open AI, like what what
+1:07:44
+problem are you solving? And don't let the programmers answer because the programmers have they're extrapolating
+1:07:50
+their experience to the rest of people. But it's not there's a great use case if you're using cloud code.
+1:07:56
+That's a great use case. You can't extrapolate that to the rest of the rest of people. Think about our relationship with these things. It's unsettling. It's
+1:08:03
+like some small benefits with a lot of like distraction and then some pure moments of like this is weird or or
+1:08:09
+unsettling. Yeah. Like these questions should be asked. I have a problem with who asked for this because like no one
+1:08:15
+asked for anything like technology like what is possible is very different from what I want you know like I want a
+1:08:24
+cheesecake that is as healthy as a carrot and yet I will I will never get one. So like I never asked for a
+1:08:30
+cheesecake but like it was presented to me and I'm like yeah cheesecake. I I
+1:08:35
+would prefer a world that did not have sugary drinks. You know that's a better world. No one asked for Coca-Cola, but
+1:08:42
+we have Coca-Cola and we live in a world with it and we choose it sometimes and we should not choose it as often as we
+1:08:48
+do. And and so in the same way, I'm like, okay, like you present us with this tool and a lot of people use it and
+1:08:54
+a lot of people find value in it. There are there are certainly valuable use cases for large language models,
+1:09:00
+especially the way that they have been constructed to become more useful for research or for, you know, the dumb dumb
+1:09:06
+little things you got to do. What I think is an interesting question and it leads to a question I really want to get
+1:09:11
+to is okay, no one asked for it to be basically free when it costs a trillion
+1:09:18
+dollars. That's actually weird. Like I buy Coca-Cola, Coca-Cola makes money.
+1:09:24
+When Open AI sells me Chachi PT, they lose money. So, like this is kind of the
+1:09:30
+weird perverse incentive that we have right now where they are they are shoveling a product at us and they're
+1:09:36
+trying to make it more and more useful and also to be clear all I think more and more addictive and they are doing it
+1:09:41
+at a loss and this perplexes me. Does that make sense? It does make sense. It doesn't perplex
+1:09:46
+me as much. I think it's a standard. Right. I I understand why I understand why you're doing it but but I it's how I
+1:09:53
+feel about when you say like nobody asked for this. I'm like, "No, but like I I also feel like something actually
+1:10:00
+manipulative is going on here, which is like get them hooked and figure out where the the addiction levers are." I I
+1:10:06
+mean, I think that's I think that's one of the things they're doing. Yeah, I agree with that. I think there's a there's more generally a desperation
+1:10:11
+play of try a bunch of things to see if one of these can actually be the revenue
+1:10:16
+generator. But I would also say when I say no one asked for this, the the specific thing that's kind of being
+1:10:22
+shoved down our throats is the just a general purpose conversational partner
+1:10:27
+like actually the the obvious useful uses of this technology has to do with like solving particular problems.
+1:10:33
+Wherever you get natural language interface in the computation like that can be useful, right? Like I get it. Um
+1:10:39
+if I want summaries of text, like that's really useful. If I want to be able to tell Microsoft Excel what I want it to
+1:10:45
+do and not have to learn what all those menus mean, like that would be like a really, you know, that's really useful. It's like an obvious use case. But if
+1:10:52
+you came to me ahead of time and say you can like chat with a machine and it'll kind of like be a friend and kind of do
+1:10:57
+all these different things. It's a weird use case. It's not one like a lot of the people understood the use case for Coke.
+1:11:03
+I like good tasting soda, but I don't I feel like the chatbot interface is it's weird and dark and people are but but I
+1:11:10
+do think you're I do think you're right. the they're searching for what's going to click. That makes sense. And the
+1:11:16
+question I always had is like, well, the obvious things that would click would be natural language interfaces in the software. Make everyone five times
+1:11:22
+better at using tools, right? Like, I'm not great at Microsoft Excel. Why not give me a natural language interface
+1:11:27
+where I could say, "Hey, go through I don't know what commands to do, but get rid of all the rows where the dollar amount in column B is above $5 and then
+1:11:34
+sort it on this column." But what I've heard from my sources is that would be the obvious way. It'd make all your software more valuable, right?
+1:11:41
+it's not working. Actually, the hallucination rate of LLMs means if
+1:11:46
+you're talking to an LLM and then it's translating that in the commands that'll be executed by the software, it makes
+1:11:51
+too many mistakes. And so, this and using tools like that like like uh Air Table has a tool like this and
+1:11:58
+I'm like, "Yeah, build me a little workflow." And then it's like, "Oh, now I have to do a bunch of work fixing your
+1:12:03
+weird mistakes." And I think it's a really interesting point is that also and not to go on a brief tangent, but
+1:12:09
+when we're chatting with these chat bots, we underestimate the degree to which we're constantly sort of
+1:12:14
+interpreting and correcting and fixing and asking a question different way. And so like a lot of these other obvious use
+1:12:20
+cases of like great, we can now have this be an intermediary between humans and the whole world of computation,
+1:12:25
+which I think is a very exciting proposition. They're struggling with that one. So now they have to look at more, I think, addiction based ones.
+1:12:32
+This is why they they like companions because what's more engaging than a a friend that you going to talk to all day
+1:12:38
+long? That seems good for them. More erotica in chatt that tends to be something that captures people's
+1:12:43
+attention. Uh Sora and Sora 2 made no sense to me. The economics don't make sense. Those videos are way too
+1:12:48
+expensive. That's very dumb. Yeah, that's kind of But I get they're they're trying to find ways because the breadand butter stuff that actually
+1:12:55
+would be like, oh, it's the new mouse, which would be a big deal. I think that's not quite working as well as they'd hope. that's not working as well
+1:13:01
+as they'd hoped. There is potentially some kind of like as you say with the the systems, what was it? I AI.
+1:13:09
+Yeah. Where they are more specialized. If it turns out that that that all the valuation is based on actually only
+1:13:16
+giant companies can do this, so you have to buy into one of the big three. That still leads us to a world where the
+1:13:22
+bubble pops. Yes. Yeah. This the spending doesn't make sense. It just doesn't make sense. and
+1:13:28
+and the spending is largely being done by a small number of companies right now. It just doesn't make sense. It would be very unlikely, it seems to
+1:13:34
+me, that the that this IAI thing happens fast enough to fill in the value gap that has been created.
+1:13:41
+Well, I I just don't think it requires the level of investment that Microsoft and uh OpenAI and Anthropic like the
+1:13:48
+level of investment these companies are making. You don't need it for something like that future of specialized machines. and the the Plurabis which can
+1:13:55
+beat in a tournament with real money on the line real Texas Holden players can run on a laptop and it uses some really
+1:14:00
+smart neural networks and some other really smart things. Uh yeah, so I think the loveless spending now doesn't make
+1:14:06
+sense. It's bubble-l like it's just it's too much spending for the potential revenue that you can concentrate on the
+1:14:11
+other side. It's just too expensive the comput look at a company like Google, right? like their big rise in the the
+1:14:18
+early 2000s that the whole key to their rise was the cost effectiveness of their infrastructure. Like that was the whole
+1:14:24
+ballgame there was simple dumb hardware, smart software on top of it and give you very powerful
+1:14:31
+systems without having to buy a bunch of supercomputers and the the cost the compute cost was really low and then
+1:14:36
+they could print money. We're doing the opposite right now. The compute cost is astronomically high. we're we're that to
+1:14:43
+do inference on these models right now um is like the most expensive computational thing we can do. So it
+1:14:49
+really is I don't know how inference is the thing where I where I ask it a question and it does something where it calculates every time someone
+1:14:56
+interfaces with it that's expensive not just the training part I feel like we'll
+1:15:01
+figure out ways to make that cheaper you have to make the model smaller I mean it's it's simple what's happening models they look complicated when you
+1:15:08
+see the layered structure right but underneath it all what you're doing is multiplying tables of numbers again and
+1:15:15
+again and again and again right and the number of numbers in those tables is rel relative to the size of the model and
+1:15:21
+all GPUs do because GPUs are made to do 3D graphics for video games. And the way you describe 3D objects in video games
+1:15:28
+is with tables of numbers. And the way you rotate a 3D object is you multiply that table of numbers by
+1:15:35
+like a rotation vector and it rotates a little bit. So GPUs were just machines made to multiply tables of numbers or
+1:15:41
+and tables by rows and numbers as fast and specialized as possible. That turned out to be fortuitously for the A
+1:15:47
+industry exactly what you need to do to have a uh an input go into a large language model and a token come out the
+1:15:53
+other side. So they're like perfectly well suited for it. But that means to generate even that single token you have to multiply something by all of those
+1:16:00
+parameters that define this really large it could be hundreds of billions of parameters and you have to do all of
+1:16:06
+those multiplications token. Yeah. Yeah. And there isn't a way to not not you got to just make the number of
+1:16:12
+things you're multiplying smaller, which means smaller models, which again comes back to my theory of like the only thing that makes economic sense is smaller
+1:16:19
+models and bespoke systems that do really cool things. Gotcha. So So you don't think that uh my
+1:16:24
+bubble worry is unfounded? No, it's I I don't know. I don't know what the popping's going to look like,
+1:16:30
+right? Like maybe. Yeah. And like what I what I do know is that there will be like lots of large rooms full of GPUs that will be used for
+1:16:36
+something like that that will be they will try and figure out economic utility for this stuff. I think that's true and and we might
+1:16:42
+find more GPUs just distributed in every day because the thing that makes the most cost effective sense is trying to get things on device. Nvidia is trying
+1:16:49
+to do this in a sort of a clunky way right now but I think in the future you know it'll be I have a lot of things that have GPUs in them and that
+1:16:55
+inference is happening here. or I'm paying for electricity because it's happening on my machine and my at my house that makes more. So there
+1:17:01
+might be a huge market. So like I'm I'm not a anti- Nvidia person, but I think the amount of money being spent by the
+1:17:07
+the fang companies otherwise is it it seems unsustainable, right? Best case scenario it'll just be large
+1:17:13
+cuts, right? Meta is going to have to cut this many people. Open AAI might go away. Anthropic is going to have to like
+1:17:18
+go down to a third of its size, you It might be something like which would be very that would be a very like a it feels somewhat
+1:17:26
+like it would be a big problem for at least the stock market. Yeah. Uh which usually leads to a problem in
+1:17:32
+the economy especially when most of the money in the economy is spent by rich people who are feeling flush right now
+1:17:39
+because portfolios have gone up. Yeah. Maybe this is why Mark Zuckerberg has bought half of Hawaii. He needs a quiet
+1:17:46
+place to go when people get upset. He's he's he's definitely seen that we we
+1:17:51
+don't love him. I think he's noticed. I have two final questions. Um number one,
+1:17:56
+I saved it for the end. What did I what do you think I did worst on? Oh, that was a good video. You good?
+1:18:03
+What What do you wor Okay, here's an effect that I think your video creates that a lot of discussions of this
+1:18:08
+create, which I I think of as like Doom amplification loop. So because it's such a diverse
+1:18:14
+technology with so many possible things that could be a problem that as you go through them one after another after another after another we have a natural
+1:18:21
+human tendency to put that into an amplification loop and sort of imagine the aggregate of all of that doom
+1:18:28
+because if you if you isolate any one of those issues you'll be like ah this is a problem like that's annoying like we should do something about it but it's
+1:18:34
+not going to have me up at night but when you hear 20 different issues it seems like it's 20 times as bad but the thing is there's tons of technologies
+1:18:40
+out there creating their own issues of roughly that size. We just don't aggregate them. We're just used to there's
+1:18:46
+a lot of different things out there that are causing trouble. So, that's the one thing I worry about is keeping our
+1:18:52
+mindset of there's lots of issues here that are serious, but we don't have to add them up into
+1:18:58
+therefore an issue that's so big that we'll never be able to handle it. We can handle lots of small issues. Uh it's not
+1:19:04
+the same as this is the biggest issue we've ever faced and we're not going to be able to handle it. when we break this up, when we recognize these are
+1:19:10
+individual issues. They're often dealing with completely separate technologies, Mhm. it seems more tractable. So, I don't
+1:19:17
+want people to fall I just get a lot of this when I talk to people right now is you fall into despair because it's complicated and there's so much going on
+1:19:22
+and so many possible things. But like humans also have a pretty good t you know capacity to adjust to things to
+1:19:28
+push back on things to to eventually say enough of this like we don't want to use this anymore. I think that's finally
+1:19:33
+starting to happen for social media. It's taking five years longer than I would have hoped, but like we're getting fed up, you know? I think
+1:19:40
+so. I I I have some I have optimism and I don't want the I don't want to seem if we list all the
+1:19:46
+dooms out in a row, I don't want it to seem like these are all adding up to one villain
+1:19:52
+that's going to be impossible to slay, right? A and if you listed out all the ways that AI has like helped you know
+1:19:59
+somebody do some thing or even like things that are relatively large like coming up with new cancer treatment
+1:20:05
+combinations or protein folding on its own like is is massive and will will be
+1:20:12
+a you know worldchanging innovation. And it just like sort of
+1:20:18
+takes time for these things to filter through the the technology loop. And nobody wants to hear the video that's
+1:20:23
+like, "Hey, look at all the things that are that like have come out of this technology." Well, and that's the that's the other
+1:20:28
+point I want to make there too is we we have to be careful about connecting unrelated AI technologies as well and allowing advances and want to reflect on
+1:20:35
+others. So like yeah, cancer diagnosis, protein folding, these are completely different technologies
+1:20:40
+than language models, right? But I was just I just also had a conversation with an oncologist today and she's like a while I do need you to
+1:20:47
+know that I don't mean chat bots. Yeah. Because I think what happens then is you get these extrapolations where
+1:20:52
+because like oh chat bots got much better therefore cancer will be a thing of the past. Like no that's a different
+1:20:58
+AI or like we're going to have like robots are just going to do all of our you know manual labor. Well that's a
+1:21:04
+completely different type of AI with its own challenges or right self-driving cars. like that's yes, but
+1:21:10
+that's a very slow that's its own technology and it's a very long trajectory that we're on and it's there's there's a lot of um progress
+1:21:18
+laundering I sometimes call it where something within this broad field makes a leap and we launder that progress over
+1:21:24
+to sort of other technologies in the field and say well they also have or will be making the same type of leap but
+1:21:29
+they're completely different technologies and so like chatbots getting better there are also like there's there's like legitimately research that's been done
+1:21:35
+by kind of leveraging the gains of chat bots Yeah, that's true too. Fair enough. Yeah. But with cancer research, what they did
+1:21:42
+is they kind of leveraged an LLM but gave it like a different language and that language is the language of the
+1:21:48
+cell. Yeah. And how how cells communicate with each other and that's likeing genius. I like
+1:21:53
+I love that. That's very cool and I want to make a video about it. But it's very cool. And they train them completely differently and it but it's
+1:21:59
+like really cool. Yeah. I mean and that excitement of one technology can also lead to excitement in the related
+1:22:05
+technologies which which I which I Yeah. which I think is good, right? Like, oh, we're reinvigorated in our AI cancer
+1:22:11
+research because there's energy in AI in general. So, do you feel some amount of like tech joy
+1:22:17
+about this? Like, holy crap, I'm kind of alive for a really weird moment. I do. I mean, I I I especially did like
+1:22:23
+through GPT4 because that really was, as you said, uh a huge step function leap
+1:22:30
+because most people hadn't seen GPT3. you sort of had to have a permission to access the API and that was like wow
+1:22:36
+this is like a really big lead. I actually had some disappointment on the other side of it. I thought uh we were
+1:22:44
+going to have natural language interfacing and computing like we're in that era now which would have been like a fantastic era for a lot of reasons. I
+1:22:50
+think productivity in the technical sense would have jumped up if you make everyone experts at all software. Like I
+1:22:58
+was really excited about that and was like a little bit disappointed. I was like, wait, why aren't we seeing these
+1:23:03
+tools being added to all this software? Why instead are we just seeing uh benchmark charts? Like, good.
+1:23:09
+I think that we will see it. And I the reason why I think that we will see it is because it's so good at code. Yeah.
+1:23:14
+But like it's weird and true that it turns out that like code is because it's
+1:23:19
+language adjacent. These systems are really good at code, but they're not really good at like clicking on something, which is weird.
+1:23:26
+Y, you know, that's not what you would expect. But it turns out that like we're bet we're good at things we didn't
+1:23:31
+realize we were good at. And and that's I just wrote an article on this. This was a whole story where we were tricked by coding agents being so
+1:23:38
+good relatively speaking that at the beginning of 2025 the word was this will be the year of
+1:23:44
+the agent. We will be assigning work and it didn't happen because again like as you said moving the mouse is hard and
+1:23:51
+code is like really well suited. Um we also don't realize that those coding agents are working entirely in a terminal. So it's entirely textbased.
+1:23:57
+They're in a world of textbased commands producing structured text. It's like uh Disneyland for language models. It's
+1:24:02
+like the best possible scenario, right? But you could imagine an Excel that that exists inside of that
+1:24:10
+world like co like you know Excel is code. It's just that it's it's like we
+1:24:15
+thought that we could skip over the part where we built Excel for us. Yeah. What we have to do is like we need to
+1:24:21
+build Excel for them, which sounds like I Yeah. And I'll tell you, here's my tech joy. I I was talking to um someone in
+1:24:27
+this coding agent space and they had this really cool idea like yeah here's here's what's going to here's the way to think about it is actually everything's
+1:24:34
+a program. So if I'm like asking Excel to do something the the the approximate
+1:24:40
+way to do that is like to have a language model produce a bunch of um commands of the type we would give
+1:24:45
+Excel. But like actually what should happen is Excel should have an API opened up a textbased API and when I say
+1:24:52
+here's what I want to do the language model creates a computer program to do that because really good at creating
+1:24:58
+computer programs and that computer program talks to Excel and like actually
+1:25:03
+code is going to become the universal language of computing. We say things in English, it gets turned into a computer
+1:25:08
+program that then can access other computer programs through well-known interfaces. That that presses my
+1:25:14
+computer science uh technical joy button. That's so smart. Yeah. Yeah. Like if you have prolevel CHPT it
+1:25:22
+can already it just does that like it's built in like in certain situations it just starts doing code and you're like
+1:25:28
+what are you what's happening? Yeah, for a computer scientist, you're like, "Ah,
+1:25:33
+that's my that's the world I imagine." Like, you just think in code. It makes so much sense. Yeah.
+1:25:38
+Um I and I think so. Anyways, I'm excited about that. I think it's okay. And that does actually have big ramifications and it's going to change a
+1:25:45
+lot of things and it could have economic impacts. Uh but that's a good but I think ultimately that would be a good thing. But it yeah, it's different than
+1:25:51
+the conversation we're having right now. It sound it also sounds to me like if this is the world that we end up in it
+1:25:57
+it I one of my big fears really is like what do people do uh when they aren't that good at stuff yet? So like what
+1:26:04
+does a college graduate do in the world? If AI is is better than someone who's
+1:26:10
+bad at it but not as good as someone who's good at it, how does apprenticeship work in that world in
+1:26:16
+knowledge work? You know, apprentichip will still be a thing in plumbing. And it sounds a little bit like actually there is a lot of space for human labor
+1:26:22
+in this version of reality. Yeah. Because I think most things at least right now think about that reality
+1:26:28
+aren't replaced by AI. The industry that is in trouble I do think is is developing computer programming because
+1:26:34
+I was talking to some developers recently and the thing they were telling me that's their words not mine. They said here's what you have to understand
+1:26:40
+about the software development world. Most programmers are pretty bad like just in general like uh not we we think
+1:26:46
+about the really fancy 10x programmers who are like the hot shots at you know meta or whatever because I was I was
+1:26:53
+making this argument of like I don't like this new model of you have multiple tabs each with their own coding agent
+1:27:00
+all you're doing is supervising the tabs I was like this feels like the skilling this feels like be a little bit wary you you don't want to lose what you do best
+1:27:06
+to create expert elegant code and some of the developers wrote back like actually a lot of people are just sort of copying and past there's a lot of
+1:27:12
+programming jobs out there that are just people are producing bad code. Well, agents are good at producing
+1:27:18
+bad code, right? Like that that is that is in danger. So, last question. We've already talked a little bit about this, but when we
+1:27:24
+comes to the the the problems that we do see, and we're all going to place different levels of severity on them
+1:27:29
+for, you know, various reasons, but when we come to the problems that are will be presented to us by any new technology,
+1:27:36
+but this one in particular, do you feel like we have agency here? like what what levers are there? You know, identifying
+1:27:43
+a problem sucks, but feeling like you have some kind of can have like an impact on this.
+1:27:48
+I think there's a there's a few different levers we do have, right? Okay. So, first of all, I think there's a sort of personal choice lever where I
+1:27:54
+think it's completely fine to say it is not my job to figure out why your product is useful. It's your job to
+1:27:59
+convince me that it's useful. Don't tell me like you better know AI and then not tell me what that means. It's like if I
+1:28:05
+don't have a clear use case for using something, I'm not going to go and spend my time and money and attention trying to master your tool. And if I find your
+1:28:10
+tool distasteful, um, I'm not going to use it. I think parents and teachers should have a rule that uh, kids should
+1:28:16
+never be using a chatbot unsupervised. I I think that's completely dangerous. There's, you know, we do not I do not
+1:28:22
+buy the argument that like kids need to know how to use the tools of the future. Like I think that there has to be like some kind of cultural language norms
+1:28:29
+taboos around this. Yeah. Uh, and so we should start developing those. Well, and that that could be parental supervision
+1:28:34
+early on is you're seeing examples. I'm only using it, but also it's kind of a waste of time if you're talking about like a nine-year-old.
+1:28:40
+You you don't need to expose them like they need to know how to use chatbots well because the the the form factor in which we're interacting with Generative
+1:28:46
+AI six years from now is not going to be it's not going to be the same, right? It's not they don't need to learn that. That's the Formula One car they're never
+1:28:52
+going to they're never going to drive. And so, I think it's completely it should be normative to be like, "Yeah, kids shouldn't be on this." Um, I think
+1:28:57
+it's educational institutions should be free to say the whole point of this is to create friction in your mind so that
+1:29:03
+the this the connections get stronger. You know, it's like this is a gym. Yes, it's true. A forklift can lift the
+1:29:09
+weights for you and that would be easier, but the whole point of this gym is to lift the heavy weights. Like so that that's not what we're doing here.
+1:29:14
+We don't have to bend over backwards to try to like rechange our, you know, all
+1:29:20
+everything about learning to to sort of in include this tool in sort of a forced way. I I also think there's economic
+1:29:25
+levers we can pull which again is like I'm not gonna waste time on something until there's I'm like we're done with
+1:29:31
+this sort of Apple induced you know early 2000s era isn't it exciting to be a first mover on new technology and try
+1:29:38
+to figure out how it's going to be useful. We could just be done with that. I'm not going to spend money on this until I have like a really compelling
+1:29:43
+use case. And I think there's regulatory levers like I that the biggest lever we could push like the Congress to pull
+1:29:50
+would be one where we have uh much more liability for what a chatbot produces
+1:29:56
+like no you can't just have an entity that'll say anything and do psychosis you know give out really danger no uh
+1:30:03
+you are responsible for what this thing says and what happens what the effect of that would be is like oh I guess we
+1:30:08
+probably can't have a product that's just trying to be a general conversational partner and that would probably be better,
+1:30:13
+right? So, yeah. What Sam Alma would say is like, well, then there won't be chat bots. Yeah. But what you don't you don't you
+1:30:19
+think that there would be a way to actually do the research and and create features that would allow these things to
+1:30:25
+Yeah. I don't think I think so. I think if we said, look, uh, yeah, you're responsible, you know, X Y and Z, we
+1:30:31
+again, we go to the specialized future, which is like where we're going to end up anyways. Again, the oracular model of
+1:30:36
+like everything has to why do I need to use the same tool for summarizing emails
+1:30:42
+needs to also be a tool in which I can have a sort of like pedophilic erotica relationship with a virtual being? Like,
+1:30:49
+does that have to be in the same tool? You know, if if you're right, and of
+1:30:55
+course I think you are because I'm talking to you right now. Uh but but if you're right, we're going to look back at the last three years with like
+1:31:01
+remember when we were idiots? Remember when we thought that it was going to be we were going to do digital god?
+1:31:08
+Well, yeah. I hope so. I hope that's what we're saying like three years from now. It's like digital god made no
+1:31:14
+economic sense. It was incredibly dangerous and and also we were going to give it to every single person for free
+1:31:20
+and and we're give everyone for free and we still we've been searching Kawaii for the last three years and still haven't
+1:31:26
+found Mark Zuckerberg. We know he's hiding there somewhere. We'll get him eventually. He's in his ocean lair.
+1:31:32
+It's like Hunger Games. He's painted the leaves on his face. He's hard to see.
+1:31:38
+He's finally found a fashion that works for him. You don't like the the chain in the
+1:31:44
+t-shirts? Look, it looks it looks a lot better than he used to. I you know, he's making
+1:31:50
+choices or someone is um in a way that makes me think that that it is that
+1:31:56
+people that someone has learned how to say, "Actually, Mark, that haircut looks bad." Which is good. I think that's good
+1:32:02
+news. Maybe a chatbot will tell him that. See, this could all come forward. Maybe that's what happened. He got early access. Cal Newport, you could watch his
+1:32:10
+and and listen to his podcast, Deep Questions. It's free on YouTube. It's very good. I I am a a regular viewer
+1:32:17
+myself. It's also free wherever podcasts are in other places. And also if you'd
+1:32:22
+like some of Cal Newport's work, a lot of it is focused on how we focus on how
+1:32:28
+we have agency in our world, how we take that agency back, and how we do good work and how important that time is and
+1:32:36
+that focus is for doing good human work. Uh so check check out Cal. He's great.
+1:32:41
+Cal, thank you so much for spending so much time with me. Oh, it's my pleasure. enjoyed it.
