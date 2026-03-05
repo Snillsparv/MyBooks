@@ -156,7 +156,7 @@ def api_summarize():
     duration = estimate_duration(segments)
 
     def generate():
-        yield json.dumps({"type": "meta", "video_title": video_title, "video_id": video_id, "duration": duration}) + "\n"
+        yield json.dumps({"type": "meta", "video_title": video_title, "video_id": video_id, "duration": duration, "segments": segments}) + "\n"
 
         try:
             full_text = ""
