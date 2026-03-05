@@ -433,7 +433,8 @@
                                 throw new Error(msg.error);
                             }
                         } catch (e) {
-                            // ignore parse errors for incomplete chunks
+                            if (e instanceof SyntaxError) continue;
+                            throw e;
                         }
                     }
                 }
