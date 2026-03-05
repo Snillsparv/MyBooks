@@ -86,6 +86,19 @@
             margin-top: 0.3rem;
             padding-top: 0.8rem;
         }
+        .transcript-section + .transcript-section {
+            margin-top: 1rem;
+        }
+        .transcript-section h4 {
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #777;
+            margin-bottom: 0.35rem;
+        }
+        .transcript-section p {
+            margin: 0;
+        }
         .divider {
             border: none;
             border-top: 2px solid #e0dbd5;
@@ -377,6 +390,57 @@
         </div>
     </details>
 </div>
+
+<script>
+    (function () {
+        const splitIntoChunks = (content, maxSentencesPerChunk = 3) => {
+            const sentences = content
+                .split(/(?<=[.!?])\s+/)
+                .map((sentence) => sentence.trim())
+                .filter(Boolean);
+
+            if (sentences.length <= maxSentencesPerChunk) {
+                return [content.trim()];
+            }
+
+            const chunks = [];
+            for (let i = 0; i < sentences.length; i += maxSentencesPerChunk) {
+                chunks.push(sentences.slice(i, i + maxSentencesPerChunk).join(' '));
+            }
+            return chunks;
+        };
+
+        document.querySelectorAll('.transcript').forEach((transcript) => {
+            const paragraphs = Array.from(transcript.querySelectorAll('p'))
+                .map((paragraph) => paragraph.textContent.trim())
+                .filter(Boolean);
+
+            if (!paragraphs.length) return;
+
+            transcript.innerHTML = '';
+
+            paragraphs.forEach((paragraphText, paragraphIndex) => {
+                const chunks = splitIntoChunks(paragraphText);
+
+                chunks.forEach((chunk, chunkIndex) => {
+                    const section = document.createElement('div');
+                    section.className = 'transcript-section';
+
+                    const heading = document.createElement('h4');
+                    const topicLabel = paragraphs.length > 1 ? `Tema ${paragraphIndex + 1}` : 'Tema';
+                    heading.textContent = `${topicLabel} - Del ${chunkIndex + 1}`;
+
+                    const body = document.createElement('p');
+                    body.textContent = chunk;
+
+                    section.appendChild(heading);
+                    section.appendChild(body);
+                    transcript.appendChild(section);
+                });
+            });
+        });
+    })();
+</script>
 
 </body>
 </html>
