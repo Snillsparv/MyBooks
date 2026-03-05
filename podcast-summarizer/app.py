@@ -157,12 +157,19 @@ def api_summarize():
     def generate():
         yield json.dumps({"type": "meta", "video_title": video_title, "video_id": video_id, "duration": duration}) + "\n"
 
-        full_text = ""
-        for chunk in summarize_with_claude(transcript_text, duration):
-            full_text += chunk
-            yield json.dumps({"type": "chunk", "text": chunk}) + "\n"
+        try:
+            full_text = ""
+            for chunk in summarize_with_claude(transcript_text, duration):
+                full_text += chunk
+                yield json.dumps({"type": "chunk", "text": chunk}) + "\n"
 
-        yield json.dumps({"type": "done"}) + "\n"
+            yield json.dumps({"type": "done"}) + "\n"
+        except anthropic.BadRequestError as e:
+            yield json.dumps({"type": "error", "error": f"API-fel: {e.message}"}) + "\n"
+        except anthropic.AuthenticationError:
+            yield json.dumps({"type": "error", "error": "Ogiltig API-nyckel. Kontrollera ANTHROPIC_API_KEY."}) + "\n"
+        except anthropic.APIError as e:
+            yield json.dumps({"type": "error", "error": f"API-fel: {e.message}"}) + "\n"
 
     return Response(
         stream_with_context(generate()),

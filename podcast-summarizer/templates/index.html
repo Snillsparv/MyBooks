@@ -429,6 +429,8 @@
                                 fullText += msg.text;
                             } else if (msg.type === 'done') {
                                 renderResult(fullText);
+                            } else if (msg.type === 'error') {
+                                throw new Error(msg.error);
                             }
                         } catch (e) {
                             // ignore parse errors for incomplete chunks
