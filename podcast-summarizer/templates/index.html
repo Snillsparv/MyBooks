@@ -109,7 +109,7 @@
         /* Status */
         .status {
             display: none;
-            align-items: center;
+            flex-direction: column;
             gap: 0.75rem;
             padding: 1rem 1.2rem;
             background: #fff;
@@ -120,6 +120,12 @@
         }
 
         .status.visible { display: flex; }
+
+        .status-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
 
         .spinner {
             width: 20px;
@@ -132,6 +138,51 @@
         }
 
         @keyframes spin { to { transform: rotate(360deg); } }
+
+        .progress-bar {
+            display: none;
+            width: 100%;
+            height: 6px;
+            background: #e0dbd5;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-bar.visible { display: block; }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: #4a3728;
+            border-radius: 3px;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .progress-bar.indeterminate .progress-bar-fill {
+            width: 30%;
+            animation: indeterminate 1.5s ease-in-out infinite;
+        }
+
+        @keyframes indeterminate {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(430%); }
+        }
+
+        .progress-steps {
+            display: none;
+            gap: 0.5rem;
+            font-size: 0.82rem;
+            color: #999;
+        }
+
+        .progress-steps.visible { display: flex; }
+
+        .progress-step { transition: color 0.3s; }
+        .progress-step.active { color: #4a3728; font-weight: 600; }
+        .progress-step.done { color: #6a8f6a; }
+        .progress-step.done::before { content: '\2713 '; }
+        .progress-step + .progress-step::before { content: ' \203A  '; color: #ccc; margin-right: 0.3rem; }
+        .progress-step.done + .progress-step::before { content: ' \203A  '; }
 
         .status.error {
             border-color: #d4a0a0;
@@ -332,8 +383,18 @@
         </div>
 
         <div class="status" id="status">
-            <div class="spinner" id="status-spinner"></div>
-            <span id="status-text">Bearbetar...</span>
+            <div class="status-header">
+                <div class="spinner" id="status-spinner"></div>
+                <span id="status-text">Bearbetar...</span>
+            </div>
+            <div class="progress-bar" id="progress-bar">
+                <div class="progress-bar-fill" id="progress-bar-fill"></div>
+            </div>
+            <div class="progress-steps" id="progress-steps">
+                <span class="progress-step" id="step-transcript">Hamtar transkription</span>
+                <span class="progress-step" id="step-analyze">Analyserar med Claude</span>
+                <span class="progress-step" id="step-done">Klar</span>
+            </div>
         </div>
 
         <div class="result" id="result">
@@ -354,6 +415,12 @@
         const statusEl = document.getElementById('status');
         const statusText = document.getElementById('status-text');
         const statusSpinner = document.getElementById('status-spinner');
+        const progressBar = document.getElementById('progress-bar');
+        const progressBarFill = document.getElementById('progress-bar-fill');
+        const progressSteps = document.getElementById('progress-steps');
+        const stepTranscript = document.getElementById('step-transcript');
+        const stepAnalyze = document.getElementById('step-analyze');
+        const stepDone = document.getElementById('step-done');
         const resultEl = document.getElementById('result');
         const videoInfoEl = document.getElementById('video-info');
         const overallSummaryEl = document.getElementById('overall-summary');
@@ -368,10 +435,51 @@
             statusEl.classList.toggle('error', isError);
             statusSpinner.style.display = isError ? 'none' : 'block';
             statusText.textContent = msg;
+            if (isError) {
+                progressBar.classList.remove('visible');
+                progressSteps.classList.remove('visible');
+            }
         }
 
         function hideStatus() {
             statusEl.classList.remove('visible', 'error');
+            progressBar.classList.remove('visible', 'indeterminate');
+            progressSteps.classList.remove('visible');
+            [stepTranscript, stepAnalyze, stepDone].forEach(s => s.classList.remove('active', 'done'));
+        }
+
+        function setStep(step) {
+            progressBar.classList.add('visible');
+            progressSteps.classList.add('visible');
+
+            if (step === 'transcript') {
+                progressBar.classList.add('indeterminate');
+                progressBarFill.style.width = '0%';
+                stepTranscript.classList.add('active');
+                stepAnalyze.classList.remove('active', 'done');
+                stepDone.classList.remove('active', 'done');
+            } else if (step === 'analyze') {
+                progressBar.classList.remove('indeterminate');
+                progressBarFill.style.width = '15%';
+                stepTranscript.classList.remove('active');
+                stepTranscript.classList.add('done');
+                stepAnalyze.classList.add('active');
+                stepDone.classList.remove('active', 'done');
+            } else if (step === 'done') {
+                progressBar.classList.remove('indeterminate');
+                progressBarFill.style.width = '100%';
+                stepTranscript.classList.remove('active');
+                stepTranscript.classList.add('done');
+                stepAnalyze.classList.remove('active');
+                stepAnalyze.classList.add('done');
+                stepDone.classList.add('done');
+            }
+        }
+
+        function updateStreamProgress(charCount) {
+            // Estimate progress: typical response is ~3000-6000 chars
+            const estimated = Math.min(95, 15 + (charCount / 5000) * 80);
+            progressBarFill.style.width = estimated + '%';
         }
 
         async function handleSubmit() {
@@ -382,6 +490,7 @@
             resultEl.classList.remove('visible');
             chaptersEl.innerHTML = '';
             showStatus('Hamtar transkription fran YouTube...');
+            setStep('transcript');
 
             try {
                 const resp = await fetch('/api/summarize', {
@@ -401,8 +510,6 @@
                 let fullText = '';
                 let metaReceived = false;
 
-                showStatus('Claude analyserar och sammanfattar...');
-
                 while (true) {
                     const { done, value } = await reader.read();
                     if (done) break;
@@ -418,6 +525,8 @@
 
                             if (msg.type === 'meta') {
                                 metaReceived = true;
+                                showStatus('Claude analyserar och sammanfattar...');
+                                setStep('analyze');
                                 videoInfoEl.innerHTML = `
                                     <img src="https://img.youtube.com/vi/${msg.video_id}/mqdefault.jpg" alt="Thumbnail">
                                     <div class="meta">
@@ -427,7 +536,9 @@
                                 `;
                             } else if (msg.type === 'chunk') {
                                 fullText += msg.text;
+                                updateStreamProgress(fullText.length);
                             } else if (msg.type === 'done') {
+                                setStep('done');
                                 renderResult(fullText);
                             } else if (msg.type === 'error') {
                                 throw new Error(msg.error);
