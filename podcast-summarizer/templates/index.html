@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Podcast Summarizer - Sammanfatta poddar automatiskt</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: Georgia, 'Times New Roman', serif;
+            background: #f5f0eb;
+            color: #2c2c2c;
+            line-height: 1.7;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 820px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        header h1 {
+            font-size: 2rem;
+            color: #1a1a1a;
+            margin-bottom: 0.4rem;
+        }
+
+        header p {
+            color: #777;
+            font-style: italic;
+            font-size: 0.95rem;
+        }
+
+        /* Input area */
+        .input-area {
+            background: #fff;
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid #e0dbd5;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+        }
+
+        .input-area label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .input-row input {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border: 2px solid #e0dbd5;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: border-color 0.2s;
+            background: #faf8f5;
+        }
+
+        .input-row input:focus {
+            outline: none;
+            border-color: #8b7355;
+        }
+
+        .input-row button {
+            padding: 0.75rem 1.5rem;
+            background: #4a3728;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: inherit;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            white-space: nowrap;
+        }
+
+        .input-row button:hover {
+            background: #5e4a38;
+        }
+
+        .input-row button:disabled {
+            background: #b0a898;
+            cursor: not-allowed;
+        }
+
+        .supported-sources {
+            margin-top: 0.7rem;
+            font-size: 0.8rem;
+            color: #999;
+        }
+
+        /* Status */
+        .status {
+            display: none;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem 1.2rem;
+            background: #fff;
+            border-radius: 10px;
+            border: 1px solid #e0dbd5;
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+        }
+
+        .status.visible { display: flex; }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 3px solid #e0dbd5;
+            border-top-color: #4a3728;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            flex-shrink: 0;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .status.error {
+            border-color: #d4a0a0;
+            background: #fdf5f5;
+            color: #8b3a3a;
+        }
+
+        /* Result area */
+        .result { display: none; }
+        .result.visible { display: block; }
+
+        .video-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: #fff;
+            border-radius: 10px;
+            border: 1px solid #e0dbd5;
+        }
+
+        .video-info img {
+            width: 120px;
+            height: 68px;
+            object-fit: cover;
+            border-radius: 6px;
+            flex-shrink: 0;
+        }
+
+        .video-info .meta h2 {
+            font-size: 1.1rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .video-info .meta span {
+            font-size: 0.82rem;
+            color: #888;
+        }
+
+        .overall-summary {
+            background: #fff;
+            border-radius: 10px;
+            border: 1px solid #e0dbd5;
+            padding: 1.2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .overall-summary h3 {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #888;
+            margin-bottom: 0.5rem;
+        }
+
+        .overall-summary p {
+            font-size: 0.95rem;
+            color: #444;
+        }
+
+        /* Chapters */
+        .chapters-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #888;
+            margin-bottom: 0.6rem;
+            padding-left: 0.2rem;
+        }
+
+        details.chapter {
+            background: #fff;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            border: 1px solid #e0dbd5;
+            transition: box-shadow 0.2s;
+        }
+
+        details.chapter:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        details.chapter[open] {
+            border-color: #c5bfb8;
+        }
+
+        details.chapter summary {
+            padding: 0.8rem 1.2rem;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1.05rem;
+            list-style: none;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        details.chapter summary::-webkit-details-marker { display: none; }
+
+        details.chapter summary::before {
+            content: '\25B6';
+            font-size: 0.6rem;
+            color: #999;
+            transition: transform 0.2s;
+            flex-shrink: 0;
+        }
+
+        details.chapter[open] summary::before {
+            transform: rotate(90deg);
+        }
+
+        .timestamp {
+            font-size: 0.75rem;
+            color: #aaa;
+            font-weight: 400;
+            margin-left: auto;
+            white-space: nowrap;
+        }
+
+        .chapter-body {
+            padding: 0 1.2rem 1.2rem;
+            border-top: 1px solid #eee;
+            margin-top: 0.3rem;
+            padding-top: 0.8rem;
+        }
+
+        .chapter-summary {
+            font-size: 0.92rem;
+            color: #444;
+            margin-bottom: 0.8rem;
+        }
+
+        .key-points {
+            list-style: none;
+            padding: 0;
+        }
+
+        .key-points li {
+            position: relative;
+            padding-left: 1.2rem;
+            font-size: 0.88rem;
+            color: #555;
+            margin-bottom: 0.4rem;
+        }
+
+        .key-points li::before {
+            content: '\2022';
+            position: absolute;
+            left: 0;
+            color: #b0a898;
+            font-weight: bold;
+        }
+
+        .transcript-excerpt {
+            margin-top: 0.8rem;
+            padding: 0.7rem 1rem;
+            background: #faf8f5;
+            border-left: 3px solid #d4cfc8;
+            border-radius: 0 6px 6px 0;
+            font-size: 0.85rem;
+            color: #666;
+            font-style: italic;
+        }
+
+        /* Footer */
+        footer {
+            margin-top: 3rem;
+            text-align: center;
+            font-size: 0.8rem;
+            color: #aaa;
+        }
+
+        @media (max-width: 600px) {
+            .container { padding: 1rem; }
+            header h1 { font-size: 1.5rem; }
+            .input-row { flex-direction: column; }
+            .input-row button { width: 100%; }
+            .video-info { flex-direction: column; text-align: center; }
+            .video-info img { width: 100%; height: auto; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Podcast Summarizer</h1>
+            <p>Klistra in en YouTube-lank och fa en komplett sammanfattning med kapitelindelning</p>
+        </header>
+
+        <div class="input-area">
+            <label for="url-input">YouTube-lank</label>
+            <div class="input-row">
+                <input type="url" id="url-input" placeholder="https://www.youtube.com/watch?v=..." autofocus>
+                <button id="summarize-btn" onclick="handleSubmit()">Sammanfatta</button>
+            </div>
+            <p class="supported-sources">Stoder YouTube-videor med automatiska eller manuella undertexter.</p>
+        </div>
+
+        <div class="status" id="status">
+            <div class="spinner" id="status-spinner"></div>
+            <span id="status-text">Bearbetar...</span>
+        </div>
+
+        <div class="result" id="result">
+            <div class="video-info" id="video-info"></div>
+            <div class="overall-summary" id="overall-summary"></div>
+            <div class="chapters-label">Kapitel</div>
+            <div id="chapters"></div>
+        </div>
+
+        <footer>
+            Drivs av Claude AI &middot; Transkriptioner fran YouTube
+        </footer>
+    </div>
+
+    <script>
+        const urlInput = document.getElementById('url-input');
+        const btn = document.getElementById('summarize-btn');
+        const statusEl = document.getElementById('status');
+        const statusText = document.getElementById('status-text');
+        const statusSpinner = document.getElementById('status-spinner');
+        const resultEl = document.getElementById('result');
+        const videoInfoEl = document.getElementById('video-info');
+        const overallSummaryEl = document.getElementById('overall-summary');
+        const chaptersEl = document.getElementById('chapters');
+
+        urlInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') handleSubmit();
+        });
+
+        function showStatus(msg, isError = false) {
+            statusEl.classList.add('visible');
+            statusEl.classList.toggle('error', isError);
+            statusSpinner.style.display = isError ? 'none' : 'block';
+            statusText.textContent = msg;
+        }
+
+        function hideStatus() {
+            statusEl.classList.remove('visible', 'error');
+        }
+
+        async function handleSubmit() {
+            const url = urlInput.value.trim();
+            if (!url) return;
+
+            btn.disabled = true;
+            resultEl.classList.remove('visible');
+            chaptersEl.innerHTML = '';
+            showStatus('Hamtar transkription fran YouTube...');
+
+            try {
+                const resp = await fetch('/api/summarize', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url }),
+                });
+
+                if (!resp.ok) {
+                    const err = await resp.json();
+                    throw new Error(err.error || 'Nagot gick fel');
+                }
+
+                const reader = resp.body.getReader();
+                const decoder = new TextDecoder();
+                let buffer = '';
+                let fullText = '';
+                let metaReceived = false;
+
+                showStatus('Claude analyserar och sammanfattar...');
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+
+                    buffer += decoder.decode(value, { stream: true });
+                    const lines = buffer.split('\n');
+                    buffer = lines.pop();
+
+                    for (const line of lines) {
+                        if (!line.trim()) continue;
+                        try {
+                            const msg = JSON.parse(line);
+
+                            if (msg.type === 'meta') {
+                                metaReceived = true;
+                                videoInfoEl.innerHTML = `
+                                    <img src="https://img.youtube.com/vi/${msg.video_id}/mqdefault.jpg" alt="Thumbnail">
+                                    <div class="meta">
+                                        <h2>${escapeHtml(msg.video_title)}</h2>
+                                        <span>ca ${msg.duration} min</span>
+                                    </div>
+                                `;
+                            } else if (msg.type === 'chunk') {
+                                fullText += msg.text;
+                            } else if (msg.type === 'done') {
+                                renderResult(fullText);
+                            }
+                        } catch (e) {
+                            // ignore parse errors for incomplete chunks
+                        }
+                    }
+                }
+
+                // Handle remaining buffer
+                if (buffer.trim()) {
+                    try {
+                        const msg = JSON.parse(buffer);
+                        if (msg.type === 'chunk') fullText += msg.text;
+                        if (msg.type === 'done') renderResult(fullText);
+                    } catch (e) {}
+                }
+
+                // If we got text but no 'done' event, try to render anyway
+                if (fullText && !resultEl.classList.contains('visible')) {
+                    renderResult(fullText);
+                }
+
+            } catch (err) {
+                showStatus(err.message, true);
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        function renderResult(jsonText) {
+            try {
+                // Strip markdown code block fences if present
+                let cleaned = jsonText.trim();
+                if (cleaned.startsWith('```')) {
+                    cleaned = cleaned.replace(/^```(?:json)?\s*/, '').replace(/```\s*$/, '');
+                }
+                const data = JSON.parse(cleaned);
+
+                overallSummaryEl.innerHTML = `
+                    <h3>Sammanfattning</h3>
+                    <p>${escapeHtml(data.summary)}</p>
+                `;
+
+                chaptersEl.innerHTML = '';
+                data.chapters.forEach((ch, i) => {
+                    const details = document.createElement('details');
+                    details.className = 'chapter';
+
+                    const keyPointsHtml = (ch.key_points || [])
+                        .map(p => `<li>${escapeHtml(p)}</li>`)
+                        .join('');
+
+                    const excerptHtml = ch.transcript_excerpt
+                        ? `<div class="transcript-excerpt">"${escapeHtml(ch.transcript_excerpt)}"</div>`
+                        : '';
+
+                    details.innerHTML = `
+                        <summary>
+                            ${escapeHtml(ch.title)}
+                            <span class="timestamp">${escapeHtml(ch.timestamp || '')}</span>
+                        </summary>
+                        <div class="chapter-body">
+                            <p class="chapter-summary">${escapeHtml(ch.summary)}</p>
+                            ${keyPointsHtml ? `<ul class="key-points">${keyPointsHtml}</ul>` : ''}
+                            ${excerptHtml}
+                        </div>
+                    `;
+                    chaptersEl.appendChild(details);
+                });
+
+                resultEl.classList.add('visible');
+                hideStatus();
+            } catch (e) {
+                showStatus('Kunde inte tolka svaret fran Claude. Forsok igen.', true);
+                console.error('Parse error:', e, jsonText);
+            }
+        }
+
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+</html>
