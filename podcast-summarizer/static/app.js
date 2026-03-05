@@ -445,16 +445,64 @@ function parseTimeToSeconds(str) {
   return parts[0] || 0;
 }
 
-function getOriginalTextForChapter(timeStr) {
-  if (!timeStr || !rawSegments.length) return '';
+function getSegmentsForChapter(timeStr) {
+  if (!timeStr || !rawSegments.length) return [];
   const parts = timeStr.split(/[–\-—]/);
-  if (parts.length < 2) return '';
+  if (parts.length < 2) return [];
   const start = parseTimeToSeconds(parts[0]);
   const end = parseTimeToSeconds(parts[1]);
-  return rawSegments
-    .filter(s => s.start >= start && s.start < end)
-    .map(s => s.text)
-    .join(' ');
+  return rawSegments.filter(s => s.start >= start && s.start < end);
+}
+
+function formatSegmentsAsHtml(segments) {
+  if (!segments.length) return '';
+  let html = '';
+  let para = [];
+  for (let i = 0; i < segments.length; i++) {
+    para.push(segments[i].text);
+    const nextGap = (i < segments.length - 1)
+      ? segments[i + 1].start - segments[i].start
+      : 999;
+    if (para.length >= 5 || nextGap > 4 || i === segments.length - 1) {
+      html += `<p>${escapeHtml(para.join(' '))}</p>`;
+      para = [];
+    }
+  }
+  return html;
+}
+
+function buildTranscriptWithInlineOriginals(transcriptHtml, chapterSegments, chapterIdx) {
+  if (!chapterSegments.length) return transcriptHtml;
+
+  // Split transcript_html by <h4> subsections
+  const parts = transcriptHtml.split(/(?=<h4)/i);
+  if (parts.length <= 1) {
+    // Single block — just add one toggle at the end
+    const uid = `orig-${chapterIdx}-0`;
+    return transcriptHtml + buildInlineToggle(uid, chapterSegments);
+  }
+
+  // Distribute segments proportionally across subsections
+  const segsPerPart = Math.ceil(chapterSegments.length / parts.length);
+  let result = '';
+  for (let i = 0; i < parts.length; i++) {
+    const start = i * segsPerPart;
+    const end = Math.min(start + segsPerPart, chapterSegments.length);
+    const partSegs = chapterSegments.slice(start, end);
+    const uid = `orig-${chapterIdx}-${i}`;
+    result += parts[i] + (partSegs.length ? buildInlineToggle(uid, partSegs) : '');
+  }
+  return result;
+}
+
+function buildInlineToggle(uid, segments) {
+  const html = formatSegmentsAsHtml(segments);
+  return `
+    <button class="inline-original-toggle" onclick="toggleInlineOriginal(event, '${uid}')">
+      <span class="toggle-arrow">▶</span> Originaltext
+    </button>
+    <div class="inline-original-text" id="${uid}">${html}</div>
+  `;
 }
 
 
@@ -540,22 +588,15 @@ function renderResult(jsonText, doneInfo) {
 
     data.chapters.forEach((ch, idx) => {
       const transcriptHtml = ch.transcript_html || '';
-      const originalText = getOriginalTextForChapter(ch.time || ch.timestamp || '');
       const timeStr = ch.time || ch.timestamp || '';
+      const chapterSegments = getSegmentsForChapter(timeStr);
+
+      // Build transcript with inline original text toggles per subsection
+      const enrichedHtml = buildTranscriptWithInlineOriginals(transcriptHtml, chapterSegments, idx);
 
       const section = document.createElement('div');
       section.className = 'section';
       section.dataset.idx = idx;
-
-      let originalBlock = '';
-      if (originalText) {
-        originalBlock = `
-          <button class="original-toggle" onclick="toggleOriginal(event, ${idx})">
-            <span class="toggle-arrow">▶</span> Visa originaltext
-          </button>
-          <div class="original-text" id="original-${idx}">${escapeHtml(originalText)}</div>
-        `;
-      }
 
       section.innerHTML = `
         <div class="section-header" onclick="toggleSection(this)">
@@ -571,8 +612,7 @@ function renderResult(jsonText, doneInfo) {
           </div>
         </div>
         <div class="section-body">
-          <div class="transcript-text">${transcriptHtml}</div>
-          ${originalBlock}
+          <div class="transcript-text">${enrichedHtml}</div>
         </div>
       `;
       sectionsEl.appendChild(section);
@@ -598,13 +638,14 @@ function toggleSection(header) {
   section.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
-function toggleOriginal(event, idx) {
+function toggleInlineOriginal(event, uid) {
   event.stopPropagation();
-  const textEl = document.getElementById('original-' + idx);
+  const textEl = document.getElementById(uid);
+  if (!textEl) return;
   const isOpen = textEl.classList.toggle('visible');
   const btn = event.currentTarget;
   btn.classList.toggle('open', isOpen);
-  const label = isOpen ? 'Dölj originaltext' : 'Visa originaltext';
+  const label = isOpen ? 'Dölj originaltext' : 'Originaltext';
   btn.innerHTML = `<span class="toggle-arrow">${isOpen ? '▼' : '▶'}</span> ${label}`;
 }
 

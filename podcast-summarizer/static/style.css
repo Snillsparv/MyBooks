@@ -334,34 +334,50 @@ header .subtitle { color: var(--text-muted); font-size: 0.95rem; }
 .instructions { color: var(--text-muted); font-size: 0.82rem; margin-bottom: 14px; font-style: italic; }
 .kbd { font-size: 0.7rem; background: var(--surface-alt); border: 1px solid var(--border); padding: 1px 5px; border-radius: 3px; font-family: monospace; }
 
-/* ===== Sections / Chapter cards ===== */
-.section {
-  border: 1px solid var(--border); border-radius: var(--radius);
-  margin-bottom: 10px; overflow: hidden; transition: all 0.3s;
-  box-shadow: var(--shadow-sm); position: relative; background: var(--surface);
+/* ===== Folded paper strip accordion ===== */
+.sections-strip {
+  border-radius: var(--radius); overflow: hidden;
+  box-shadow: var(--shadow); border: 1px solid var(--border);
+  position: relative; background: var(--surface);
 }
-/* Folded corner */
-.section::before {
-  content: ''; position: absolute; top: 0; right: 0; z-index: 1;
-  width: 20px; height: 20px;
+.sections-strip::before {
+  content: ''; position: absolute; top: 0; right: 0; z-index: 2;
+  width: var(--fold-angle); height: var(--fold-angle);
   background: linear-gradient(225deg, var(--bg) 50%, var(--border) 50%, var(--surface-alt) 51%);
   border-radius: 0 var(--radius) 0 0;
-  transition: all 0.3s;
 }
-.section:hover { box-shadow: var(--shadow); }
-.section:hover::before {
-  width: 24px; height: 24px;
-  background: linear-gradient(225deg, var(--bg) 50%, var(--accent) 50%, var(--accent-light) 51%);
-}
-.section.open { box-shadow: var(--shadow); border-color: var(--accent-glow); }
-.section.open::before {
-  background: linear-gradient(225deg, var(--bg) 50%, var(--accent) 50%, var(--accent-light) 51%);
-}
+.sections-strip:empty { display: none; }
 
-.section.search-highlight { border-color: var(--accent); }
-.section.search-highlight::before {
-  background: linear-gradient(225deg, var(--bg) 50%, var(--accent) 50%, var(--accent-light) 51%);
+.section {
+  margin: 0; border-radius: 0; overflow: hidden; transition: all 0.3s;
+  box-shadow: none; position: relative; background: var(--surface);
+  border: none; border-bottom: 1px solid var(--border);
 }
+.section:last-child { border-bottom: none; }
+.section:nth-child(even) { background: var(--surface-alt); }
+.section:nth-child(even) .section-header { background: var(--surface-alt); }
+
+/* Fold crease triangles on edges */
+.section + .section::before {
+  content: ''; position: absolute; top: -5px; left: 0; z-index: 1;
+  width: 0; height: 0;
+  border-top: 5px solid transparent; border-bottom: 5px solid transparent;
+  border-left: 8px solid var(--border); transition: border-color 0.3s;
+}
+.section + .section::after {
+  content: ''; position: absolute; top: -5px; right: 0; z-index: 1;
+  width: 0; height: 0;
+  border-top: 5px solid transparent; border-bottom: 5px solid transparent;
+  border-right: 8px solid var(--border); transition: border-color 0.3s;
+}
+.section.open + .section::before,
+.section + .section.open::before { border-left-color: var(--accent); }
+.section.open + .section::after,
+.section + .section.open::after { border-right-color: var(--accent); }
+
+.section:hover { background: var(--surface); }
+.section.open { background: var(--surface); }
+.section.search-highlight { background: var(--accent-light); }
 
 .section-header {
   display: flex; align-items: flex-start; gap: 14px; padding: 16px 20px;
@@ -387,12 +403,18 @@ header .subtitle { color: var(--text-muted); font-size: 0.95rem; }
 }
 .timestamp:hover { color: var(--accent-hover); border-bottom-color: var(--accent); }
 
-/* Section body with fold-out animation */
+/* Section body with paper unfold animation */
 .section-body {
   max-height: 0; overflow: hidden; transition: max-height 0.4s ease;
+  transform-origin: top center;
 }
 .section.open .section-body {
   max-height: 50000px; transition: max-height 0.6s ease;
+  animation: paperUnfold 0.45s ease-out;
+}
+@keyframes paperUnfold {
+  from { transform: perspective(800px) rotateX(-12deg); opacity: 0.5; }
+  to { transform: perspective(800px) rotateX(0); opacity: 1; }
 }
 
 .transcript-text {
@@ -413,23 +435,31 @@ mark {
   border-radius: 2px; font-style: normal;
 }
 
-/* Original transcript toggle */
-.original-toggle {
-  display: inline-flex; align-items: center; gap: 6px; background: none;
-  border: 1px solid var(--border); color: var(--text-muted); padding: 5px 12px;
-  border-radius: 5px; font-family: 'DM Sans', sans-serif; font-size: 0.75rem;
-  cursor: pointer; margin: 14px 0 0 52px; transition: all 0.2s;
+/* Inline original text per subsection */
+.inline-original-toggle {
+  display: inline-flex; align-items: center; gap: 5px; background: none;
+  border: 1px dashed var(--border); color: var(--text-muted); padding: 3px 10px;
+  border-radius: 4px; font-family: 'DM Sans', sans-serif; font-size: 0.72rem;
+  cursor: pointer; margin: 6px 0 14px 0; transition: all 0.2s;
 }
-.original-toggle:hover { border-color: var(--sage); color: var(--sage); }
-.original-toggle .toggle-arrow { display: inline-block; transition: transform 0.3s; font-size: 0.65rem; }
-.original-toggle.open .toggle-arrow { transform: rotate(90deg); }
+.inline-original-toggle:hover { border-color: var(--sage); color: var(--sage); }
+.inline-original-toggle .toggle-arrow {
+  display: inline-block; transition: transform 0.3s; font-size: 0.6rem;
+}
+.inline-original-toggle.open .toggle-arrow { transform: rotate(90deg); }
 
-.original-text {
-  display: none; padding: 14px 20px 18px 52px; font-size: 0.8rem;
-  color: var(--text-muted); line-height: 1.75; border-top: 1px solid var(--border-light);
-  margin-top: 10px; background: var(--surface-alt); white-space: pre-wrap;
+.inline-original-text {
+  display: none; padding: 12px 16px; margin: 0 0 16px 0;
+  font-size: 0.8rem; color: var(--text-muted); line-height: 1.75;
+  background: var(--surface-alt); border-radius: 6px;
+  border-left: 3px solid var(--sage); position: relative;
 }
-.original-text.visible { display: block; animation: fadeUp 0.3s ease; }
+.inline-original-text.visible {
+  display: block;
+  animation: paperUnfold 0.35s ease-out;
+}
+.inline-original-text p { margin-bottom: 8px; }
+.inline-original-text p:last-child { margin-bottom: 0; }
 
 /* ===== YouTube Player ===== */
 .player-container {
