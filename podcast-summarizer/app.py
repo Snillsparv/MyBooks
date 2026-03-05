@@ -68,19 +68,19 @@ Givet följande transkription, gör följande:
    - De viktigaste citaten/poängerna (1-3 stycken)
 
 Svara ENBART med giltig JSON i följande format (ingen markdown, inga kodblock):
-{
+{{
   "title": "Titel på avsnittet",
   "summary": "Övergripande sammanfattning...",
   "chapters": [
-    {
+    {{
       "title": "Kapitelrubrik",
       "timestamp": "0:00",
       "summary": "Sammanfattning av kapitlet...",
       "key_points": ["Punkt 1", "Punkt 2"],
       "transcript_excerpt": "Ett kort relevant citat från transkriptionen..."
-    }
+    }}
   ]
-}
+}}
 
 Här är transkriptionen:
 
