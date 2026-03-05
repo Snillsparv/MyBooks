@@ -46,8 +46,8 @@ def get_transcript(video_id: str) -> tuple[str, list[dict]]:
     segments = []
     for snippet in transcript:
         segments.append({
-            "text": snippet["text"],
-            "start": snippet["start"],
+            "text": snippet.text,
+            "start": snippet.start,
         })
 
     formatter = TextFormatter()
