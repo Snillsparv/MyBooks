@@ -4,219 +4,80 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Foldly – Vik ihop långa transkriptioner</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦢</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --bg: #0f0f0f;
-    --surface: #1a1a1a;
-    --surface-hover: #222;
-    --border: #2a2a2a;
-    --text: #e0ddd5;
-    --text-muted: #8a8780;
-    --accent: #d4a853;
-    --accent-dim: #d4a85322;
-  }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; min-height: 100vh; }
-  .container { max-width: 780px; margin: 0 auto; padding: 60px 24px 100px; }
-
-  /* Header */
-  header { margin-bottom: 40px; position: relative; }
-  header::after { content: ''; position: absolute; bottom: -20px; left: 0; width: 48px; height: 2px; background: var(--accent); }
-  .logo-row { display: flex; align-items: center; gap: 14px; margin-bottom: 8px; }
-  .logo-crane { width: 36px; height: 36px; color: var(--accent); }
-  h1 { font-family: 'DM Serif Display', serif; font-size: clamp(2rem, 5vw, 2.8rem); font-weight: 400; color: #fff; letter-spacing: -0.02em; line-height: 1.2; }
-  header .subtitle { color: var(--text-muted); font-size: 0.95rem; }
-
-  /* Input area */
-  .input-area {
-    background: var(--surface); border-radius: 10px; padding: 1.2rem 1.4rem;
-    border: 1px solid var(--border); margin-bottom: 2rem;
-  }
-  .input-area label { display: block; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
-  .input-row { display: flex; gap: 0.75rem; }
-  .input-row input {
-    flex: 1; padding: 0.7rem 1rem; border: 1px solid var(--border); border-radius: 6px;
-    font-size: 0.95rem; font-family: inherit; background: var(--bg); color: var(--text); transition: border-color 0.2s;
-  }
-  .input-row input:focus { outline: none; border-color: var(--accent); }
-  .input-row input::placeholder { color: var(--text-muted); }
-  .input-row button {
-    padding: 0.7rem 1.5rem; background: var(--accent); color: #0f0f0f; border: none; border-radius: 6px;
-    font-size: 0.95rem; font-family: inherit; font-weight: 600; cursor: pointer; transition: opacity 0.2s; white-space: nowrap;
-  }
-  .input-row button:hover { opacity: 0.9; }
-  .input-row button:disabled { opacity: 0.4; cursor: not-allowed; }
-  .supported-sources { margin-top: 0.5rem; font-size: 0.78rem; color: #555; }
-
-  /* Loading / Origami animation */
-  .loading-container {
-    display: none; flex-direction: column; align-items: center; gap: 1.2rem;
-    padding: 2.5rem 1.5rem; background: var(--surface); border-radius: 12px;
-    border: 1px solid var(--border); margin-bottom: 1.5rem;
-  }
-  .loading-container.visible { display: flex; }
-  .loading-container.error { border-color: #5a2a2a; background: #1f1212; }
-
-  .origami-stage { position: relative; width: 160px; height: 160px; }
-  .origami-stage svg {
-    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    opacity: 0; transition: opacity 0.6s ease;
-  }
-  .origami-stage svg.active { opacity: 1; }
-
-  .loading-status { text-align: center; }
-  .loading-status .status-text { font-size: 0.95rem; color: var(--text); margin-bottom: 4px; }
-  .loading-status .eta-text { font-size: 0.82rem; color: var(--text-muted); }
-  .loading-status .error-text { color: #d4a0a0; }
-
-  .progress-track {
-    width: 100%; max-width: 280px; height: 4px; background: var(--border);
-    border-radius: 2px; overflow: hidden;
-  }
-  .progress-track-fill {
-    height: 100%; background: var(--accent); border-radius: 2px;
-    width: 0%; transition: width 0.4s ease;
-  }
-  .progress-track.indeterminate .progress-track-fill {
-    width: 30%; animation: indeterminate 1.5s ease-in-out infinite;
-  }
-  @keyframes indeterminate { 0% { transform: translateX(-100%); } 100% { transform: translateX(430%); } }
-
-  .progress-steps { display: flex; gap: 0.5rem; font-size: 0.78rem; color: #555; flex-wrap: wrap; justify-content: center; }
-  .progress-step { transition: color 0.3s; }
-  .progress-step.active { color: var(--accent); font-weight: 600; }
-  .progress-step.done { color: #4a9e6e; }
-  .progress-step.done::before { content: '\2713 '; }
-  .progress-step + .progress-step::before { content: ' \203A  '; color: #444; margin-right: 0.3rem; }
-  .progress-step.done + .progress-step::before { content: ' \203A  '; }
-
-  /* Result header */
-  .result { display: none; }
-  .result.visible { display: block; }
-  .result-header { margin-bottom: 40px; position: relative; }
-  .result-header::after { content: ''; position: absolute; bottom: -20px; left: 0; width: 48px; height: 2px; background: var(--accent); }
-  .result-header h2 { font-family: 'DM Serif Display', serif; font-size: clamp(1.6rem, 4vw, 2.2rem); font-weight: 400; color: #fff; letter-spacing: -0.02em; line-height: 1.2; margin-bottom: 8px; }
-  .result-header .subtitle { color: var(--text-muted); font-size: 0.95rem; }
-  .result-header .subtitle a { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--accent-dim); transition: border-color 0.2s; }
-  .result-header .subtitle a:hover { border-color: var(--accent); }
-
-  .overall-summary {
-    color: var(--text-muted); font-size: 0.92rem; margin-bottom: 28px;
-    padding: 1rem 1.2rem; background: var(--surface); border-radius: 8px; border: 1px solid var(--border);
-    font-style: italic; line-height: 1.7;
-  }
-
-  .instructions { color: var(--text-muted); font-size: 0.85rem; margin-bottom: 16px; font-style: italic; }
-
-  .expand-all {
-    display: inline-flex; align-items: center; gap: 6px; background: none;
-    border: 1px solid var(--border); color: var(--text-muted); padding: 8px 16px;
-    border-radius: 6px; font-family: 'DM Sans', sans-serif; font-size: 0.8rem;
-    cursor: pointer; margin-bottom: 24px; transition: all 0.2s;
-  }
-  .expand-all:hover { border-color: var(--accent); color: var(--accent); }
-
-  /* Sections */
-  .section { border: 1px solid var(--border); border-radius: 8px; margin-bottom: 12px; overflow: hidden; transition: border-color 0.3s; }
-  .section:hover { border-color: #3a3a3a; }
-  .section-header {
-    display: flex; align-items: flex-start; gap: 14px; padding: 18px 22px;
-    cursor: pointer; background: var(--surface); transition: background 0.2s; user-select: none;
-  }
-  .section-header:hover { background: var(--surface-hover); }
-  .section-header .arrow {
-    flex-shrink: 0; width: 20px; height: 20px; margin-top: 3px;
-    color: var(--text-muted); transition: transform 0.3s ease, color 0.2s;
-  }
-  .section.open .arrow { transform: rotate(90deg); color: var(--accent); }
-  .section-info { flex: 1; }
-  .section-title { font-family: 'DM Serif Display', serif; font-size: 1.1rem; color: #fff; margin-bottom: 4px; line-height: 1.35; }
-  .section-summary { font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; }
-  .section-meta { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
-  .timestamp { font-size: 0.75rem; color: var(--text-muted); font-variant-numeric: tabular-nums; }
-  .section-body { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
-  .section.open .section-body { max-height: 50000px; transition: max-height 0.6s ease; }
-  .transcript-text {
-    padding: 0 22px 22px 56px; font-size: 0.88rem; color: var(--text);
-    line-height: 1.85; border-top: 1px solid var(--border); padding-top: 18px;
-  }
-  .transcript-text h4 {
-    font-family: 'DM Serif Display', serif; font-size: 0.92rem; font-weight: 400;
-    color: var(--accent); margin-top: 20px; margin-bottom: 6px; letter-spacing: 0.01em;
-  }
-  .transcript-text h4:first-child { margin-top: 0; }
-  .transcript-text p { margin-bottom: 12px; }
-  .transcript-text p:last-child { margin-bottom: 0; }
-
-  /* Original transcript toggle */
-  .original-toggle {
-    display: inline-flex; align-items: center; gap: 6px; background: none;
-    border: 1px solid var(--border); color: var(--text-muted); padding: 6px 14px;
-    border-radius: 5px; font-family: 'DM Sans', sans-serif; font-size: 0.78rem;
-    cursor: pointer; margin: 16px 0 0 56px; transition: all 0.2s;
-  }
-  .original-toggle:hover { border-color: var(--accent); color: var(--accent); }
-  .original-toggle .toggle-arrow {
-    display: inline-block; transition: transform 0.3s; font-size: 0.7rem;
-  }
-  .original-toggle.open .toggle-arrow { transform: rotate(90deg); }
-  .original-text {
-    display: none; padding: 14px 22px 22px 56px; font-size: 0.82rem;
-    color: var(--text-muted); line-height: 1.8; border-top: 1px solid var(--border);
-    margin-top: 12px; background: #141414; white-space: pre-wrap;
-  }
-  .original-text.visible { display: block; }
-
-  footer { margin-top: 3rem; text-align: center; font-size: 0.78rem; color: #444; }
-
-  @media (max-width: 600px) {
-    .container { padding: 36px 16px 80px; }
-    .input-row { flex-direction: column; }
-    .input-row button { width: 100%; }
-    .section-header { padding: 14px 16px; }
-    .transcript-text { padding: 0 16px 16px 16px; padding-top: 14px; }
-    .original-toggle { margin-left: 16px; }
-    .original-text { padding: 14px 16px 16px 16px; }
-  }
-</style>
+<link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
 <div class="container">
+
+  <!-- Top bar: auth + theme -->
+  <div class="top-bar">
+    <div id="auth-area"></div>
+    <button class="theme-toggle" id="theme-btn" onclick="toggleTheme()" title="Byt tema">🌙</button>
+  </div>
+
+  <!-- Header -->
   <header>
     <div class="logo-row">
+      <!-- Origami crane logo -->
       <svg class="logo-crane" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
         <polygon points="50,8 80,22 50,52 20,22" fill="currentColor" fill-opacity="0.15"/>
         <polyline points="50,52 30,78"/>
         <polyline points="30,78 22,74"/>
         <polyline points="50,52 75,70"/>
-        <line x1="50" y1="8" x2="50" y2="52" stroke-dasharray="3,3" opacity="0.4"/>
+        <line x1="50" y1="8" x2="50" y2="52" stroke-dasharray="3,3" opacity="0.3"/>
       </svg>
       <h1>Foldly</h1>
     </div>
     <p class="subtitle">Vik ihop långa transkriptioner till lätthanterliga sammanfattningar</p>
   </header>
 
+  <!-- Input area -->
   <div class="input-area">
     <label for="url-input">YouTube-länk</label>
     <div class="input-row">
       <input type="url" id="url-input" placeholder="https://www.youtube.com/watch?v=..." autofocus>
-      <button id="summarize-btn" onclick="handleSubmit()">Vik ihop</button>
+      <button class="btn-primary" id="summarize-btn" onclick="handleSubmit()">Vik ihop</button>
+    </div>
+    <div class="options-row">
+      <div class="option-group">
+        <label for="lang-select">Språk:</label>
+        <select id="lang-select">
+          <option value="svenska" selected>Svenska</option>
+          <option value="engelska">English</option>
+          <option value="norska">Norsk</option>
+          <option value="danska">Dansk</option>
+          <option value="finska">Suomi</option>
+          <option value="tyska">Deutsch</option>
+          <option value="franska">Français</option>
+          <option value="spanska">Español</option>
+        </select>
+      </div>
+      <div class="option-group">
+        <label for="detail-select">Detaljnivå:</label>
+        <select id="detail-select">
+          <option value="short">Kort</option>
+          <option value="medium" selected>Medium</option>
+          <option value="detailed">Detaljerad</option>
+        </select>
+      </div>
     </div>
     <p class="supported-sources">Stöder YouTube-videor med automatiska eller manuella undertexter.</p>
   </div>
 
+  <!-- Loading / Origami animation -->
   <div class="loading-container" id="loading">
     <div class="origami-stage" id="origami-stage">
       <!-- Stage 1: Flat paper (diamond) -->
       <svg viewBox="0 0 100 100" id="crane-1">
-        <polygon points="50,10 85,50 50,90 15,50" fill="var(--accent)" fill-opacity="0.06" stroke="var(--accent)" stroke-width="0.8" opacity="0.7"/>
+        <polygon points="50,10 85,50 50,90 15,50" fill="var(--accent)" fill-opacity="0.08" stroke="var(--accent)" stroke-width="0.8" opacity="0.7"/>
         <line x1="50" y1="10" x2="50" y2="90" stroke="var(--accent)" stroke-width="0.4" stroke-dasharray="2,3" opacity="0.3"/>
         <line x1="15" y1="50" x2="85" y2="50" stroke="var(--accent)" stroke-width="0.4" stroke-dasharray="2,3" opacity="0.3"/>
       </svg>
-      <!-- Stage 2: First diagonal fold (triangle) -->
+      <!-- Stage 2: First fold -->
       <svg viewBox="0 0 100 100" id="crane-2">
-        <polygon points="50,10 85,50 15,50" fill="var(--accent)" fill-opacity="0.08" stroke="var(--accent)" stroke-width="0.8"/>
+        <polygon points="50,10 85,50 15,50" fill="var(--accent)" fill-opacity="0.1" stroke="var(--accent)" stroke-width="0.8"/>
         <polygon points="15,50 85,50 50,90" fill="var(--accent)" fill-opacity="0.04" stroke="var(--accent)" stroke-width="0.5" opacity="0.3"/>
         <line x1="50" y1="10" x2="50" y2="50" stroke="var(--accent)" stroke-width="0.5" stroke-dasharray="2,2" opacity="0.5"/>
       </svg>
@@ -226,45 +87,39 @@
         <line x1="50" y1="10" x2="50" y2="70" stroke="var(--accent)" stroke-width="0.5" stroke-dasharray="2,2" opacity="0.4"/>
         <line x1="28" y1="38" x2="72" y2="38" stroke="var(--accent)" stroke-width="0.4" stroke-dasharray="2,2" opacity="0.3"/>
       </svg>
-      <!-- Stage 4: Bird base (elongated) -->
+      <!-- Stage 4: Bird base -->
       <svg viewBox="0 0 100 100" id="crane-4">
         <polygon points="50,8 63,42 50,85 37,42" fill="var(--accent)" fill-opacity="0.1" stroke="var(--accent)" stroke-width="0.8"/>
         <line x1="50" y1="8" x2="50" y2="85" stroke="var(--accent)" stroke-width="0.5" stroke-dasharray="2,2" opacity="0.4"/>
         <line x1="37" y1="42" x2="63" y2="42" stroke="var(--accent)" stroke-width="0.4" opacity="0.3"/>
       </svg>
-      <!-- Stage 5: Forming head/tail -->
+      <!-- Stage 5: Forming -->
       <svg viewBox="0 0 100 100" id="crane-5">
         <polygon points="50,12 60,42 50,78 40,42" fill="var(--accent)" fill-opacity="0.1" stroke="var(--accent)" stroke-width="0.8"/>
         <polyline points="40,46 26,30" fill="none" stroke="var(--accent)" stroke-width="1"/>
         <polyline points="60,46 78,65" fill="none" stroke="var(--accent)" stroke-width="0.8"/>
-        <circle cx="23" cy="28" r="1.2" fill="var(--accent)" opacity="0.6"/>
+        <circle cx="23" cy="28" r="1.5" fill="var(--accent)" opacity="0.5"/>
       </svg>
-      <!-- Stage 6: Wings spreading -->
+      <!-- Stage 6: Wings -->
       <svg viewBox="0 0 100 100" id="crane-6">
         <polygon points="48,38 50,30 52,38 50,58" fill="var(--accent)" fill-opacity="0.15" stroke="var(--accent)" stroke-width="0.8"/>
         <polygon points="50,38 24,18 42,40" fill="var(--accent)" fill-opacity="0.1" stroke="var(--accent)" stroke-width="0.8"/>
         <polygon points="50,38 76,18 58,40" fill="var(--accent)" fill-opacity="0.1" stroke="var(--accent)" stroke-width="0.8"/>
         <polyline points="44,48 28,72 22,68" fill="none" stroke="var(--accent)" stroke-width="1"/>
         <polyline points="56,50 76,66" fill="none" stroke="var(--accent)" stroke-width="0.8"/>
-        <circle cx="20" cy="66" r="1.2" fill="var(--accent)" opacity="0.6"/>
+        <circle cx="20" cy="66" r="1.5" fill="var(--accent)" opacity="0.5"/>
       </svg>
       <!-- Stage 7: Complete crane -->
       <svg viewBox="0 0 100 100" id="crane-7">
-        <!-- Body -->
         <polygon points="47,40 50,34 53,40 50,56" fill="var(--accent)" fill-opacity="0.2" stroke="var(--accent)" stroke-width="0.8"/>
-        <!-- Left wing -->
         <polygon points="47,38 14,12 18,16 42,40" fill="var(--accent)" fill-opacity="0.12" stroke="var(--accent)" stroke-width="0.8"/>
         <polygon points="14,12 10,20 42,40" fill="var(--accent)" fill-opacity="0.06" stroke="var(--accent)" stroke-width="0.5"/>
-        <!-- Right wing -->
         <polygon points="53,38 86,12 82,16 58,40" fill="var(--accent)" fill-opacity="0.12" stroke="var(--accent)" stroke-width="0.8"/>
         <polygon points="86,12 90,20 58,40" fill="var(--accent)" fill-opacity="0.06" stroke="var(--accent)" stroke-width="0.5"/>
-        <!-- Neck + head -->
         <polyline points="45,48 30,74 24,70" fill="none" stroke="var(--accent)" stroke-width="1.2"/>
         <polyline points="24,70 18,68" fill="none" stroke="var(--accent)" stroke-width="1.5"/>
-        <circle cx="17" cy="67.5" r="1.5" fill="var(--accent)" opacity="0.7"/>
-        <!-- Tail -->
+        <circle cx="17" cy="67.5" r="1.5" fill="var(--accent)" opacity="0.6"/>
         <polyline points="55,50 78,64 82,60" fill="none" stroke="var(--accent)" stroke-width="1"/>
-        <!-- Subtle fold lines on wings -->
         <line x1="47" y1="38" x2="26" y2="18" stroke="var(--accent)" stroke-width="0.3" opacity="0.3"/>
         <line x1="53" y1="38" x2="74" y2="18" stroke="var(--accent)" stroke-width="0.3" opacity="0.3"/>
       </svg>
@@ -286,339 +141,119 @@
     </div>
   </div>
 
+  <!-- YouTube Player (embedded) -->
+  <div class="player-container" id="player-container">
+    <iframe src="" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+  </div>
+
+  <!-- Result -->
   <div class="result" id="result">
     <div class="result-header" id="result-header"></div>
+    <div class="result-meta-bar" id="result-meta-bar"></div>
     <div class="overall-summary" id="overall-summary"></div>
-    <p class="instructions">Klicka på en rubrik för att visa sammanfattningen. Klicka på "Visa originaltext" för den oförkortade transkriptionen.</p>
-    <button class="expand-all" onclick="toggleAll()">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 10l5 5 5-5"/></svg>
-      <span>Visa/dölj alla</span>
-    </button>
+
+    <div class="key-quotes" id="key-quotes" style="display:none"></div>
+
+    <hr class="fold-divider">
+
+    <div class="toolbar">
+      <div class="search-box">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        <input type="text" id="search-input" placeholder="Sök i sammanfattningen... ( / )">
+      </div>
+      <span class="search-count" id="search-count"></span>
+      <button class="toolbar-btn" onclick="toggleAll()" title="Visa/dölj alla">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 10l5 5 5-5"/></svg>
+        Alla
+      </button>
+      <button class="toolbar-btn" onclick="copyAll()" title="Kopiera som Markdown">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        Kopiera
+      </button>
+      <button class="toolbar-btn" onclick="exportMarkdown()" title="Ladda ner Markdown">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        .md
+      </button>
+    </div>
+
+    <p class="instructions">
+      Klicka på en rubrik för att vika ut den. Tidsstämplar hoppar till videon.
+      <span class="kbd">J</span>/<span class="kbd">K</span> navigerar, <span class="kbd">Enter</span> öppnar, <span class="kbd">/</span> söker.
+    </p>
+
     <div id="sections"></div>
   </div>
 
-  <footer>Foldly &middot; Drivs av Claude AI &middot; Transkriptioner från YouTube</footer>
+  <footer>Foldly · Drivs av Claude AI · Transkriptioner från YouTube</footer>
 </div>
 
-<script>
-const urlInput = document.getElementById('url-input');
-const btn = document.getElementById('summarize-btn');
-const loadingEl = document.getElementById('loading');
-const statusText = document.getElementById('status-text');
-const etaText = document.getElementById('eta-text');
-const progressTrack = document.getElementById('progress-track');
-const progressFill = document.getElementById('progress-fill');
-const progressSteps = document.getElementById('progress-steps');
-const stepTranscript = document.getElementById('step-transcript');
-const stepAnalyze = document.getElementById('step-analyze');
-const stepDone = document.getElementById('step-done');
-const resultEl = document.getElementById('result');
-const resultHeader = document.getElementById('result-header');
-const overallSummaryEl = document.getElementById('overall-summary');
-const sectionsEl = document.getElementById('sections');
+<!-- Login modal -->
+<div class="modal-overlay" id="login-modal" onclick="if(event.target===this)closeModal('login')">
+  <div class="modal">
+    <h3>Logga in</h3>
+    <form onsubmit="doLogin(event)">
+      <div class="form-group">
+        <label>E-post</label>
+        <input type="email" id="login-email" required autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label>Lösenord</label>
+        <input type="password" id="login-password" required autocomplete="current-password">
+      </div>
+      <div class="form-error" id="login-error"></div>
+      <div class="form-actions">
+        <button type="button" class="btn-sm" onclick="closeModal('login')">Avbryt</button>
+        <button type="submit" class="btn-sm primary">Logga in</button>
+      </div>
+    </form>
+    <div class="switch-link">Inget konto? <a onclick="closeModal('login');openModal('register')">Skapa ett</a></div>
+  </div>
+</div>
 
-let videoMeta = {};
-let rawSegments = [];
-let allOpen = false;
-let streamStartTime = 0;
+<!-- Register modal -->
+<div class="modal-overlay" id="register-modal" onclick="if(event.target===this)closeModal('register')">
+  <div class="modal">
+    <h3>Skapa konto</h3>
+    <form onsubmit="doRegister(event)">
+      <div class="form-group">
+        <label>Namn (valfritt)</label>
+        <input type="text" id="reg-name" autocomplete="name">
+      </div>
+      <div class="form-group">
+        <label>E-post</label>
+        <input type="email" id="reg-email" required autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label>Lösenord (minst 6 tecken)</label>
+        <input type="password" id="reg-password" required minlength="6" autocomplete="new-password">
+      </div>
+      <div class="form-error" id="reg-error"></div>
+      <div class="form-actions">
+        <button type="button" class="btn-sm" onclick="closeModal('register')">Avbryt</button>
+        <button type="submit" class="btn-sm primary">Skapa konto</button>
+      </div>
+    </form>
+    <div class="switch-link">Har redan konto? <a onclick="closeModal('register');openModal('login')">Logga in</a></div>
+  </div>
+</div>
 
-urlInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') handleSubmit(); });
+<!-- History sidebar -->
+<div class="history-panel" id="history-panel">
+  <h3>
+    Dina folds
+    <button class="close-btn" onclick="closeHistory()">×</button>
+  </h3>
+  <div id="history-list"></div>
+</div>
 
-/* --- Origami crane animation --- */
-const craneStages = 7;
-function setCraneStage(progress) {
-    // progress 0-100 -> stage 1-7
-    const stage = Math.min(craneStages, Math.max(1, Math.ceil((progress / 100) * craneStages)));
-    for (let i = 1; i <= craneStages; i++) {
-        const el = document.getElementById('crane-' + i);
-        if (el) el.classList.toggle('active', i === stage);
-    }
-}
+<!-- Toast -->
+<div class="toast" id="toast"></div>
 
-/* --- Loading state management --- */
-function showLoading(msg, isError = false) {
-    loadingEl.classList.add('visible');
-    loadingEl.classList.toggle('error', isError);
-    statusText.textContent = msg;
-    statusText.classList.toggle('error-text', isError);
-    if (isError) {
-        etaText.textContent = '';
-        progressTrack.style.display = 'none';
-        progressSteps.style.display = 'none';
-        // Hide all cranes on error
-        for (let i = 1; i <= craneStages; i++) {
-            const el = document.getElementById('crane-' + i);
-            if (el) el.classList.remove('active');
-        }
-    } else {
-        progressTrack.style.display = '';
-        progressSteps.style.display = '';
-    }
-}
+<!-- Shared fold data (injected by server) -->
+{% if shared_fold %}
+<script type="application/json" id="shared-fold-data">{{ shared_fold | tojson }}</script>
+{% endif %}
 
-function hideLoading() {
-    loadingEl.classList.remove('visible', 'error');
-    progressTrack.classList.remove('indeterminate');
-    etaText.textContent = '';
-    [stepTranscript, stepAnalyze, stepDone].forEach(s => s.classList.remove('active', 'done'));
-}
-
-function setStep(step) {
-    if (step === 'transcript') {
-        progressTrack.classList.add('indeterminate');
-        progressFill.style.width = '0%';
-        stepTranscript.classList.add('active');
-        stepAnalyze.classList.remove('active', 'done');
-        stepDone.classList.remove('active', 'done');
-        setCraneStage(5);
-    } else if (step === 'analyze') {
-        progressTrack.classList.remove('indeterminate');
-        progressFill.style.width = '15%';
-        stepTranscript.classList.remove('active');
-        stepTranscript.classList.add('done');
-        stepAnalyze.classList.add('active');
-        stepDone.classList.remove('active', 'done');
-        streamStartTime = Date.now();
-        setCraneStage(15);
-    } else if (step === 'done') {
-        progressTrack.classList.remove('indeterminate');
-        progressFill.style.width = '100%';
-        stepTranscript.classList.remove('active');
-        stepTranscript.classList.add('done');
-        stepAnalyze.classList.remove('active');
-        stepAnalyze.classList.add('done');
-        stepDone.classList.add('done');
-        setCraneStage(100);
-        etaText.textContent = '';
-    }
-}
-
-function updateStreamProgress(charCount) {
-    // Estimate: typical response is ~4000-10000 chars. Use video duration to estimate.
-    const durationMin = videoMeta.duration || 30;
-    const estimatedChars = Math.max(4000, durationMin * 200);
-    const progress = Math.min(95, 15 + (charCount / estimatedChars) * 80);
-    progressFill.style.width = progress + '%';
-    setCraneStage(progress);
-
-    // ETA calculation
-    if (streamStartTime && charCount > 200) {
-        const elapsed = (Date.now() - streamStartTime) / 1000;
-        const rate = charCount / elapsed; // chars per second
-        const remaining = Math.max(0, estimatedChars - charCount);
-        const etaSeconds = Math.round(remaining / rate);
-        if (etaSeconds > 2) {
-            const min = Math.floor(etaSeconds / 60);
-            const sec = etaSeconds % 60;
-            etaText.textContent = min > 0
-                ? `Beräknad tid kvar: ~${min} min ${sec} s`
-                : `Beräknad tid kvar: ~${sec} s`;
-        } else {
-            etaText.textContent = 'Nästan klar...';
-        }
-    }
-}
-
-/* --- Main submit handler --- */
-async function handleSubmit() {
-    const url = urlInput.value.trim();
-    if (!url) return;
-
-    btn.disabled = true;
-    resultEl.classList.remove('visible');
-    sectionsEl.innerHTML = '';
-    rawSegments = [];
-    showLoading('Hämtar transkription från YouTube...');
-    setStep('transcript');
-
-    try {
-        const resp = await fetch('/api/summarize', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ url }),
-        });
-
-        if (!resp.ok) {
-            const err = await resp.json();
-            throw new Error(err.error || 'Något gick fel');
-        }
-
-        const reader = resp.body.getReader();
-        const decoder = new TextDecoder();
-        let buffer = '';
-        let fullText = '';
-
-        while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
-
-            buffer += decoder.decode(value, { stream: true });
-            const lines = buffer.split('\n');
-            buffer = lines.pop();
-
-            for (const line of lines) {
-                if (!line.trim()) continue;
-                try {
-                    const msg = JSON.parse(line);
-                    if (msg.type === 'meta') {
-                        videoMeta = msg;
-                        rawSegments = msg.segments || [];
-                        showLoading('Claude analyserar och sammanfattar...');
-                        setStep('analyze');
-                    } else if (msg.type === 'chunk') {
-                        fullText += msg.text;
-                        updateStreamProgress(fullText.length);
-                    } else if (msg.type === 'done') {
-                        setStep('done');
-                        renderResult(fullText);
-                    } else if (msg.type === 'error') {
-                        throw new Error(msg.error);
-                    }
-                } catch (e) {
-                    if (e instanceof SyntaxError) continue;
-                    throw e;
-                }
-            }
-        }
-
-        if (buffer.trim()) {
-            for (const part of buffer.split('\n')) {
-                if (!part.trim()) continue;
-                try {
-                    const msg = JSON.parse(part);
-                    if (msg.type === 'chunk') fullText += msg.text;
-                    if (msg.type === 'done') { setStep('done'); renderResult(fullText); }
-                    if (msg.type === 'error') { showLoading(msg.error, true); }
-                } catch (e) {}
-            }
-        }
-
-        if (fullText && !resultEl.classList.contains('visible')) {
-            renderResult(fullText);
-        }
-
-    } catch (err) {
-        showLoading(err.message, true);
-    } finally {
-        btn.disabled = false;
-    }
-}
-
-/* --- Time parsing utilities --- */
-function parseTimeToSeconds(str) {
-    if (!str) return 0;
-    const parts = str.trim().split(':').map(Number);
-    if (parts.length === 3) return parts[0] * 3600 + parts[1] * 60 + parts[2];
-    if (parts.length === 2) return parts[0] * 60 + parts[1];
-    return parts[0] || 0;
-}
-
-function getOriginalTextForChapter(timeStr) {
-    if (!timeStr || !rawSegments.length) return '';
-    const parts = timeStr.split(/[–\-—]/);
-    if (parts.length < 2) return '';
-    const start = parseTimeToSeconds(parts[0]);
-    const end = parseTimeToSeconds(parts[1]);
-    return rawSegments
-        .filter(s => s.start >= start && s.start < end)
-        .map(s => s.text)
-        .join(' ');
-}
-
-/* --- Render result --- */
-function renderResult(jsonText) {
-    try {
-        let cleaned = jsonText.trim();
-        if (cleaned.startsWith('```')) {
-            cleaned = cleaned.replace(/^```(?:json)?\s*/, '').replace(/```\s*$/, '');
-        }
-        const data = JSON.parse(cleaned);
-
-        const ytUrl = `https://www.youtube.com/watch?v=${videoMeta.video_id}`;
-        resultHeader.innerHTML = `
-            <h2>${escapeHtml(data.title || videoMeta.video_title)}</h2>
-            <p class="subtitle">${escapeHtml(videoMeta.video_title)} &middot; <a href="${ytUrl}" target="_blank">Se på YouTube</a></p>
-        `;
-
-        overallSummaryEl.textContent = data.summary;
-
-        sectionsEl.innerHTML = '';
-        allOpen = false;
-
-        data.chapters.forEach((ch, idx) => {
-            const transcriptHtml = ch.transcript_html || '';
-            const originalText = getOriginalTextForChapter(ch.time || ch.timestamp || '');
-
-            const section = document.createElement('div');
-            section.className = 'section';
-
-            let originalBlock = '';
-            if (originalText) {
-                originalBlock = `
-                    <button class="original-toggle" onclick="toggleOriginal(event, this)" data-idx="${idx}">
-                        <span class="toggle-arrow">&#9654;</span> Visa originaltext
-                    </button>
-                    <div class="original-text" id="original-${idx}">${escapeHtml(originalText)}</div>
-                `;
-            }
-
-            section.innerHTML = `
-                <div class="section-header" onclick="toggleSection(this)">
-                    <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M9 6l6 6-6 6"/>
-                    </svg>
-                    <div class="section-info">
-                        <div class="section-title">${escapeHtml(ch.title)}</div>
-                        <div class="section-summary">${escapeHtml(ch.summary)}</div>
-                        <div class="section-meta">
-                            <span class="timestamp">${escapeHtml(ch.time || ch.timestamp || '')}</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="section-body">
-                    <div class="transcript-text">${transcriptHtml}</div>
-                    ${originalBlock}
-                </div>
-            `;
-            sectionsEl.appendChild(section);
-        });
-
-        resultEl.classList.add('visible');
-        hideLoading();
-    } catch (e) {
-        console.error('Parse error:', e);
-        console.error('Raw response (first 500 chars):', jsonText.substring(0, 500));
-        showLoading('Kunde inte tolka svaret från Claude. Försök igen.', true);
-    }
-}
-
-function toggleSection(header) {
-    header.parentElement.classList.toggle('open');
-}
-
-function toggleOriginal(event, btn) {
-    event.stopPropagation();
-    const idx = btn.dataset.idx;
-    const textEl = document.getElementById('original-' + idx);
-    const isOpen = textEl.classList.toggle('visible');
-    btn.classList.toggle('open', isOpen);
-    btn.querySelector('.toggle-arrow').textContent = isOpen ? '\u25BC' : '\u25B6';
-    const label = isOpen ? 'Dölj originaltext' : 'Visa originaltext';
-    btn.innerHTML = `<span class="toggle-arrow">${isOpen ? '\u25BC' : '\u25B6'}</span> ${label}`;
-}
-
-function toggleAll() {
-    allOpen = !allOpen;
-    document.querySelectorAll('.section').forEach(s => {
-        s.classList.toggle('open', allOpen);
-    });
-}
-
-function escapeHtml(str) {
-    const div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
-}
-</script>
+<script src="/static/app.js"></script>
 </body>
 </html>
