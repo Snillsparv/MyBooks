@@ -55,7 +55,8 @@ def get_transcript(video_id: str) -> tuple[str, list[dict]]:
     return full_text, segments
 
 
-SUMMARIZE_PROMPT = """Du är en expert på att sammanfatta podcast-avsnitt och videoinnehåll.
+SUMMARIZE_PROMPT = """\
+Du är en expert på att sammanfatta podcast-avsnitt och videoinnehåll.
 
 Givet följande transkription, gör följande:
 
@@ -63,9 +64,11 @@ Givet följande transkription, gör följande:
 2. Dela upp innehållet i logiska kapitel/sektioner (5-15 stycken beroende på längd).
 3. Varje kapitel ska ha:
    - En kort, beskrivande rubrik på svenska
-   - En ungefärlig tidsstämpel (baserat på textens position i transkriptionen)
-   - En sammanfattning på 2-4 meningar
-   - De viktigaste citaten/poängerna (1-3 stycken)
+   - En tidsperiod (t.ex. "0:00\u20135:30") baserat på textens position i transkriptionen
+   - En sammanfattning på 1-3 meningar
+   - Den faktiska transkriptionstexten för det avsnittet, organiserad under underrubriker. \
+Inkludera ALL text från transkriptionen \u2014 utelämna ingenting. \
+Formatera som HTML-fragment med <h4> för underrubriker och <p> för stycken.
 
 Svara ENBART med giltig JSON i följande format (ingen markdown, inga kodblock):
 {{
@@ -74,10 +77,9 @@ Svara ENBART med giltig JSON i följande format (ingen markdown, inga kodblock):
   "chapters": [
     {{
       "title": "Kapitelrubrik",
-      "timestamp": "0:00",
+      "time": "0:00\u20135:30",
       "summary": "Sammanfattning av kapitlet...",
-      "key_points": ["Punkt 1", "Punkt 2"],
-      "transcript_excerpt": "Ett kort relevant citat från transkriptionen..."
+      "transcript_html": "<h4>Underrubrik</h4><p>Text från transkriptionen...</p>"
     }}
   ]
 }}
@@ -88,8 +90,7 @@ Här är transkriptionen:
 {transcript}
 ---
 
-Totallängd på videon: cirka {duration} minuter.
-"""
+Totallängd på videon: cirka {duration} minuter."""
 
 
 def estimate_duration(segments: list[dict]) -> int:
@@ -111,7 +112,7 @@ def summarize_with_claude(transcript_text: str, duration_minutes: int):
 
     with client.messages.stream(
         model="claude-sonnet-4-20250514",
-        max_tokens=8000,
+        max_tokens=16000,
         messages=[{"role": "user", "content": prompt}],
     ) as stream:
         full_response = ""
