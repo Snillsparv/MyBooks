@@ -393,6 +393,39 @@
 
 <script>
     (function () {
+        const headingRules = [
+            { pattern: /(internet of slop|fake|deepfake|untrustworthy)/i, title: 'Fejkinnehåll och förtroendekris' },
+            { pattern: /(blackbox|algorithmic|credit card|sentenc)/i, title: 'Ogenomskinliga beslut och orättvisa' },
+            { pattern: /(intellectual property|trained|lawsuit|books|youtube)/i, title: 'Träningsdata, upphovsrätt och ersättning' },
+            { pattern: /(psychosis|chatbots|dependence|sycophancy|fall in love)/i, title: 'Psykologiska risker med chatbotar' },
+            { pattern: /(jobs|labor|workers|employment)/i, title: 'Arbete, yrkesroller och omställning' },
+            { pattern: /(electricity|data centers|water|utilities|air conditioning)/i, title: 'Energi, vatten och samhällskostnader' },
+            { pattern: /(bubble|econom|great depression)/i, title: 'AI-bubbla och ekonomiska följder' },
+            { pattern: /(epistemic|reality|candidate|politic|searches)/i, title: 'Sanning, politik och informationsmiljö' },
+            { pattern: /(power|control reality|god emperors|grock|claude|gemini)/i, title: 'Maktkoncentration i AI-plattformar' },
+            { pattern: /(model collapse|plateau|ran out of data)/i, title: 'Modellkollaps och stagnation' },
+            { pattern: /(truth|focus|concentration|literacy|deep reading)/i, title: 'Fokus, lärande och kognitiv förmåga' },
+            { pattern: /(regulatory|liability|congress|responsible)/i, title: 'Reglering, ansvar och styrning' }
+        ];
+
+        const fallbackHeading = (text) => {
+            const cleaned = text
+                .replace(/^[A-Za-zÀ-ÖØ-öø-ÿ]+:\s*/, '')
+                .replace(/["“”]/g, '')
+                .trim();
+
+            const firstSentence = cleaned.split(/(?<=[.!?])\s+/)[0] || cleaned;
+            const words = firstSentence.split(/\s+/).slice(0, 7);
+            const short = words.join(' ').replace(/[.,:;!?]+$/, '');
+            return short || 'Sammanfattning av avsnittet';
+        };
+
+        const makeHeading = (text, chunkIndex) => {
+            const matchedRule = headingRules.find((rule) => rule.pattern.test(text));
+            const baseTitle = matchedRule ? matchedRule.title : fallbackHeading(text);
+            return chunkIndex > 0 ? `${baseTitle} (del ${chunkIndex + 1})` : baseTitle;
+        };
+
         const splitIntoChunks = (content, maxSentencesPerChunk = 3) => {
             const sentences = content
                 .split(/(?<=[.!?])\s+/)
@@ -427,8 +460,7 @@
                     section.className = 'transcript-section';
 
                     const heading = document.createElement('h4');
-                    const topicLabel = paragraphs.length > 1 ? `Tema ${paragraphIndex + 1}` : 'Tema';
-                    heading.textContent = `${topicLabel} - Del ${chunkIndex + 1}`;
+                    heading.textContent = makeHeading(chunk, chunkIndex);
 
                     const body = document.createElement('p');
                     body.textContent = chunk;
