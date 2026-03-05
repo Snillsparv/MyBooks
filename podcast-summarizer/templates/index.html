@@ -327,11 +327,15 @@ async function handleSubmit() {
         }
 
         if (buffer.trim()) {
-            try {
-                const msg = JSON.parse(buffer);
-                if (msg.type === 'chunk') fullText += msg.text;
-                if (msg.type === 'done') { setStep('done'); renderResult(fullText); }
-            } catch (e) {}
+            for (const part of buffer.split('\n')) {
+                if (!part.trim()) continue;
+                try {
+                    const msg = JSON.parse(part);
+                    if (msg.type === 'chunk') fullText += msg.text;
+                    if (msg.type === 'done') { setStep('done'); renderResult(fullText); }
+                    if (msg.type === 'error') { showStatus(msg.error, true); }
+                } catch (e) {}
+            }
         }
 
         if (fullText && !resultEl.classList.contains('visible')) {
@@ -393,8 +397,10 @@ function renderResult(jsonText) {
         resultEl.classList.add('visible');
         hideStatus();
     } catch (e) {
-        showStatus('Kunde inte tolka svaret från Claude. Försök igen.', true);
-        console.error('Parse error:', e, jsonText);
+        console.error('Parse error:', e);
+        console.error('Raw response (first 500 chars):', jsonText.substring(0, 500));
+        console.error('Raw response (last 500 chars):', jsonText.substring(jsonText.length - 500));
+        showStatus('Kunde inte tolka svaret från Claude. Svaret kan ha blivit avklippt. Försök igen.', true);
     }
 }
 

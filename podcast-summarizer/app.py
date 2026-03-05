@@ -67,8 +67,8 @@ Givet följande transkription, gör följande:
    - En tidsperiod (t.ex. "0:00\u20135:30") baserat på textens position i transkriptionen
    - En sammanfattning på 1-3 meningar
    - Den faktiska transkriptionstexten för det avsnittet, organiserad under underrubriker. \
-Inkludera ALL text från transkriptionen \u2014 utelämna ingenting. \
-Formatera som HTML-fragment med <h4> för underrubriker och <p> för stycken.
+Inkludera de viktigaste delarna av transkriptionstexten \u2014 parafrasera och komprimera där det behövs, \
+men behåll viktiga citat ordagrant. Formatera som HTML-fragment med <h4> för underrubriker och <p> för stycken.
 
 Svara ENBART med giltig JSON i följande format (ingen markdown, inga kodblock):
 {{
@@ -112,7 +112,7 @@ def summarize_with_claude(transcript_text: str, duration_minutes: int):
 
     with client.messages.stream(
         model="claude-sonnet-4-20250514",
-        max_tokens=16000,
+        max_tokens=32000,
         messages=[{"role": "user", "content": prompt}],
     ) as stream:
         full_response = ""
