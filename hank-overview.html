@@ -86,6 +86,19 @@
             margin-top: 0.3rem;
             padding-top: 0.8rem;
         }
+        .transcript-section + .transcript-section {
+            margin-top: 1rem;
+        }
+        .transcript-section h4 {
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #777;
+            margin-bottom: 0.35rem;
+        }
+        .transcript-section p {
+            margin: 0;
+        }
         .divider {
             border: none;
             border-top: 2px solid #e0dbd5;
@@ -377,6 +390,89 @@
         </div>
     </details>
 </div>
+
+<script>
+    (function () {
+        const headingRules = [
+            { pattern: /(internet of slop|fake|deepfake|untrustworthy)/i, title: 'Fejkinnehåll och förtroendekris' },
+            { pattern: /(blackbox|algorithmic|credit card|sentenc)/i, title: 'Ogenomskinliga beslut och orättvisa' },
+            { pattern: /(intellectual property|trained|lawsuit|books|youtube)/i, title: 'Träningsdata, upphovsrätt och ersättning' },
+            { pattern: /(psychosis|chatbots|dependence|sycophancy|fall in love)/i, title: 'Psykologiska risker med chatbotar' },
+            { pattern: /(jobs|labor|workers|employment)/i, title: 'Arbete, yrkesroller och omställning' },
+            { pattern: /(electricity|data centers|water|utilities|air conditioning)/i, title: 'Energi, vatten och samhällskostnader' },
+            { pattern: /(bubble|econom|great depression)/i, title: 'AI-bubbla och ekonomiska följder' },
+            { pattern: /(epistemic|reality|candidate|politic|searches)/i, title: 'Sanning, politik och informationsmiljö' },
+            { pattern: /(power|control reality|god emperors|grock|claude|gemini)/i, title: 'Maktkoncentration i AI-plattformar' },
+            { pattern: /(model collapse|plateau|ran out of data)/i, title: 'Modellkollaps och stagnation' },
+            { pattern: /(truth|focus|concentration|literacy|deep reading)/i, title: 'Fokus, lärande och kognitiv förmåga' },
+            { pattern: /(regulatory|liability|congress|responsible)/i, title: 'Reglering, ansvar och styrning' }
+        ];
+
+        const fallbackHeading = (text) => {
+            const cleaned = text
+                .replace(/^[A-Za-zÀ-ÖØ-öø-ÿ]+:\s*/, '')
+                .replace(/["“”]/g, '')
+                .trim();
+
+            const firstSentence = cleaned.split(/(?<=[.!?])\s+/)[0] || cleaned;
+            const words = firstSentence.split(/\s+/).slice(0, 7);
+            const short = words.join(' ').replace(/[.,:;!?]+$/, '');
+            return short || 'Sammanfattning av avsnittet';
+        };
+
+        const makeHeading = (text, chunkIndex) => {
+            const matchedRule = headingRules.find((rule) => rule.pattern.test(text));
+            const baseTitle = matchedRule ? matchedRule.title : fallbackHeading(text);
+            return chunkIndex > 0 ? `${baseTitle} (del ${chunkIndex + 1})` : baseTitle;
+        };
+
+        const splitIntoChunks = (content, maxSentencesPerChunk = 3) => {
+            const sentences = content
+                .split(/(?<=[.!?])\s+/)
+                .map((sentence) => sentence.trim())
+                .filter(Boolean);
+
+            if (sentences.length <= maxSentencesPerChunk) {
+                return [content.trim()];
+            }
+
+            const chunks = [];
+            for (let i = 0; i < sentences.length; i += maxSentencesPerChunk) {
+                chunks.push(sentences.slice(i, i + maxSentencesPerChunk).join(' '));
+            }
+            return chunks;
+        };
+
+        document.querySelectorAll('.transcript').forEach((transcript) => {
+            const paragraphs = Array.from(transcript.querySelectorAll('p'))
+                .map((paragraph) => paragraph.textContent.trim())
+                .filter(Boolean);
+
+            if (!paragraphs.length) return;
+
+            transcript.innerHTML = '';
+
+            paragraphs.forEach((paragraphText, paragraphIndex) => {
+                const chunks = splitIntoChunks(paragraphText);
+
+                chunks.forEach((chunk, chunkIndex) => {
+                    const section = document.createElement('div');
+                    section.className = 'transcript-section';
+
+                    const heading = document.createElement('h4');
+                    heading.textContent = makeHeading(chunk, chunkIndex);
+
+                    const body = document.createElement('p');
+                    body.textContent = chunk;
+
+                    section.appendChild(heading);
+                    section.appendChild(body);
+                    transcript.appendChild(section);
+                });
+            });
+        });
+    })();
+</script>
 
 </body>
 </html>
