@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hank Green - AI Concerns Overview</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: Georgia, 'Times New Roman', serif;
+            background: #f5f0eb;
+            color: #2c2c2c;
+            line-height: 1.7;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 0.3rem;
+            color: #1a1a1a;
+        }
+        .subtitle {
+            color: #666;
+            font-style: italic;
+            margin-bottom: 2rem;
+            font-size: 0.95rem;
+        }
+        .phase {
+            margin-bottom: 1.5rem;
+        }
+        .phase-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #888;
+            margin-bottom: 0.5rem;
+            padding-left: 0.2rem;
+        }
+        details {
+            background: #fff;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            border: 1px solid #e0dbd5;
+            transition: box-shadow 0.2s;
+        }
+        details:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        details[open] {
+            border-color: #c5bfb8;
+        }
+        summary {
+            padding: 0.8rem 1.2rem;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1.05rem;
+            list-style: none;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+        summary::-webkit-details-marker { display: none; }
+        summary::before {
+            content: '\25B6';
+            font-size: 0.6rem;
+            color: #999;
+            transition: transform 0.2s;
+            flex-shrink: 0;
+        }
+        details[open] summary::before {
+            transform: rotate(90deg);
+        }
+        .timestamp {
+            font-size: 0.75rem;
+            color: #aaa;
+            font-weight: 400;
+            margin-left: auto;
+            white-space: nowrap;
+        }
+        .transcript {
+            padding: 0 1.2rem 1.2rem;
+            font-size: 0.92rem;
+            color: #444;
+            border-top: 1px solid #eee;
+            margin-top: 0.3rem;
+            padding-top: 0.8rem;
+        }
+        .divider {
+            border: none;
+            border-top: 2px solid #e0dbd5;
+            margin: 2rem 0;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Hank Green: Everything I'm Worried About with AI</h1>
+<p class="subtitle">Samtalsoversikt med klickbara sektioner. Klicka pa en rubrik for att lasa transkriptionen.</p>
+
+<div class="phase">
+    <div class="phase-label">Introduktion</div>
+
+    <details>
+        <summary>
+            Inledning: Varfor det ar sa svart att veta vad man ska oroa sig for
+            <span class="timestamp">0:00</span>
+        </summary>
+        <div class="transcript">
+            <p>I'm doing something absolutely insane right now. Artificial intelligence is a little bit perplexing because you can not like it for a lot of different reasons. You can have worries in a lot of different directions and I have a really hard time and I've been criticized for this. I have a really hard time knowing which like direction to put my emphasis on. There's a ton of disagreement about how big of a deal AI is, about how severe some impacts are, and how likely some impacts are. This is important. every potential thing that might happen has both a level of severity and a level of likelihood. Some people say, "Well, if the severity is really, really big, even if the likelihood is really, really small, we should be most concerned about the thing that has the most potential impact for harm." And other people say, "Well, I think we should probably be focusing on the things that are definitely going to happen, in fact, maybe are happening right now, even if they aren't, you know, the extinction of humanity." And it's really hard to like wrap your head around even the number of potentially concerning things about the rise of artificial intelligence that are all separate from each other. And I'm not even gonna talk about all of them in this video, but I'm gonna talk about so many. I have a list and it like I keep coming up with other ones, but I just have to cut it off and do it. And my goal is by the end of this, maybe I will know the thing I am most worried about. Though honestly, probably I won't. But that's my goal. But also, my secondary goal is to just say out loud a bunch of the things that are true concerns and and and are real and people talk about them and I am worried about them and people should be worried about them. And we're going to start with things that are happening now. and we're going to move into things like more and more and more long term.</p>
+        </div>
+    </details>
+</div>
+
+<div class="phase">
+    <div class="phase-label">Redan nu - saker som redan hander</div>
+
+    <details>
+        <summary>
+            1. Internet of Slop - fejkat innehall oversvallar internet
+            <span class="timestamp">1:27</span>
+        </summary>
+        <div class="transcript">
+            <p>So, number one thing that I'm concerned about that is already happening to some extent is an internet of slop. I already am scrolling Tik Tok. I am seeing things that are fake and people not knowing that they are fake. We started with the bouncing bunnies on the trampoline. Where are we now? You know, I've probably seen videos that I think are real that were not real. What is creation like in that world? What is the economic incentive to create new content if it's just being ingested by the AI machine and turned into summaries that are not monetized for the people who originally wrote that stuff? Are we making the internet worse every day? So, there is definitely a 100% chance that this will happen because it's already happening to some extent. But is there a 100% chance that it will happen so bad that the internet will become unusable? No. But on the severity scale, I really don't know where to put this because of course like good information is extraordinarily valuable as all of these things will. This is going to feed into another concern of mine later on about the concentration and the control of power and of these systems through which people, you know, form their realities.</p>
+        </div>
+    </details>
+
+    <details>
+        <summary>
+            2. Svarta lador & algoritmisk grymhet - oforklarliga AI-beslut
+            <span class="timestamp">2:36</span>
+        </summary>
+        <div class="transcript">
+            <p>Number two, so not all of these are going to be like chatbot related things. This one already exists. We already know that it's a thing. models are blackbox. We cannot tell usually, you know, we need to fix this. We cannot usually tell how they make decisions and yet they are making decisions that affect people's lives already. So there's this algorithmic cruelty that we cannot explain and that when we look often have racial components, class components, gender components to whether or not somebody gets a credit card. And so that's a thing that's happening now. So 100% chance it's going to happen. But again, how bad is it going to be? Are we going to let these things decide how somebody gets sentenced after doing a crime? Already those systems are obviously not good. Like we see differences in sentencing based on whether you're like the first person a judge sees or the last person a judge sees. That's not very fair. We see differences in sentencing whether you're rich or not rich, black or white. That's not fair. But if there is no way to investigate how those choices are being made if we cannot crack open the black box and see what happened and led to that outcome, then this is a kind of cruelty that uh we should not accept.</p>
+        </div>
+    </details>
+
+    <details>
+        <summary>
+            3. Kreativ vampyrism - traningsdata utan samtycke
+            <span class="timestamp">4:07</span>
+        </summary>
+        <div class="transcript">
+            <p>We also have a thing that already happened where generative AI models were trained using intellectual property that did not agree to be in the training data and now those things are being used to replace the intellectual property that was non-consensually used to train the AI. This does not seem fair. And I this is a thing that has definitely already happened. It is continuing to happen and there are lawsuits around it. I'm encouraged. Like I'm about to get money from Anthropic because of a lawsuit because they trained on my books, but like so many people trained on my YouTube videos and I'm never going to get money for that. I just like the the fact that the publishing industry can organize around this and like make their lawyers make the case and like can the YouTube industry do that? And also there's so much of it. So can we peg to the amount per word that the publishing industry is getting and get that for YouTube videos? I feel like no because I feel like that's going to be more money than exists. So these things are already very unfair and and you know you've seen people who run AI companies saying like well yeah if it's on the internet it's kind of like we all agree that that's okay to grab but if it's in a book yeah maybe that's different. I'm like why why that's no intellectual property is not different if it's inside of a book. That's not how that works. No law works that way. I own it the same if it's on the internet as if it's in a book.</p>
+        </div>
+    </details>
+
+    <details>
+        <summary>
+            4. AI-inducerad psykos, sycofanti & beroende
+            <span class="timestamp">5:54</span>
+        </summary>
+        <div class="transcript">
+            <p>I'm going to put this in a broader category, but I'm going to start by talking about AI induced psychosis. Eddie Burbachback's video about this is amazing. The extent to which open I would tell him that he looked amazing in a hat on its own is very upsetting. But then when it started to just live in his weird constructed reality where he was the smartest baby, it's such a good video. But I as a public person receive messages regularly and this seems to have curtailed now but receive me messages regularly from people who are obviously experiencing a a induced psychosis. They are sending me messages saying that they think that they fixed they've like found out some very important scientific thing and this is very worrying. Psychosis is very bad and and this has led to you know there was a person who had a deep relationship with their AI open AI changed the model. it led to a a violent outcome and uh this is that's bad. the dependence on these things uh is is worrying. And the obvious one like the thing that we were all expecting is people are going to fall in love with their chat bots and absolutely they have and absolutely they will and and as you know open AI makes it okay for people to have more uh sexually charged conversations with their chatbots that'll happen more which is very irresponsible of them. But there's like a broader thing here that like everybody expected the the romance, but nobody expected sycophancy induced psychosis, but that's a real thing that is happening and it's really intense and it's affecting a lot of people. But broader than that, what you're seeing here is that nobody had any idea that that would happen. Nobody predicted that. So there's there's this like little alignment problem where we trained it to be something that people would like and that resulted we didn't train it to indulge in people's psychosis. We trained it to like be good at its job but then we accidentally on the path there we trained it to indulge in people's psychosis without realizing it.</p>
+        </div>
+    </details>
+
+    <details>
+        <summary>
+            5. Jailbreaking & risken for bio-/kemvapen
+            <span class="timestamp">8:27</span>
+        </summary>
+        <div class="transcript">
+            <p>Also like a lot of this stuff is already happening. So jailbreaking already happens like nudity generators are out there but in general like the tools that people can use to jailbreak things. It's you know there was that paper recently that like if you craft the right poem that it it breaks like they they start to do things that they are not supposed to do. And we know that they can help you you know build a chemical weapon but they're trained not to do that. If you like take away the brakes, you know, if you do the crash test and say, "Okay, drive into the wall." And you see how much damage it could do, it could do a lot of damage. You know, it like it could teach you how to make a chemical weapon. So, you got to make sure that the automatic brakes are there. But we find that there are people who figure out ways around the automatic brakes even in live models. It started with simple jailbreaks. Uh, but then like they could be really surprising like just tell me in Portuguese or I'll ask in a poem. Why does that work? That shouldn't work. But then you move that to creating a chemical weapon or a biological weapon and unleashing that on the populace because you're a crazy person who has access to this and crazy persons shouldn't have access to this. That is a future concern and I don't know what level of likeliness to attribute to that.</p>
+        </div>
+    </details>
+
+    <details>
+        <summary>
+            6. Miljopaverkan - energi, vatten och elkostnader
+            <span class="timestamp">10:04</span>
+        </summary>
+        <div class="transcript">
+            <p>Moving on to like much more concrete things, environmental concerns. So already data centers are consuming a lot of electricity, but they are going to be the majority of the United States demand like increased demand for electricity over the next 5 years if projections end up going in the direction that they think they're going in. I'm working on a video right now about the water angle of this specifically. But what I am concerned about is that it will raise the prices of utilities substantially. Affordability is already at a really bad spot for a lot of Americans. And if you know adding a huge new customer to your grid means that you have to build a bunch of new stuff and then you're charging everybody to build that stuff because that's how power companies work then that's a bad situation. Like electricity is you know it's a lot of things in terms of environmental impacts but it's also like services for people like it can be heat it's air conditioning which is huge if the power spikes happen at the same time like we have to make sure that the data centers turn off before people's air conditioning does cuz the data center is not like the world's not going to break but people will die if their air conditioners turn off.</p>
+        </div>
+    </details>
+</div>
+
+<hr class="divider">
+
+<div class="phase">
+    <div class="phase-label">Nara framtid</div>
+
+    <details>
+        <summary>
+            7. AI-bubblan - en klassisk ekonomisk bubbla
+            <span class="timestamp">11:35</span>
+        </summary>
+        <div class="transcript">
+            <p>This is probably a bubble. I am not looking forward to the repercussions of the bubble. This isn't really AI's fault. This is the AI industry's fault. It's the hype machine's fault. It's our inevitable like fear of missing out uh from from rich people who are dumping money in because they want a piece of the pie. This is a classic bubble. And I don't I'm not looking forward to the consequences. I would give a greater than 50% chance of it happening. And on like a 1 to 10 scale of of severity, I could give it like a three to a seven. I don't know where it's going to fall there. But like economic collapses are really bad. Like the Great Depression was really bad. I hope that the people who know what they're doing here are being careful, but I don't feel like they are. I feel like they feel insulated and like it's worth taking risks with everyone and if they don't do it, then someone else will. I just don't feel like people are playing carefully with the world economy right now.</p>
+        </div>
+    </details>
+
+    <details>
+        <summary>
+            8. Epistemisk kollaps - deepfakes, politik & forlorad sanning
+            <span class="timestamp">12:47</span>
+        </summary>
+        <div class="transcript">
+            <p>Let's talk about epistemic collapse. So I I already I'm seeing that there's like data about uh how much it matters how a candidate is showing up in AI searches and so politics people are like how do you optimize your candidate for AI and I'm like I'm going to die. But also like we're entering uh the first major election cycles where um video evidence is untrustworthy, images are untrustworthy, audio is untrustworthy. I don't know what we do here. I don't know what reality is. It's so messy. And we and so many people already have their worlds defined by algorithms and by what algorithms choose to show them. And then we also have these models that will further give small organizations power to define reality for people.</p>
+        </div>
+    </details>
+
+    <details>
+        <summary>
+            9. Maktkoncentration - ett fatal foretag kontrollerar verkligheten
+            <span class="timestamp">13:50</span>
+        </summary>
+        <div class="transcript">
+            <p>I think that there's a concentration of power problem here. I think there's a 100% chance this will happen and I think that that there is a high chance that it's going to be it's it's a quite bad move to concentrate power in this few hands. We've got Grock, Chachi BT, Claude, Gemini. That's is that it? Meta has a thing. That's very small. The most recent media revolution that we had was a fracturing one where everybody got access to these tools to broadcast themselves. And we've been experiencing the consequences of that which have positive and negative aspects. But there are others that are narrowing. So radio, for example, was a narrowing. TV was very narrowing. Back in the day when when radio was a thing, the like if you were going to do a coup, you would capture the president, lock him up or kill him, and then you'd take over the radio station. That was the whole coup. We're headed into a world where like, okay, let's do a coup for the whole world where now there's three radio stations and they control reality for everyone. Elon Musk talks about how he wants to use it to affect reality. He's like, "No, no, no. Grock's going to make you have more babies." And I'm like, "That's God." Like, I'm sure they're all talking about behind the scenes. They're like, "Oh, we get to be the three god emperors of Earth." But Elon Mus is like, "Yeah, no, I'll say it aloud."</p>
+        </div>
+    </details>
+
+    <details>
+        <summary>
+            10. Modellkollaps & generell disruption
+            <span class="timestamp">16:30</span>
+        </summary>
+        <div class="transcript">
+            <p>Model collapse. This like completely unrelatedly. Model collapse that GPTs just start to plateau because they ran out of good data. They're ingesting their own data. They cannot operate. I actually put this at a fairly low chance of happening and fairly low level of concern. Like if it happened, it would trigger maybe the collapse of the bubble, which would be bad. But that's not really model collapse's fault. It's the bubble's fault.</p>
+            <p style="margin-top:0.8rem">I'm going to add another one. A very broad category of just the systems not working because there's just so much AI going on that nobody knows what to do with anything. So you have a job opening and you get 20,000 applications. Companies aren't used to this and it's all automated. You don't know who's real and who's not real. You have fake job openings. And also in terms of education which I think a lot about I am very worried that there's going to be a period of time where no one knows whether the credential of higher education stands up anymore. In a chatGPT world did everybody just sort of fake their way through college? Some people did and so how do you deal with that.</p>
+        </div>
+    </details>
+</div>
+
+<hr class="divider">
+
+<div class="phase">
+    <div class="phase-label">Medellang sikt (3-10 ar)</div>
+
+    <details>
+        <summary>
+            11. Slutet for larlingskap - inga jobb for nyborjare
+            <span class="timestamp">18:34</span>
+        </summary>
+        <div class="transcript">
+            <p>We could see a world I think this might already be happening, but I think that 3 years from now is like my big concern time. Just a world without any apprenticeship. So, like nobody gets paid to kind of suck at something anymore because that's like what the beginning of your career is is like you're not that good at things yet and you learn by having a job where you're at an introductory level. But like if these systems can do the easy work on their own, nobody gets hired to do that. Like I remember being hired to like design bad logos and and develop cloudy databases that weren't very good and like do SQL queries badly and that was fine. That like somebody had to do it. But now no one would hire somebody to be bad at SQL logos make themselves. And then where do the good people come from? So if there's no apprenticeship, what happens in the future? The real like bite us in the ass part of it comes down the road when we're like, "Oh, we don't have any lawyers to do the hard stuff because we didn't hire any intro people because we had GPTs doing the easy stuff."</p>
+        </div>
+    </details>
+
+    <details>
+        <summary>
+            12. Kognitiv atrofi - tappar vi vara formagar?
+            <span class="timestamp">20:02</span>
+        </summary>
+        <div class="transcript">
+            <p>People are worried about cognitive atrophy. So will people just not be able to do things? Will they not know how code works? They'll just prompt. Will they not know how to write an essay? They'll just prompt. I think this is to some extent almost inevitable. But I I weirdly am not as concerned about it as a lot of other people because we've done it before. You know, written language outsourced a lot of our brain power onto the page and like that ended up being a net good. I don't know. Are we going to be dumb or are we going to be sharp but with different tools? That seems more likely to me. People will fight me about this and they absolutely should. I am not assigning any level of certainty to this one. I could totally be wrong. Less like 50/50 on this.</p>
+        </div>
+    </details>
+
+    <details>
+        <summary>
+            13. AI i krigforing - autonoma vapensystem
+            <span class="timestamp">20:53</span>
+        </summary>
+        <div class="transcript">
+            <p>Also happening in the next 3 to 10 years and also already happening to some extent today is using AI in warfare. And right now I have heard that people will use AI to to select targets but not to do the actual button pushing though. To what extent that's different, I don't know. But in the future, I don't think that we're that far away from an autonomous system that both determines and executes a target or or an action on a target. I'm worried about this. Do I think that it's going to become Terminator? I don't think it's going to become Terminator, but like I don't love that because of the blackbox thing, because of all of it. Like I just tools of the future used in warfare are always very upsetting and uh likely to be misused. We won't know how they will be misused until they are misused.</p>
+        </div>
+    </details>
+</div>
+
+<hr class="divider">
+
+<div class="phase">
+    <div class="phase-label">Lang sikt (10+ ar)</div>
+
+    <details>
+        <summary>
+            14. Ekonomi & mening - vad gor manniskor om AI ar smartare?
+            <span class="timestamp">22:03</span>
+        </summary>
+        <div class="transcript">
+            <p>Number one obviously what is the economy if they're right? So if they're right that the AI will be smarter than everybody, what does anybody do and how does anybody find meaning in that world? I think that is a totally legitimate concern. Now I do know lots of people who do not work and who have a great deal of meaning in their world. They might be disabled. They might be retired. They like work and meaning do not have to be tied. They are for a lot of people right now and that does not surprise me. I also think if if not intervened with, it seems likely to me that it will come along with a huge amount of inequality in wealth. And that also concerns me. I think that that is likely to have bad outcomes. And I don't just mean like, oh, people have not very much wealth. I mean, they do not stand for that world. Why would they? Why would they stand for a world that does not treat them with dignity? Why would they stand for a world that does not treat them as valuable?</p>
+        </div>
+    </details>
+
+    <details>
+        <summary>
+            15. Superintelligens & existentiell risk
+            <span class="timestamp">23:26</span>
+        </summary>
+        <div class="transcript">
+            <p>And then we have uh you know super intelligence unaligned uncontrollable turns into evil uh it takes over the world and turns us into pets or destroys us. I have received critique that I spend too much time on that one. I understand why some people spend more time on that one. Some people will say like that the motivation behind that is really the AI industry hype machine and they're like focus on this thing over here and not on all these like shitty things we're doing right now. I take them at their word and maybe I will eat my word someday but I take them at their word that in fact they are worried about this. Is the biggest possible problem you know becoming pets to a super intelligence or being extincted by it that seems like a big deal but I don't think that it's the most likely outcome. But I understand people who are in this uh frame where it's like well if it's the biggest deal even if it's a small likelihood we should concern ourselves with it.</p>
+        </div>
+    </details>
+</div>
+
+<hr class="divider">
+
+<div class="phase">
+    <div class="phase-label">Hanks slutsats</div>
+
+    <details>
+        <summary>
+            Det jag ar mest orolig for: manipulation & forlorad agens
+            <span class="timestamp">27:04</span>
+        </summary>
+        <div class="transcript">
+            <p>This is what I am most concerned about at this moment. I might change my mind tomorrow, but right now this focus on biological warfare, on chemical weapons, on on paperclip maximization, I don't think this is the biggest concern. I think we should look at what AI could potentially be good at. What weaknesses human beings have and mix those two things together. And what I'm concerned about is the thing that's already happening where AI that the goal of the AI is to give us stuff that will keep us engaged on a video platform and it starts to optimize for things we did not expect. Nobody said give these people outrage bait. What they said was keep people on the website and outrage bait because it became a very compelling kind of content.</p>
+            <p style="margin-top:0.8rem">So what I am concerned with is we are not that difficult ultimately probably to manipulate. And so if you have one or multiple very intelligent systems that have goals, I think that they will find it much more easy to manipulate people than we would guess. Our realities are defined by what we consume. People prefer decisions being taken away from them. And that is the thing that I think concerns me the most like broadly. That like given all of these things, that's what concerns me the most about AI. People tend to prefer their choices be taken away and to to have less agency.</p>
+        </div>
+    </details>
+</div>
+
+<hr class="divider">
+
+<div class="phase">
+    <div class="phase-label">Intervju med Cal Newport</div>
+
+    <details>
+        <summary>
+            Cal Newport: sanningens & fokusformagens forsvinnande
+            <span class="timestamp">30:48</span>
+        </summary>
+        <div class="transcript">
+            <p>Cal Newport, professor i datavetenskap vid Georgetown, delar sina tva storsta AI-bekymmer:</p>
+            <p style="margin-top:0.8rem">"Two of them that I care quite a bit about is the disappearance of truth and the disappearance of focus or concentration as a human ability. Disappearance of truth generative AI can create videos and images of anything. That's a problem. There's no way for that not to be a massive problem. We don't need super intelligence for a massive problem. And the disappearance of focus I'm a professor. My concern is a lot of what we do in the educational system is exercises invented to stretch your mind like you would stretch a muscle so that mind becomes more complicated and in the future can handle original thoughts we need for the the survival of humanity and civilization. AI, especially chatbots and LLMs, are very good at these exercises because they're just exercises. And so in theory, you can offload that type of work to them, which in the moment makes your life easier and in the long run means your brain misses a final step of development."</p>
+        </div>
+    </details>
+
+    <details>
+        <summary>
+            Sociala medier + AI: en dubbel small mot hjarnan
+            <span class="timestamp">38:01</span>
+        </summary>
+        <div class="transcript">
+            <p>"I think it's a one-two punch to our brains where the other punch is social media. We have highly engaging, distracting, ubiquitous entertainment happening on our phone which lowers our tolerance for cognitive strain because we get so used to this idea that at the slightest hint of boredom, I can get this sort of algorithmically perfectly targeted little hit of something that's going to be interesting. So that reduces our interest or comfort with concentration consuming hard information. The other thing we have to do with our brain to try to get smarter is produce information from scratch. Generative AI takes us away from producing information which is using the circuits we already have. And you put those two things together and I think we lose those circuits and they're critical circuits."</p>
+            <p style="margin-top:0.8rem">"Literacy is not natural. In order to actually consume a book or to read the written word, we have to essentially hijack parts of our brain that were evolved for very different purposes. That rewired brain that can do what Maryanne Wolf calls deep reading processes is literally a smarter brain that sees the world in a more complicated way. If you begin to really degrade that wiring, it's going to make it difficult for the way our civilized world runs today. We're going back closer to a premodern brain which will not play nice with the modern world."</p>
+        </div>
+    </details>
+
+    <details>
+        <summary>
+            Informations-skrapmat: Doritos du aldrig blir matt pa
+            <span class="timestamp">41:03</span>
+        </summary>
+        <div class="transcript">
+            <p>Hank: "Imagine eating junk food but you never got full. One like you could literally couldn't have so many Doritos that you stopped being hungry and two you ate a Dorito by looking at it. Like that's what information is like now. It is like we have created junk food information but information is something that we never lose our hunger for because we're information bots."</p>
+            <p style="margin-top:0.8rem">Cal: "Don't forget the piece where someone follows you around with a cart full of Doritos. They're always there no matter where you go, including to the bathroom."</p>
+            <p style="margin-top:0.8rem">Cal: "What's kind of interesting about all this is the AI that you're just describing which has a massive impact on so many ways, these recommendation algorithms, that's actually really simple comparably speaking. The actual underlying recommendation algorithms are really pretty simple. It's like all of this content is getting embedded in some sort of multi-dimensional space. We've known about these type of recommendation algorithms for 30 years, but we've never executed them so cleanly as something like Tik Tok came along and did."</p>
+        </div>
+    </details>
+
+    <details>
+        <summary>
+            Bubblan & specialiserade modeller vs. "digital gud"
+            <span class="timestamp">44:07</span>
+        </summary>
+        <div class="transcript">
+            <p>Cal: "I am very interested right now in a lot of the present issues. Two of them that I care quite a bit about is the disappearance of truth and the disappearance of focus."</p>
+            <p style="margin-top:0.8rem">Cal om bubblan: "The spending doesn't make sense. It just doesn't make sense. Look at inference on these models right now is like the most expensive computational thing we can do. The future is probably going to be taking that technology much more energy efficient and smaller and cost-effective to run embedded more closely into particular use cases. The foundation models I think are really just a measuring contest between these companies."</p>
+            <p style="margin-top:0.8rem">Cal om specialisering: "I call it intentional AI or I AI. When you move away from all we have is a language model, you have a control module written by humans in normal computer code. There's nothing unknown about it. It can talk to neural networks to understand things, but it's just a normal human control program. I'm more optimistic about this world of distributed AGI. I don't think it's going to be out of control. I think this alignment problem is really a problem about language model text production, not necessarily fundamental to AI powered devices more generally."</p>
+        </div>
+    </details>
+
+    <details>
+        <summary>
+            Doom-forstarkningsslingan & var manska agens
+            <span class="timestamp">1:18:03</span>
+        </summary>
+        <div class="transcript">
+            <p>Cal: "Here's an effect that I think your video creates that a lot of discussions of this create, which I think of as like Doom amplification loop. Because it's such a diverse technology with so many possible things that could be a problem that as you go through them one after another we have a natural human tendency to put that into an amplification loop and sort of imagine the aggregate of all of that doom. If you isolate any one of those issues you'll be like ah this is a problem like that's annoying like we should do something about it but it's not going to have me up at night. But when you hear 20 different issues it seems like it's 20 times as bad but the thing is there's tons of technologies out there creating their own issues of roughly that size. We just don't aggregate them."</p>
+            <p style="margin-top:0.8rem">"We don't have to add them up into therefore an issue that's so big that we'll never be able to handle it. We can handle lots of small issues. Humans also have a pretty good capacity to adjust to things to push back on things to eventually say enough of this like we don't want to use this anymore."</p>
+        </div>
+    </details>
+
+    <details>
+        <summary>
+            Regulering, ansvar & vagen framat
+            <span class="timestamp">1:27:24</span>
+        </summary>
+        <div class="transcript">
+            <p>Cal om manska agens: "I think there's a sort of personal choice lever where I think it's completely fine to say it is not my job to figure out why your product is useful. It's your job to convince me that it's useful. I think parents and teachers should have a rule that kids should never be using a chatbot unsupervised. I think that's completely dangerous."</p>
+            <p style="margin-top:0.8rem">"Educational institutions should be free to say the whole point of this is to create friction in your mind so that the connections get stronger. It's like this is a gym. Yes, it's true. A forklift can lift the weights for you and that would be easier, but the whole point of this gym is to lift the heavy weights."</p>
+            <p style="margin-top:0.8rem">"I think there's regulatory levers - the biggest lever we could push Congress to pull would be one where we have much more liability for what a chatbot produces. No you can't just have an entity that'll say anything and do psychosis. You are responsible for what this thing says. The effect of that would be like oh I guess we probably can't have a product that's just trying to be a general conversational partner and that would probably be better."</p>
+            <p style="margin-top:0.8rem">Hank: "If you're right, we're going to look back at the last three years with like remember when we were idiots? Remember when we thought that it was going to be digital god?"</p>
+        </div>
+    </details>
+</div>
+
+</body>
+</html>
