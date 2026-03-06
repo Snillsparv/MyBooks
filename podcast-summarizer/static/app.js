@@ -558,7 +558,7 @@ function buildInlineToggle(uid, segments) {
     <button class="inline-original-toggle" onclick="toggleInlineOriginal(event, '${uid}')">
       <span class="toggle-arrow">▶</span> Original text
     </button>
-    <div class="inline-original-text" id="${uid}">${html}</div>
+    <div class="inline-original-text" id="${uid}"><div class="orig-inner">${html}</div></div>
   `;
 }
 
@@ -620,24 +620,34 @@ function renderResult(jsonText, doneInfo) {
 
     overallSummaryEl.textContent = data.summary;
 
-    // Key quotes
+    // Key quotes (collapsible, collapsed by default)
     if (data.key_quotes && data.key_quotes.length > 0) {
       keyQuotesEl.innerHTML = `
-        <div class="key-quotes-title">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V21z"/><path d="M15 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V21z"/></svg>
-          Key quotes
-        </div>
-        ${data.key_quotes.map(q => `
-          <div class="quote-card">
-            <div class="quote-text">"${escapeHtml(q.text)}"</div>
-            <div class="quote-meta">
-              ${escapeHtml(q.context || '')}
-              ${q.time ? ` · <span class="quote-time" onclick="seekTo('${escapeHtml(q.time)}')">${escapeHtml(q.time)}</span>` : ''}
-            </div>
+        <div class="key-quotes-header" onclick="this.parentElement.classList.toggle('open')">
+          <svg class="kq-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 6l6 6-6 6"/>
+          </svg>
+          <div class="key-quotes-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V21z"/><path d="M15 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V21z"/></svg>
+            Key quotes <span style="font-family:'DM Sans';font-size:0.78rem;color:var(--text-muted);font-weight:400">(${data.key_quotes.length})</span>
           </div>
-        `).join('')}
+        </div>
+        <div class="key-quotes-body">
+          <div class="kq-inner">
+            ${data.key_quotes.map(q => `
+              <div class="quote-card">
+                <div class="quote-text">"${escapeHtml(q.text)}"</div>
+                <div class="quote-meta">
+                  ${escapeHtml(q.context || '')}
+                  ${q.time ? ` · <span class="quote-time" onclick="seekTo('${escapeHtml(q.time)}')">${escapeHtml(q.time)}</span>` : ''}
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
       `;
       keyQuotesEl.style.display = 'block';
+      keyQuotesEl.classList.remove('open');
     } else {
       keyQuotesEl.style.display = 'none';
     }
@@ -672,7 +682,9 @@ function renderResult(jsonText, doneInfo) {
           </div>
         </div>
         <div class="section-body">
-          <div class="transcript-text">${enrichedHtml}</div>
+          <div class="section-body-inner">
+            <div class="transcript-text">${enrichedHtml}</div>
+          </div>
         </div>
       `;
       sectionsEl.appendChild(section);

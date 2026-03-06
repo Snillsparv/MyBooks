@@ -1,58 +1,58 @@
-/* ===== Foldly – Origami-themed pastel design ===== */
+/* ===== Foldly – Minimalist origami design ===== */
 
 :root {
-  --bg: #faf8f5;
-  --bg-pattern: #f3efe9;
+  --bg: #ffffff;
+  --bg-pattern: #ffffff;
   --surface: #ffffff;
-  --surface-alt: #f7f4f0;
-  --border: #e8e3dc;
-  --border-light: #f0ebe5;
-  --text: #2d2a26;
-  --text-secondary: #5a5650;
-  --text-muted: #9a9590;
+  --surface-alt: #fafafa;
+  --border: #eaeaea;
+  --border-light: #f2f2f2;
+  --text: #1a1a1a;
+  --text-secondary: #555;
+  --text-muted: #999;
   --accent: #c4917c;
   --accent-hover: #b07d68;
-  --accent-light: #f8ede8;
-  --accent-glow: #c4917c22;
+  --accent-light: #faf3f0;
+  --accent-glow: #c4917c18;
   --sage: #8fa5a0;
-  --sage-light: #eaf2f0;
+  --sage-light: #f0f5f4;
   --lavender: #b5a0c9;
-  --lavender-light: #f2ecf7;
-  --cream: #f0e6d3;
+  --lavender-light: #f5f1f9;
+  --cream: #fdf6ec;
   --rose: #d4a0a8;
-  --rose-light: #f8edef;
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.03), 0 2px 8px rgba(0,0,0,0.02);
-  --shadow: 0 1px 4px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.03);
-  --shadow-lg: 0 2px 8px rgba(0,0,0,0.05), 0 12px 32px rgba(0,0,0,0.04);
+  --rose-light: #fdf2f4;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+  --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.03);
+  --shadow-lg: 0 2px 6px rgba(0,0,0,0.06), 0 10px 28px rgba(0,0,0,0.05);
   --radius: 10px;
-  --fold-angle: 24px;
+  --fold-angle: 20px;
 }
 
 /* Dark mode */
 body.dark {
-  --bg: #131210;
-  --bg-pattern: #1a1916;
-  --surface: #1e1d1a;
-  --surface-alt: #242320;
-  --border: #33312d;
-  --border-light: #2a2826;
-  --text: #e5e2dc;
-  --text-secondary: #b5b2ac;
-  --text-muted: #7a7770;
+  --bg: #111;
+  --bg-pattern: #111;
+  --surface: #1a1a1a;
+  --surface-alt: #202020;
+  --border: #2e2e2e;
+  --border-light: #252525;
+  --text: #eee;
+  --text-secondary: #aaa;
+  --text-muted: #666;
   --accent: #d4a088;
   --accent-hover: #e0b49c;
-  --accent-light: #2a201c;
-  --accent-glow: #d4a08822;
+  --accent-light: #251d1a;
+  --accent-glow: #d4a08820;
   --sage: #a5bbb6;
-  --sage-light: #1c2422;
+  --sage-light: #1a2220;
   --lavender: #c5b0d9;
-  --lavender-light: #221c2a;
-  --cream: #2a2418;
+  --lavender-light: #201a28;
+  --cream: #252010;
   --rose: #d4a8b0;
-  --rose-light: #2a1c1e;
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.15);
-  --shadow: 0 1px 4px rgba(0,0,0,0.2), 0 4px 16px rgba(0,0,0,0.15);
-  --shadow-lg: 0 2px 8px rgba(0,0,0,0.25), 0 12px 32px rgba(0,0,0,0.2);
+  --rose-light: #251a1c;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.2);
+  --shadow: 0 1px 3px rgba(0,0,0,0.25), 0 4px 12px rgba(0,0,0,0.15);
+  --shadow-lg: 0 2px 6px rgba(0,0,0,0.3), 0 10px 28px rgba(0,0,0,0.2);
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -63,12 +63,6 @@ body {
   color: var(--text);
   line-height: 1.7;
   min-height: 100vh;
-  /* Subtle geometric origami background pattern */
-  background-image:
-    linear-gradient(135deg, var(--bg-pattern) 25%, transparent 25%),
-    linear-gradient(225deg, var(--bg-pattern) 25%, transparent 25%);
-  background-size: 60px 60px;
-  background-position: 0 0, 30px 0;
 }
 
 .container { max-width: 780px; margin: 0 auto; padding: 48px 24px 100px; }
@@ -282,13 +276,29 @@ header .subtitle { color: var(--text-muted); font-size: 0.95rem; }
   border-radius: 0 var(--radius) 0 0;
 }
 
-/* Key quotes */
+/* Key quotes – collapsible */
 .key-quotes { margin-bottom: 28px; }
+.key-quotes-header {
+  display: flex; align-items: center; gap: 8px; cursor: pointer;
+  padding: 10px 0; user-select: none; transition: color 0.2s;
+}
+.key-quotes-header:hover { color: var(--accent); }
+.key-quotes-header .kq-arrow {
+  width: 16px; height: 16px; color: var(--text-muted);
+  transition: transform 0.3s ease, color 0.2s; flex-shrink: 0;
+}
+.key-quotes.open .kq-arrow { transform: rotate(90deg); color: var(--accent); }
 .key-quotes-title {
   font-family: 'DM Serif Display', serif; font-size: 1rem; color: var(--text);
-  margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
+  display: flex; align-items: center; gap: 8px; margin: 0;
 }
 .key-quotes-title svg { color: var(--accent); }
+.key-quotes-body {
+  display: grid; grid-template-rows: 0fr;
+  transition: grid-template-rows 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.key-quotes-body > .kq-inner { overflow: hidden; }
+.key-quotes.open .key-quotes-body { grid-template-rows: 1fr; }
 .quote-card {
   padding: 1rem 1.2rem 1rem 1.6rem; margin-bottom: 10px;
   border-left: 3px solid var(--lavender); background: var(--lavender-light);
@@ -403,18 +413,17 @@ header .subtitle { color: var(--text-muted); font-size: 0.95rem; }
 }
 .timestamp:hover { color: var(--accent-hover); border-bottom-color: var(--accent); }
 
-/* Section body with paper unfold animation */
+/* Section body – smooth CSS Grid expand */
 .section-body {
-  max-height: 0; overflow: hidden; transition: max-height 0.4s ease;
-  transform-origin: top center;
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.section-body > .section-body-inner {
+  overflow: hidden;
 }
 .section.open .section-body {
-  max-height: 50000px; transition: max-height 0.6s ease;
-  animation: paperUnfold 0.45s ease-out;
-}
-@keyframes paperUnfold {
-  from { transform: perspective(800px) rotateX(-12deg); opacity: 0.5; }
-  to { transform: perspective(800px) rotateX(0); opacity: 1; }
+  grid-template-rows: 1fr;
 }
 
 .transcript-text {
@@ -449,14 +458,15 @@ mark {
 .inline-original-toggle.open .toggle-arrow { transform: rotate(90deg); }
 
 .inline-original-text {
-  display: none; padding: 12px 16px; margin: 0 0 16px 0;
-  font-size: 0.8rem; color: var(--text-muted); line-height: 1.75;
-  background: var(--surface-alt); border-radius: 6px;
-  border-left: 3px solid var(--sage); position: relative;
+  display: grid; grid-template-rows: 0fr;
+  transition: grid-template-rows 0.3s cubic-bezier(0.4, 0, 0.2, 1), margin 0.3s ease, padding 0.3s ease;
+  margin: 0; padding: 0; font-size: 0.8rem; color: var(--text-muted);
+  line-height: 1.75; background: var(--surface-alt); border-radius: 6px;
+  border-left: 3px solid var(--sage); overflow: hidden;
 }
+.inline-original-text > .orig-inner { overflow: hidden; }
 .inline-original-text.visible {
-  display: block;
-  animation: paperUnfold 0.35s ease-out;
+  grid-template-rows: 1fr; padding: 12px 16px; margin: 6px 0 16px 0;
 }
 .inline-original-text p { margin-bottom: 8px; }
 .inline-original-text p:last-child { margin-bottom: 0; }
