@@ -10,10 +10,10 @@
   --text: #1a1a1a;
   --text-secondary: #555;
   --text-muted: #999;
-  --accent: #c4917c;
-  --accent-hover: #b07d68;
-  --accent-light: #faf3f0;
-  --accent-glow: #c4917c18;
+  --accent: #9b7bc7;
+  --accent-hover: #8566b3;
+  --accent-light: #f5f1fa;
+  --accent-glow: #9b7bc718;
   --sage: #8fa5a0;
   --sage-light: #f0f5f4;
   --lavender: #b5a0c9;
@@ -39,10 +39,10 @@ body.dark {
   --text: #eee;
   --text-secondary: #aaa;
   --text-muted: #666;
-  --accent: #d4a088;
-  --accent-hover: #e0b49c;
-  --accent-light: #251d1a;
-  --accent-glow: #d4a08820;
+  --accent: #b89edb;
+  --accent-hover: #c8b0e8;
+  --accent-light: #221a2e;
+  --accent-glow: #b89edb20;
   --sage: #a5bbb6;
   --sage-light: #1a2220;
   --lavender: #c5b0d9;
@@ -369,8 +369,6 @@ header .subtitle { color: var(--text-secondary); font-size: 0.95rem; }
   border: none; border-bottom: 1px solid var(--border);
 }
 .section:last-child { border-bottom: none; }
-.section:nth-child(even) { background: var(--surface-alt); }
-.section:nth-child(even) .section-header { background: var(--surface-alt); }
 
 /* Fold crease triangles on edges */
 .section + .section::before {
@@ -420,6 +418,28 @@ header .subtitle { color: var(--text-secondary); font-size: 0.95rem; }
   border-bottom: 1px dashed var(--accent-glow);
 }
 .timestamp:hover { color: var(--accent-hover); border-bottom-color: var(--accent); }
+
+/* Category badge */
+.section-category {
+  display: inline-block; font-size: 0.62rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.08em;
+  padding: 2px 8px; border-radius: 4px; line-height: 1.4;
+}
+.section-category.cat-introduction { background: var(--accent-light); color: var(--accent); }
+.section-category.cat-background { background: var(--sage-light); color: var(--sage); }
+.section-category.cat-analysis { background: var(--lavender-light); color: var(--lavender); }
+.section-category.cat-discussion { background: #f0f4ff; color: #7b8fc4; }
+.section-category.cat-story { background: var(--cream); color: #b89a5a; }
+.section-category.cat-deep-dive { background: #f0f4ff; color: #7b8fc4; }
+.section-category.cat-opinion { background: var(--rose-light); color: var(--rose); }
+.section-category.cat-conclusion { background: var(--accent-light); color: var(--accent); }
+.section-category.cat-practical { background: var(--sage-light); color: var(--sage); }
+.section-category.cat-interview { background: var(--lavender-light); color: var(--lavender); }
+.section-category.cat-other { background: var(--surface-alt); color: var(--text-muted); }
+
+body.dark .section-category.cat-discussion { background: #1a1e2a; color: #9aaad4; }
+body.dark .section-category.cat-story { background: #252010; color: #c4aa6a; }
+body.dark .section-category.cat-deep-dive { background: #1a1e2a; color: #9aaad4; }
 
 /* Section body – smooth CSS Grid expand */
 .section-body {

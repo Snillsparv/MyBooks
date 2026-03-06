@@ -114,6 +114,7 @@ Givet följande transkription, gör följande:
 3. Varje kapitel ska ha:
    - En kort, beskrivande rubrik på {language}
    - En tidsperiod (t.ex. "0:00\u20135:30") baserat på textens position i transkriptionen
+   - En kategori (ett av: introduction, background, analysis, discussion, story, deep-dive, opinion, conclusion, practical, interview)
    - En sammanfattning på {chapter_summary_length} på {language}
    - Den faktiska transkriptionstexten för det avsnittet, organiserad under underrubriker. \
 Inkludera de viktigaste delarna av transkriptionstexten \u2014 parafrasera och komprimera där det behövs, \
@@ -128,6 +129,7 @@ Svara ENBART med giltig JSON i följande format (ingen markdown, inga kodblock):
     {{
       "title": "Kapitelrubrik",
       "time": "0:00\u20135:30",
+      "category": "analysis",
       "summary": "Sammanfattning av kapitlet...",
       "transcript_html": "<h4>Underrubrik</h4><p>Text från transkriptionen...</p>"
     }}

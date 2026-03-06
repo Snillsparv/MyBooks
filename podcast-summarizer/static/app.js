@@ -28,6 +28,19 @@ const toastEl = $('#toast');
 let videoMeta = {};
 let rawSegments = [];
 let summaryData = null;
+
+const CATEGORY_LABELS = {
+  introduction: 'Introduction',
+  background: 'Background',
+  analysis: 'Analysis',
+  discussion: 'Discussion',
+  story: 'Story',
+  'deep-dive': 'Deep Dive',
+  opinion: 'Opinion',
+  conclusion: 'Conclusion',
+  practical: 'Practical',
+  interview: 'Interview',
+};
 let allOpen = false;
 let streamStartTime = 0;
 let currentUser = null;
@@ -668,6 +681,9 @@ function renderResult(jsonText, doneInfo) {
       section.className = 'section';
       section.dataset.idx = idx;
 
+      const cat = (ch.category || 'other').toLowerCase().replace(/\s+/g, '-');
+      const catLabel = CATEGORY_LABELS[cat] || cat.charAt(0).toUpperCase() + cat.slice(1);
+
       section.innerHTML = `
         <div class="section-header" onclick="toggleSection(this)">
           <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -678,6 +694,7 @@ function renderResult(jsonText, doneInfo) {
             <div class="section-summary">${escapeHtml(ch.summary)}</div>
             <div class="section-meta">
               ${timeStr ? `<span class="timestamp" onclick="event.stopPropagation(); seekTo('${escapeHtml(timeStr.split(/[–—-]/)[0])}')">${escapeHtml(timeStr)}</span>` : ''}
+              <span class="section-category cat-${cat}">${catLabel}</span>
             </div>
           </div>
         </div>
