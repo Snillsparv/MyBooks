@@ -51,7 +51,8 @@ def init_db():
     try:
         conn.execute("SELECT google_id FROM users LIMIT 1")
     except Exception:
-        conn.execute("ALTER TABLE users ADD COLUMN google_id TEXT UNIQUE")
+        conn.execute("ALTER TABLE users ADD COLUMN google_id TEXT")
+        conn.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_users_google_id ON users(google_id)")
     try:
         conn.execute("SELECT avatar_url FROM users LIMIT 1")
     except Exception:
