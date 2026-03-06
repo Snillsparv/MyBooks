@@ -526,16 +526,51 @@ function getSegmentsForChapter(timeStr) {
 
 function formatSegmentsAsHtml(segments) {
   if (!segments.length) return '';
-  let html = '';
-  let para = [];
+
+  // Group segments into sections separated by larger pauses (>6s gap)
+  const sections = [];
+  let current = { start: segments[0].start, texts: [] };
+
   for (let i = 0; i < segments.length; i++) {
-    para.push(segments[i].text);
+    current.texts.push(segments[i].text);
     const nextGap = (i < segments.length - 1)
       ? segments[i + 1].start - segments[i].start
       : 999;
-    if (para.length >= 5 || nextGap > 4 || i === segments.length - 1) {
-      html += `<p>${escapeHtml(para.join(' '))}</p>`;
-      para = [];
+
+    if (nextGap > 6 || i === segments.length - 1) {
+      sections.push(current);
+      if (i < segments.length - 1) {
+        current = { start: segments[i + 1].start, texts: [] };
+      }
+    }
+  }
+
+  // If only one section, split into roughly equal parts for readability
+  if (sections.length === 1 && segments.length > 15) {
+    const chunkSize = Math.ceil(segments.length / Math.min(4, Math.ceil(segments.length / 10)));
+    const split = [];
+    for (let i = 0; i < segments.length; i += chunkSize) {
+      const slice = segments.slice(i, i + chunkSize);
+      split.push({ start: slice[0].start, texts: slice.map(s => s.text) });
+    }
+    sections.length = 0;
+    sections.push(...split);
+  }
+
+  let html = '';
+  for (const sec of sections) {
+    const mins = Math.floor(sec.start / 60);
+    const secs = Math.floor(sec.start % 60);
+    const ts = `${mins}:${secs.toString().padStart(2, '0')}`;
+    html += `<h5>${ts}</h5>`;
+
+    // Split joined text into paragraphs at sentence boundaries (~3-4 sentences each)
+    const fullText = sec.texts.join(' ');
+    const sentences = fullText.match(/[^.!?]+[.!?]+[\s]*/g) || [fullText];
+    const parasSize = Math.max(3, Math.ceil(sentences.length / Math.ceil(sentences.length / 4)));
+    for (let i = 0; i < sentences.length; i += parasSize) {
+      const chunk = sentences.slice(i, i + parasSize).join('').trim();
+      if (chunk) html += `<p>${escapeHtml(chunk)}</p>`;
     }
   }
   return html;

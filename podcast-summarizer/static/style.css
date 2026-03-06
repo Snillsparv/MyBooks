@@ -496,6 +496,12 @@ mark {
 .inline-original-text.visible {
   grid-template-rows: 1fr; padding: 12px 16px; margin: 6px 0 16px 0;
 }
+.inline-original-text h5 {
+  font-family: 'DM Sans', sans-serif; font-size: 0.7rem; font-weight: 600;
+  color: var(--sage); margin: 12px 0 4px 0; letter-spacing: 0.03em;
+  font-variant-numeric: tabular-nums;
+}
+.inline-original-text h5:first-child { margin-top: 0; }
 .inline-original-text p { margin-bottom: 8px; }
 .inline-original-text p:last-child { margin-bottom: 0; }
 
