@@ -31,7 +31,6 @@ let summaryData = null;
 let allOpen = false;
 let streamStartTime = 0;
 let currentUser = null;
-let ytPlayer = null;
 
 // --- Init ---
 document.addEventListener('DOMContentLoaded', () => {
@@ -69,9 +68,12 @@ function updateAuthUI() {
   if (!authArea) return;
 
   if (currentUser) {
-    let badges = `<span class="user-email">${escapeHtml(currentUser.email)}</span>`;
+    const avatarHtml = currentUser.avatar
+      ? `<img class="user-avatar" src="${escapeHtml(currentUser.avatar)}" alt="">`
+      : '';
+    let badges = `${avatarHtml}<span class="user-email">${escapeHtml(currentUser.name || currentUser.email)}</span>`;
     if (currentUser.folds_remaining !== null && currentUser.folds_remaining !== undefined) {
-      badges += ` <span class="remaining-badge">${currentUser.folds_remaining} folds kvar idag</span>`;
+      badges += ` <span class="remaining-badge">${currentUser.folds_remaining} folds left today</span>`;
     }
     if (currentUser.is_subscriber) {
       badges += ` <span class="remaining-badge" style="background:var(--sage-light);color:var(--sage)">Pro</span>`;
@@ -80,14 +82,14 @@ function updateAuthUI() {
       <div class="top-bar-left">
         <div class="user-badge">${badges}</div>
       </div>
-      <button class="btn-sm ghost" onclick="openHistory()">Historik</button>
-      <button class="btn-sm ghost" onclick="doLogout()">Logga ut</button>
+      <button class="btn-sm ghost" onclick="openHistory()">History</button>
+      <button class="btn-sm ghost" onclick="doLogout()">Sign out</button>
     `;
   } else {
     authArea.innerHTML = `
       <div class="top-bar-left"></div>
-      <button class="btn-sm" onclick="openModal('login')">Logga in</button>
-      <button class="btn-sm primary" onclick="openModal('register')">Skapa konto</button>
+      <button class="btn-sm" onclick="openModal('login')">Sign in</button>
+      <button class="btn-sm primary" onclick="openModal('register')">Create account</button>
     `;
   }
 }
@@ -95,11 +97,66 @@ function updateAuthUI() {
 function openModal(type) {
   $$('.modal-overlay').forEach(m => m.classList.remove('visible'));
   const modal = $(`#${type}-modal`);
-  if (modal) modal.classList.add('visible');
+  if (modal) {
+    modal.classList.add('visible');
+    initGoogleSignIn();
+  }
 }
 function closeModal(type) {
   const modal = $(`#${type}-modal`);
   if (modal) modal.classList.remove('visible');
+}
+
+// --- Google Sign-In ---
+let googleInitialized = false;
+function initGoogleSignIn() {
+  const clientId = window.FOLDLY_CONFIG?.googleClientId;
+  if (!clientId || googleInitialized) return;
+  if (typeof google === 'undefined' || !google.accounts) {
+    // GIS library not loaded yet, retry
+    setTimeout(initGoogleSignIn, 300);
+    return;
+  }
+  googleInitialized = true;
+
+  google.accounts.id.initialize({
+    client_id: clientId,
+    callback: handleGoogleCredential,
+  });
+
+  const loginTarget = document.getElementById('google-signin-login');
+  const registerTarget = document.getElementById('google-signin-register');
+
+  if (loginTarget) {
+    google.accounts.id.renderButton(loginTarget, {
+      theme: 'outline', size: 'large', text: 'signin_with', width: 300,
+    });
+  }
+  if (registerTarget) {
+    google.accounts.id.renderButton(registerTarget, {
+      theme: 'outline', size: 'large', text: 'signup_with', width: 300,
+    });
+  }
+}
+
+async function handleGoogleCredential(response) {
+  try {
+    const resp = await fetch('/api/auth/google', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ credential: response.credential }),
+    });
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data.error);
+    currentUser = data.user;
+    updateAuthUI();
+    closeModal('login');
+    closeModal('register');
+    showToast('Signed in with Google!');
+  } catch (err) {
+    const errEl = $('#login-error') || $('#reg-error');
+    if (errEl) errEl.textContent = err.message;
+  }
 }
 
 async function doRegister(e) {
@@ -162,18 +219,18 @@ async function openHistory() {
   const panel = $('#history-panel');
   const list = $('#history-list');
   panel.classList.add('visible');
-  list.innerHTML = '<div class="history-empty">Laddar...</div>';
+  list.innerHTML = '<div class="history-empty">Loading...</div>';
 
   try {
     const resp = await fetch('/api/history');
     const data = await resp.json();
     if (!data.folds || data.folds.length === 0) {
-      list.innerHTML = '<div class="history-empty">Inga sparade folds ännu.</div>';
+      list.innerHTML = '<div class="history-empty">No saved folds yet.</div>';
       return;
     }
     list.innerHTML = data.folds.map(f => `
       <div class="history-item" onclick="loadFold(${f.id})">
-        <div class="hi-title">${escapeHtml(f.video_title || 'Utan titel')}</div>
+        <div class="hi-title">${escapeHtml(f.video_title || 'Untitled')}</div>
         <div class="hi-meta">
           <span>${f.created_at ? f.created_at.substring(0, 16).replace('T', ' ') : ''}</span>
           <span>${f.cost_sek ? f.cost_sek.toFixed(2) + ' kr' : ''}</span>
@@ -181,7 +238,7 @@ async function openHistory() {
       </div>
     `).join('');
   } catch (e) {
-    list.innerHTML = '<div class="history-empty">Kunde inte ladda historik.</div>';
+    list.innerHTML = '<div class="history-empty">Could not load history.</div>';
   }
 }
 
@@ -325,10 +382,10 @@ function updateStreamProgress(charCount) {
       const min = Math.floor(etaSeconds / 60);
       const sec = etaSeconds % 60;
       etaText.textContent = min > 0
-        ? `Beräknad tid kvar: ~${min} min ${sec} s`
-        : `Beräknad tid kvar: ~${sec} s`;
+        ? `Estimated time left: ~${min} min ${sec}s`
+        : `Estimated time left: ~${sec}s`;
     } else {
-      etaText.textContent = 'Nästan klar...';
+      etaText.textContent = 'Almost done...';
     }
   }
 }
@@ -351,10 +408,10 @@ async function handleSubmit() {
   sectionsEl.innerHTML = '';
   rawSegments = [];
   summaryData = null;
-  showLoading('Hämtar transkription från YouTube...');
+  showLoading('Fetching transcript from YouTube...');
   setStep('transcript');
 
-  const language = $('#lang-select')?.value || 'svenska';
+  const language = $('#lang-select')?.value || 'english';
   const detailLevel = $('#detail-select')?.value || 'medium';
 
   try {
@@ -366,7 +423,7 @@ async function handleSubmit() {
 
     if (!resp.ok) {
       const err = await resp.json();
-      throw new Error(err.error || 'Något gick fel');
+      throw new Error(err.error || 'Something went wrong');
     }
 
     const reader = resp.body.getReader();
@@ -390,7 +447,7 @@ async function handleSubmit() {
           if (msg.type === 'meta') {
             videoMeta = msg;
             rawSegments = msg.segments || [];
-            showLoading('Claude viker ihop transkriptionen...');
+            showLoading('Claude is folding the transcript...');
             setStep('analyze');
           } else if (msg.type === 'chunk') {
             fullText += msg.text;
@@ -499,7 +556,7 @@ function buildInlineToggle(uid, segments) {
   const html = formatSegmentsAsHtml(segments);
   return `
     <button class="inline-original-toggle" onclick="toggleInlineOriginal(event, '${uid}')">
-      <span class="toggle-arrow">▶</span> Originaltext
+      <span class="toggle-arrow">▶</span> Original text
     </button>
     <div class="inline-original-text" id="${uid}">${html}</div>
   `;
@@ -535,17 +592,20 @@ function renderResult(jsonText, doneInfo) {
     const data = JSON.parse(cleaned);
     summaryData = data;
 
+    // Also save to localStorage for quick access
+    saveToLocalHistory(data, doneInfo);
+
     const ytUrl = `https://www.youtube.com/watch?v=${videoMeta.video_id}`;
     resultHeader.innerHTML = `
       <h2>${escapeHtml(data.title || videoMeta.video_title)}</h2>
-      <p class="subtitle">${escapeHtml(videoMeta.video_title)} · <a href="${ytUrl}" target="_blank">Se på YouTube</a></p>
+      <p class="subtitle">${escapeHtml(videoMeta.video_title)} · <a href="${ytUrl}" target="_blank">Watch on YouTube</a></p>
     `;
 
     // Meta bar (cost, tokens, share)
     let metaHtml = '';
     if (doneInfo) {
       if (doneInfo.cost_sek !== undefined) {
-        metaHtml += `<span class="meta-chip cost">Kostnad: ${doneInfo.cost_sek.toFixed(2)} kr</span>`;
+        metaHtml += `<span class="meta-chip cost">Cost: ${doneInfo.cost_sek.toFixed(2)} kr</span>`;
       }
       if (doneInfo.input_tokens) {
         const totalTok = ((doneInfo.input_tokens + doneInfo.output_tokens) / 1000).toFixed(1);
@@ -553,7 +613,7 @@ function renderResult(jsonText, doneInfo) {
       }
       if (doneInfo.share_token) {
         const shareUrl = `${window.location.origin}/fold/${doneInfo.share_token}`;
-        metaHtml += `<span class="meta-chip share" onclick="copyShareLink('${shareUrl}')" title="Kopiera delningslänk">Dela ↗</span>`;
+        metaHtml += `<span class="meta-chip share" onclick="copyShareLink('${shareUrl}')" title="Copy share link">Share ↗</span>`;
       }
     }
     resultMetaBar.innerHTML = metaHtml;
@@ -565,7 +625,7 @@ function renderResult(jsonText, doneInfo) {
       keyQuotesEl.innerHTML = `
         <div class="key-quotes-title">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V21z"/><path d="M15 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V21z"/></svg>
-          Nyckelcitat
+          Key quotes
         </div>
         ${data.key_quotes.map(q => `
           <div class="quote-card">
@@ -624,8 +684,26 @@ function renderResult(jsonText, doneInfo) {
 
   } catch (e) {
     console.error('Parse error:', e, jsonText.substring(0, 500));
-    showLoading('Kunde inte tolka svaret. Försök igen.', true);
+    showLoading('Could not parse response. Please try again.', true);
   }
+}
+
+
+// ===== localStorage history =====
+
+function saveToLocalHistory(data, doneInfo) {
+  try {
+    const history = JSON.parse(localStorage.getItem('foldly-history') || '[]');
+    history.unshift({
+      title: data.title || videoMeta.video_title || 'Untitled',
+      video_id: videoMeta.video_id,
+      cost_sek: doneInfo?.cost_sek,
+      share_token: doneInfo?.share_token,
+      date: new Date().toISOString(),
+    });
+    // Keep max 20 entries in localStorage
+    localStorage.setItem('foldly-history', JSON.stringify(history.slice(0, 20)));
+  } catch (e) {}
 }
 
 
@@ -634,7 +712,6 @@ function renderResult(jsonText, doneInfo) {
 function toggleSection(header) {
   const section = header.parentElement;
   section.classList.toggle('open');
-  // Focus for keyboard nav
   section.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
@@ -645,7 +722,7 @@ function toggleInlineOriginal(event, uid) {
   const isOpen = textEl.classList.toggle('visible');
   const btn = event.currentTarget;
   btn.classList.toggle('open', isOpen);
-  const label = isOpen ? 'Dölj originaltext' : 'Originaltext';
+  const label = isOpen ? 'Hide original text' : 'Original text';
   btn.innerHTML = `<span class="toggle-arrow">${isOpen ? '▼' : '▶'}</span> ${label}`;
 }
 
@@ -666,7 +743,6 @@ function handleSearch() {
       s.classList.remove('search-highlight');
       s.style.display = '';
     });
-    // Remove highlights
     $$('.transcript-text').forEach(el => {
       el.innerHTML = el.innerHTML.replace(/<mark>(.*?)<\/mark>/gi, '$1');
     });
@@ -682,14 +758,13 @@ function handleSearch() {
     s.classList.toggle('search-highlight', matches);
     if (matches) matchCount++;
   });
-  searchCount.textContent = `${matchCount} träff${matchCount !== 1 ? 'ar' : ''}`;
+  searchCount.textContent = `${matchCount} match${matchCount !== 1 ? 'es' : ''}`;
 }
 
 
 // ===== Keyboard navigation =====
 
 function handleKeyboard(e) {
-  // Don't capture if typing in input
   if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
   if (!resultEl.classList.contains('visible')) return;
 
@@ -720,7 +795,6 @@ function focusSection(sections, idx) {
   if (sections[idx]) {
     sections[idx].classList.add('kb-focus');
     sections[idx].scrollIntoView({ behavior: 'smooth', block: 'center' });
-    // Brief visual indicator
     sections[idx].style.outline = '2px solid var(--accent)';
     setTimeout(() => { sections[idx].style.outline = ''; }, 800);
   }
@@ -732,7 +806,7 @@ function focusSection(sections, idx) {
 function copyAll() {
   if (!summaryData) return;
   const md = generateMarkdown();
-  navigator.clipboard.writeText(md).then(() => showToast('Kopierat till urklipp!'));
+  navigator.clipboard.writeText(md).then(() => showToast('Copied to clipboard!'));
 }
 
 function exportMarkdown() {
@@ -742,10 +816,10 @@ function exportMarkdown() {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `${(summaryData.title || 'fold').replace(/[^a-zåäö0-9 ]/gi, '')}.md`;
+  a.download = `${(summaryData.title || 'fold').replace(/[^a-z0-9 ]/gi, '')}.md`;
   a.click();
   URL.revokeObjectURL(url);
-  showToast('Markdown-fil laddas ner!');
+  showToast('Downloading Markdown file!');
 }
 
 function generateMarkdown() {
@@ -754,11 +828,11 @@ function generateMarkdown() {
   md += `${summaryData.summary}\n\n`;
 
   if (videoMeta.video_id) {
-    md += `[Se på YouTube](https://www.youtube.com/watch?v=${videoMeta.video_id})\n\n---\n\n`;
+    md += `[Watch on YouTube](https://www.youtube.com/watch?v=${videoMeta.video_id})\n\n---\n\n`;
   }
 
   if (summaryData.key_quotes && summaryData.key_quotes.length > 0) {
-    md += `## Nyckelcitat\n\n`;
+    md += `## Key Quotes\n\n`;
     summaryData.key_quotes.forEach(q => {
       md += `> "${q.text}"\n> — ${q.context || ''}${q.time ? ' (' + q.time + ')' : ''}\n\n`;
     });
@@ -769,7 +843,6 @@ function generateMarkdown() {
     md += `## ${ch.title}\n`;
     md += `*${ch.time || ''}*\n\n`;
     md += `${ch.summary}\n\n`;
-    // Strip HTML from transcript_html for markdown
     if (ch.transcript_html) {
       const tmp = document.createElement('div');
       tmp.innerHTML = ch.transcript_html;
@@ -782,7 +855,7 @@ function generateMarkdown() {
 }
 
 function copyShareLink(url) {
-  navigator.clipboard.writeText(url).then(() => showToast('Delningslänk kopierad!'));
+  navigator.clipboard.writeText(url).then(() => showToast('Share link copied!'));
 }
 
 

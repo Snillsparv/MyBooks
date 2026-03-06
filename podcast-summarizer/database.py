@@ -18,8 +18,10 @@ def init_db():
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             email TEXT UNIQUE NOT NULL,
-            password_hash TEXT NOT NULL,
+            password_hash TEXT DEFAULT '',
             display_name TEXT DEFAULT '',
+            google_id TEXT UNIQUE,
+            avatar_url TEXT DEFAULT '',
             is_subscriber INTEGER DEFAULT 0,
             stripe_customer_id TEXT,
             daily_folds_used INTEGER DEFAULT 0,
@@ -37,7 +39,7 @@ def init_db():
             input_tokens INTEGER DEFAULT 0,
             output_tokens INTEGER DEFAULT 0,
             cost_sek REAL DEFAULT 0.0,
-            language TEXT DEFAULT 'svenska',
+            language TEXT DEFAULT 'english',
             detail_level TEXT DEFAULT 'medium',
             share_token TEXT UNIQUE,
             created_at TEXT DEFAULT (datetime('now'))
@@ -45,5 +47,14 @@ def init_db():
         CREATE INDEX IF NOT EXISTS idx_folds_user_id ON folds(user_id);
         CREATE INDEX IF NOT EXISTS idx_folds_share ON folds(share_token);
     """)
+    # Migration: add google_id column if missing
+    try:
+        conn.execute("SELECT google_id FROM users LIMIT 1")
+    except Exception:
+        conn.execute("ALTER TABLE users ADD COLUMN google_id TEXT UNIQUE")
+    try:
+        conn.execute("SELECT avatar_url FROM users LIMIT 1")
+    except Exception:
+        conn.execute("ALTER TABLE users ADD COLUMN avatar_url TEXT DEFAULT ''")
     conn.commit()
     conn.close()

@@ -20,6 +20,7 @@ app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "dev-secret-change-in-prod")
 
 ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
+GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "")
 
 FREE_DAILY_LIMIT = 2
 
@@ -55,9 +56,9 @@ def get_video_title(video_id: str) -> str:
         req = urllib.request.Request(oembed_url, headers={"User-Agent": "Mozilla/5.0"})
         with urllib.request.urlopen(req, timeout=10) as resp:
             data = json.loads(resp.read().decode())
-            return data.get("title", "Okänd titel")
+            return data.get("title", "Unknown title")
     except Exception:
-        return "Okänd titel"
+        return "Unknown title"
 
 
 def get_transcript(video_id: str) -> tuple[str, list[dict]]:
@@ -227,7 +228,7 @@ def increment_usage(user_id):
 @app.route("/")
 def index():
     user = get_current_user()
-    return render_template("index.html", user=user)
+    return render_template("index.html", user=user, google_client_id=GOOGLE_CLIENT_ID)
 
 
 @app.route("/fold/<share_token>")
@@ -238,7 +239,7 @@ def shared_fold(share_token):
     if not fold:
         return "Fold not found", 404
     user = get_current_user()
-    return render_template("index.html", user=user, shared_fold=dict(fold))
+    return render_template("index.html", user=user, shared_fold=dict(fold), google_client_id=GOOGLE_CLIENT_ID)
 
 
 @app.route("/api/register", methods=["POST"])
@@ -249,15 +250,15 @@ def api_register():
     name = (data.get("name") or "").strip()
 
     if not email or not password:
-        return jsonify({"error": "E-post och lösenord krävs"}), 400
+        return jsonify({"error": "Email and password are required"}), 400
     if len(password) < 6:
-        return jsonify({"error": "Lösenordet måste vara minst 6 tecken"}), 400
+        return jsonify({"error": "Password must be at least 6 characters"}), 400
 
     db = get_db()
     existing = db.execute("SELECT id FROM users WHERE email = ?", (email,)).fetchone()
     if existing:
         db.close()
-        return jsonify({"error": "E-postadressen är redan registrerad"}), 400
+        return jsonify({"error": "This email is already registered"}), 400
 
     pw_hash = generate_password_hash(password)
     cursor = db.execute(
@@ -283,7 +284,7 @@ def api_login():
     db.close()
 
     if not user or not check_password_hash(user["password_hash"], password):
-        return jsonify({"error": "Fel e-post eller lösenord"}), 401
+        return jsonify({"error": "Incorrect email or password"}), 401
 
     session["user_id"] = user["id"]
     return jsonify({
@@ -293,6 +294,69 @@ def api_login():
             "email": user["email"],
             "name": user["display_name"],
             "is_subscriber": bool(user["is_subscriber"]),
+        },
+    })
+
+
+@app.route("/api/auth/google", methods=["POST"])
+def api_auth_google():
+    data = request.get_json()
+    credential = data.get("credential", "")
+    if not credential:
+        return jsonify({"error": "No credential provided"}), 400
+
+    # Verify Google ID token via Google's tokeninfo endpoint
+    try:
+        token_url = f"https://oauth2.googleapis.com/tokeninfo?id_token={urllib.parse.quote(credential)}"
+        req = urllib.request.Request(token_url)
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            info = json.loads(resp.read().decode())
+    except Exception:
+        return jsonify({"error": "Could not verify Google token"}), 401
+
+    # Verify audience matches our client ID
+    if GOOGLE_CLIENT_ID and info.get("aud") != GOOGLE_CLIENT_ID:
+        return jsonify({"error": "Token audience mismatch"}), 401
+
+    google_id = info.get("sub")
+    email = info.get("email", "").lower()
+    name = info.get("name", "")
+    avatar = info.get("picture", "")
+
+    if not email:
+        return jsonify({"error": "No email in Google token"}), 400
+
+    db = get_db()
+
+    # Check if user exists by google_id or email
+    user = db.execute("SELECT * FROM users WHERE google_id = ?", (google_id,)).fetchone()
+    if not user:
+        user = db.execute("SELECT * FROM users WHERE email = ?", (email,)).fetchone()
+        if user:
+            # Link Google account to existing email user
+            db.execute("UPDATE users SET google_id = ?, avatar_url = ? WHERE id = ?",
+                       (google_id, avatar, user["id"]))
+            db.commit()
+        else:
+            # Create new user
+            cursor = db.execute(
+                "INSERT INTO users (email, password_hash, display_name, google_id, avatar_url) "
+                "VALUES (?, '', ?, ?, ?)",
+                (email, name or email.split("@")[0], google_id, avatar),
+            )
+            db.commit()
+            user = db.execute("SELECT * FROM users WHERE id = ?", (cursor.lastrowid,)).fetchone()
+
+    db.close()
+    session["user_id"] = user["id"]
+    return jsonify({
+        "ok": True,
+        "user": {
+            "id": user["id"],
+            "email": user["email"],
+            "name": user["display_name"],
+            "is_subscriber": bool(user["is_subscriber"]),
+            "avatar": user["avatar_url"] or "",
         },
     })
 
@@ -314,6 +378,7 @@ def api_me():
             "id": user["id"],
             "email": user["email"],
             "name": user["display_name"],
+            "avatar": user["avatar_url"] or "",
             "is_subscriber": bool(user["is_subscriber"]),
             "folds_remaining": remaining if not user["is_subscriber"] else None,
         }
@@ -324,7 +389,7 @@ def api_me():
 def api_history():
     user = get_current_user()
     if not user:
-        return jsonify({"error": "Ej inloggad"}), 401
+        return jsonify({"error": "Not signed in"}), 401
     db = get_db()
     folds = db.execute(
         "SELECT id, video_id, video_title, video_url, cost_sek, share_token, created_at "
@@ -339,14 +404,14 @@ def api_history():
 def api_fold(fold_id):
     user = get_current_user()
     if not user:
-        return jsonify({"error": "Ej inloggad"}), 401
+        return jsonify({"error": "Not signed in"}), 401
     db = get_db()
     fold = db.execute(
         "SELECT * FROM folds WHERE id = ? AND user_id = ?", (fold_id, user["id"])
     ).fetchone()
     db.close()
     if not fold:
-        return jsonify({"error": "Hittades inte"}), 404
+        return jsonify({"error": "Not found"}), 404
     return jsonify(dict(fold))
 
 
@@ -358,31 +423,31 @@ def api_summarize():
     detail_level = data.get("detail_level", "medium")
 
     if not url:
-        return jsonify({"error": "Ingen URL angiven"}), 400
+        return jsonify({"error": "No URL provided"}), 400
 
     video_id = extract_video_id(url)
     if not video_id:
-        return jsonify({"error": "Kunde inte identifiera YouTube-video-ID."}), 400
+        return jsonify({"error": "Could not identify YouTube video ID."}), 400
 
     if not ANTHROPIC_API_KEY:
-        return jsonify({"error": "ANTHROPIC_API_KEY är inte konfigurerad."}), 500
+        return jsonify({"error": "ANTHROPIC_API_KEY is not configured."}), 500
 
     user = get_current_user()
     allowed, remaining = check_rate_limit(user)
     if not allowed:
-        msg = "Logga in för att använda Foldly." if user is None else \
-              "Du har nått dagens gräns. Uppgradera till Foldly Pro för obegränsade folds."
+        msg = "Sign in to use Foldly." if user is None else \
+              "You've reached today's limit. Upgrade to Foldly Pro for unlimited folds."
         return jsonify({"error": msg}), 429
 
     try:
         video_title = get_video_title(video_id)
     except Exception:
-        video_title = "Okänd titel"
+        video_title = "Unknown title"
 
     try:
         transcript_text, segments = get_transcript(video_id)
     except Exception as e:
-        return jsonify({"error": f"Kunde inte hämta transkription: {e}"}), 400
+        return jsonify({"error": f"Could not fetch transcript: {e}"}), 400
 
     duration = estimate_duration(segments)
 
@@ -441,7 +506,7 @@ def api_summarize():
         except anthropic.BadRequestError as e:
             yield json.dumps({"type": "error", "error": f"API-fel: {e.message}"}) + "\n"
         except anthropic.AuthenticationError:
-            yield json.dumps({"type": "error", "error": "Ogiltig API-nyckel."}) + "\n"
+            yield json.dumps({"type": "error", "error": "Invalid API key."}) + "\n"
         except anthropic.APIError as e:
             yield json.dumps({"type": "error", "error": f"API-fel: {e.message}"}) + "\n"
 

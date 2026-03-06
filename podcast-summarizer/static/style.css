@@ -511,6 +511,20 @@ mark {
 .modal .switch-link a { color: var(--accent); cursor: pointer; text-decoration: none; border-bottom: 1px solid var(--accent-glow); }
 .modal .switch-link a:hover { border-bottom-color: var(--accent); }
 
+.modal-divider {
+  display: flex; align-items: center; gap: 12px; margin: 1.2rem 0;
+  color: var(--text-muted); font-size: 0.78rem;
+}
+.modal-divider::before, .modal-divider::after {
+  content: ''; flex: 1; height: 1px; background: var(--border);
+}
+.google-signin-wrapper { display: flex; justify-content: center; min-height: 44px; }
+
+/* Google Sign-In avatar */
+.user-avatar {
+  width: 24px; height: 24px; border-radius: 50%; vertical-align: middle; margin-right: 4px;
+}
+
 /* ===== History panel ===== */
 .history-panel {
   display: none; position: fixed; top: 0; right: 0; bottom: 0; width: 360px;
