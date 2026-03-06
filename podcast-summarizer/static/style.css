@@ -122,7 +122,7 @@ header .subtitle { color: var(--text-secondary); font-size: 0.95rem; }
   background: var(--surface); border-radius: var(--radius);
   padding: 1.4rem 1.6rem; border: 1px solid var(--border);
   margin-bottom: 2rem; box-shadow: var(--shadow-sm);
-  position: relative;
+  position: relative; text-align: center;
 }
 /* Folded corner */
 .input-area::before {
@@ -135,7 +135,7 @@ header .subtitle { color: var(--text-secondary); font-size: 0.95rem; }
   display: block; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.82rem;
   color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em;
 }
-.input-row { display: flex; gap: 0.75rem; }
+.input-row { display: flex; gap: 0.75rem; justify-content: center; }
 .input-row input {
   flex: 1; padding: 0.7rem 1rem; border: 1px solid var(--border); border-radius: 6px;
   font-size: 0.95rem; font-family: inherit; background: var(--surface-alt);
@@ -146,7 +146,7 @@ header .subtitle { color: var(--text-secondary); font-size: 0.95rem; }
 
 /* Options row */
 .options-row {
-  display: flex; gap: 0.75rem; margin-top: 0.75rem; flex-wrap: wrap; align-items: center;
+  display: flex; gap: 0.75rem; margin-top: 0.75rem; flex-wrap: wrap; align-items: center; justify-content: center;
 }
 .option-group { display: flex; align-items: center; gap: 6px; }
 .option-group label { font-size: 0.78rem; color: var(--text-muted); text-transform: none; letter-spacing: 0; font-weight: 500; margin-bottom: 0; }
