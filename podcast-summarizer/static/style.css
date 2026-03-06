@@ -141,6 +141,7 @@ header .subtitle { color: var(--text-secondary); font-size: 0.95rem; }
   font-size: 0.95rem; font-family: inherit; background: var(--surface-alt);
   color: var(--text); transition: border-color 0.2s;
 }
+.btn-row { display: flex; justify-content: center; margin-top: 0.75rem; }
 .input-row input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
 .input-row input::placeholder { color: var(--text-muted); }
 
@@ -622,7 +623,7 @@ footer {
 @media (max-width: 600px) {
   .container { padding: 28px 16px 80px; }
   .input-row { flex-direction: column; }
-  .input-row button { width: 100%; }
+  .btn-row button { width: 100%; }
   .options-row { flex-direction: column; }
   .section-header { padding: 14px 16px; }
   .transcript-text { padding: 14px 16px 16px 16px; }
