@@ -121,6 +121,7 @@ Givet följande transkription, gör följande:
 
 1. Ge en sammanfattning ({summary_length}) av hela innehållet. Skriv på {language}.
 2. Dela upp innehållet i logiska kapitel/sektioner ({chapter_count} beroende på längd).
+   Tidsintervallen ska tillsammans täcka hela videon från början till slut (även sista delen).
 3. Varje kapitel ska ha:
    - En kort, beskrivande rubrik på {language}
    - En tidsperiod (t.ex. "0:00\u20135:30") baserat på textens position i transkriptionen
@@ -165,7 +166,7 @@ Totallängd på videon: cirka {duration} minuter."""
 def build_prompt(transcript_text, duration_minutes, language="svenska", detail_level="medium"):
     config = DETAIL_CONFIGS.get(detail_level, DETAIL_CONFIGS["medium"])
     return SUMMARIZE_PROMPT.format(
-        transcript=transcript_text[:100000],
+        transcript=transcript_text,
         duration=duration_minutes,
         language=language,
         **config,
