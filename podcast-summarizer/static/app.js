@@ -328,6 +328,8 @@ function showLoading(msg, isError = false) {
   loadingEl.classList.toggle('error', isError);
   statusText.textContent = msg;
   statusText.classList.toggle('error-text', isError);
+  statusText.style.whiteSpace = isError ? 'pre-wrap' : '';
+  statusText.style.textAlign = isError ? 'left' : '';
   if (isError) {
     etaText.textContent = '';
     progressTrack.style.display = 'none';
@@ -759,8 +761,14 @@ function renderResult(jsonText, doneInfo) {
     resultEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
   } catch (e) {
-    console.error('Parse error:', e, jsonText.substring(0, 500));
-    showLoading('Could not parse response. Please try again.', true);
+    console.error('Parse error:', e, jsonText);
+    const preview = jsonText
+      ? `First 300 chars:\n${jsonText.substring(0, 300)}\n\n…Last 200 chars:\n${jsonText.substring(jsonText.length - 200)}`
+      : '(empty response)';
+    showLoading(
+      `Could not parse response.\n\nError: ${e.message}\n\nLength: ${jsonText?.length ?? 0} chars\n\n${preview}`,
+      true,
+    );
   }
 }
 
