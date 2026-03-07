@@ -635,24 +635,32 @@ function seekTo(timeStr) {
 // ===== Render result =====
 
 function extractJSON(text) {
-  let s = text.trim();
+  let s = (text || '').trim();
   // Strip markdown code fences
   s = s.replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/, '');
+
   // Try parsing directly
   try { return JSON.parse(s); } catch {}
+
   // Try to find the outermost { ... } object
   const first = s.indexOf('{');
   const last = s.lastIndexOf('}');
   if (first !== -1 && last > first) {
     try { return JSON.parse(s.substring(first, last + 1)); } catch {}
   }
-  // Try to repair truncated JSON
+
+  // Repair with progressive trimming to handle trailing garbage/truncation.
   if (first !== -1) {
-    const repaired = repairTruncatedJSON(s.substring(first));
-    if (repaired) {
+    const base = s.substring(first);
+    const maxTrim = Math.min(500, Math.max(0, base.length - 2));
+    for (let trim = 0; trim <= maxTrim; trim++) {
+      const candidate = base.substring(0, base.length - trim);
+      const repaired = repairTruncatedJSON(candidate);
+      if (!repaired) continue;
       try { return JSON.parse(repaired); } catch {}
     }
   }
+
   return null;
 }
 
@@ -666,8 +674,9 @@ function repairTruncatedJSON(text) {
   }
   if (inString) s += '"';
 
-  // Remove trailing incomplete key-value (trailing colon without value, etc.)
+  // Remove trailing incomplete key-value / dangling property fragments
   s = s.replace(/,\s*"[^"]*"\s*:\s*$/, '');
+  s = s.replace(/,\s*"[^"]*$/, '');
   // Remove trailing comma
   s = s.replace(/,\s*$/, '');
 
