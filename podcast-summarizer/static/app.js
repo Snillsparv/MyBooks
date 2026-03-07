@@ -646,7 +646,47 @@ function extractJSON(text) {
   if (first !== -1 && last > first) {
     try { return JSON.parse(s.substring(first, last + 1)); } catch {}
   }
+  // Try to repair truncated JSON
+  if (first !== -1) {
+    const repaired = repairTruncatedJSON(s.substring(first));
+    if (repaired) {
+      try { return JSON.parse(repaired); } catch {}
+    }
+  }
   return null;
+}
+
+function repairTruncatedJSON(text) {
+  let s = text;
+  // Close unclosed string: count unescaped quotes
+  let inString = false;
+  for (let i = 0; i < s.length; i++) {
+    if (s[i] === '\\' && inString) { i++; continue; }
+    if (s[i] === '"') inString = !inString;
+  }
+  if (inString) s += '"';
+
+  // Remove trailing incomplete key-value (trailing colon without value, etc.)
+  s = s.replace(/,\s*"[^"]*"\s*:\s*$/, '');
+  // Remove trailing comma
+  s = s.replace(/,\s*$/, '');
+
+  // Close open brackets/braces
+  const stack = [];
+  let inStr = false;
+  for (let i = 0; i < s.length; i++) {
+    const ch = s[i];
+    if (ch === '\\' && inStr) { i++; continue; }
+    if (ch === '"') { inStr = !inStr; continue; }
+    if (inStr) continue;
+    if (ch === '{') stack.push('}');
+    else if (ch === '[') stack.push(']');
+    else if (ch === '}' || ch === ']') stack.pop();
+  }
+  // Remove any trailing comma before closing
+  s = s.replace(/,\s*$/, '');
+  while (stack.length) s += stack.pop();
+  return s;
 }
 
 function renderResult(jsonText, doneInfo) {
@@ -678,6 +718,13 @@ function renderResult(jsonText, doneInfo) {
         const shareUrl = `${window.location.origin}/fold/${doneInfo.share_token}`;
         metaHtml += `<span class="meta-chip share" onclick="copyShareLink('${shareUrl}')" title="Copy share link">Share ↗</span>`;
       }
+    }
+    // Show warning if response was truncated or interrupted
+    if (doneInfo && doneInfo.stop_reason && doneInfo.stop_reason !== 'end_turn') {
+      metaHtml += `<span class="meta-chip cost" title="${escapeHtml(doneInfo.stop_reason)}">⚠ Partial result</span>`;
+    }
+    if (doneInfo && doneInfo.warning) {
+      metaHtml += `<span class="meta-chip cost" title="${escapeHtml(doneInfo.warning)}">⚠ ${escapeHtml(doneInfo.warning)}</span>`;
     }
     resultMetaBar.innerHTML = metaHtml;
 

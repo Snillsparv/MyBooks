@@ -546,12 +546,13 @@ def api_summarize():
             stop_reason = usage_info.get("stop_reason") if usage_info else None
             cost = calc_cost_sek(input_tokens, output_tokens)
 
-            # If the model hit max_tokens, the JSON is likely truncated.
-            # Try to repair by closing open brackets.
-            if stop_reason == "max_tokens":
+            # Always try to repair JSON if it's not valid
+            # (handles max_tokens, network interruptions, malformed output)
+            try:
+                json.loads(full_text)
+            except (json.JSONDecodeError, ValueError):
                 repaired = _try_repair_json(full_text)
                 if repaired != full_text:
-                    # Send the repair diff as a final chunk so frontend has complete JSON
                     extra = repaired[len(full_text):]
                     yield json.dumps({"type": "chunk", "text": extra}) + "\n"
                     full_text = repaired
@@ -591,6 +592,26 @@ def api_summarize():
             yield json.dumps({"type": "error", "error": "Invalid API key."}) + "\n"
         except anthropic.APIError as e:
             yield json.dumps({"type": "error", "error": f"API-fel: {e.message}"}) + "\n"
+        except Exception as e:
+            # Catch-all for network errors, timeouts, etc.
+            # If we have partial text, try to repair and send it
+            if full_text:
+                repaired = _try_repair_json(full_text)
+                if repaired != full_text:
+                    extra = repaired[len(full_text):]
+                    yield json.dumps({"type": "chunk", "text": extra}) + "\n"
+                yield json.dumps({
+                    "type": "done",
+                    "input_tokens": 0,
+                    "output_tokens": 0,
+                    "cost_sek": 0,
+                    "share_token": None,
+                    "fold_id": None,
+                    "stop_reason": f"error: {type(e).__name__}",
+                    "warning": f"Stream interrupted: {e}",
+                }) + "\n"
+            else:
+                yield json.dumps({"type": "error", "error": f"Unexpected error: {e}"}) + "\n"
 
     return Response(
         stream_with_context(generate()),
