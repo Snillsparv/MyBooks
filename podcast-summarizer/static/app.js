@@ -635,24 +635,32 @@ function seekTo(timeStr) {
 // ===== Render result =====
 
 function extractJSON(text) {
-  let s = text.trim();
+  let s = (text || '').trim();
   // Strip markdown code fences
   s = s.replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/, '');
+
   // Try parsing directly
   try { return JSON.parse(s); } catch {}
+
   // Try to find the outermost { ... } object
   const first = s.indexOf('{');
   const last = s.lastIndexOf('}');
   if (first !== -1 && last > first) {
     try { return JSON.parse(s.substring(first, last + 1)); } catch {}
   }
-  // Try to repair truncated JSON
+
+  // Repair with progressive trimming to handle trailing garbage/truncation.
   if (first !== -1) {
-    const repaired = repairTruncatedJSON(s.substring(first));
-    if (repaired) {
+    const base = s.substring(first);
+    const maxTrim = Math.min(500, Math.max(0, base.length - 2));
+    for (let trim = 0; trim <= maxTrim; trim++) {
+      const candidate = base.substring(0, base.length - trim);
+      const repaired = repairTruncatedJSON(candidate);
+      if (!repaired) continue;
       try { return JSON.parse(repaired); } catch {}
     }
   }
+
   return null;
 }
 
@@ -666,46 +674,28 @@ function repairTruncatedJSON(text) {
   }
   if (inString) s += '"';
 
-  // Try closing brackets and parsing. If invalid, strip back to last
-  // comma outside a string and retry (handles orphaned keys, partial values, etc.)
-  for (let attempts = 0; attempts < 10; attempts++) {
-    // Strip trailing whitespace, commas, colons
-    let candidate = s.replace(/[\s,:]+$/, '');
-    // Remove trailing orphaned key ("key" with no colon/value)
-    candidate = candidate.replace(/,\s*"([^"\\]|\\.)*"$/, '');
-    // Remove trailing comma again after stripping
-    candidate = candidate.replace(/,\s*$/, '');
+  // Remove trailing incomplete key-value / dangling property fragments
+  s = s.replace(/,\s*"[^"]*"\s*:\s*$/, '');
+  s = s.replace(/,\s*"[^"]*$/, '');
+  // Remove trailing comma
+  s = s.replace(/,\s*$/, '');
 
-    // Close open brackets/braces
-    const stack = [];
-    let inStr = false;
-    for (let i = 0; i < candidate.length; i++) {
-      const ch = candidate[i];
-      if (ch === '\\' && inStr) { i++; continue; }
-      if (ch === '"') { inStr = !inStr; continue; }
-      if (inStr) continue;
-      if (ch === '{') stack.push('}');
-      else if (ch === '[') stack.push(']');
-      else if (ch === '}' || ch === ']') stack.pop();
-    }
-    let closed = candidate;
-    while (stack.length) closed += stack.pop();
-
-    try { JSON.parse(closed); return closed; } catch {}
-
-    // Strip back to the last comma outside a string and retry
-    let lastComma = -1;
-    inStr = false;
-    for (let i = 0; i < s.length; i++) {
-      const ch = s[i];
-      if (ch === '\\' && inStr) { i++; continue; }
-      if (ch === '"') { inStr = !inStr; continue; }
-      if (!inStr && ch === ',') lastComma = i;
-    }
-    if (lastComma <= 0) break;
-    s = s.substring(0, lastComma);
+  // Close open brackets/braces
+  const stack = [];
+  let inStr = false;
+  for (let i = 0; i < s.length; i++) {
+    const ch = s[i];
+    if (ch === '\\' && inStr) { i++; continue; }
+    if (ch === '"') { inStr = !inStr; continue; }
+    if (inStr) continue;
+    if (ch === '{') stack.push('}');
+    else if (ch === '[') stack.push(']');
+    else if (ch === '}' || ch === ']') stack.pop();
   }
-  return null;
+  // Remove any trailing comma before closing
+  s = s.replace(/,\s*$/, '');
+  while (stack.length) s += stack.pop();
+  return s;
 }
 
 function renderResult(jsonText, doneInfo) {

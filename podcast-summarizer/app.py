@@ -173,49 +173,53 @@ def build_prompt(transcript_text, duration_minutes, language="svenska", detail_l
 
 
 def _try_repair_json(text):
-    """Attempt to close truncated JSON so it can be parsed."""
-    import re
+    """Attempt to recover valid JSON from truncated/garbled model output."""
+    text = (text or "").strip()
+    if not text:
+        return text
 
-    text = text.rstrip()
     try:
         json.loads(text)
-        return text  # already valid
-    except (json.JSONDecodeError, ValueError):
+        return text
+    except json.JSONDecodeError:
         pass
 
-    # Close unclosed string
-    s = text
-    in_string = False
-    i = 0
-    while i < len(s):
-        ch = s[i]
-        if ch == '\\' and in_string:
-            i += 2
-            continue
-        if ch == '"':
-            in_string = not in_string
-        i += 1
-    if in_string:
-        s += '"'
+    first_obj = text.find("{")
+    if first_obj == -1:
+        return text
 
-    # Try closing brackets. If invalid, strip back to last comma and retry.
-    for _ in range(10):
-        candidate = s.rstrip()
-        # Strip trailing whitespace, commas, colons
-        candidate = re.sub(r'[\s,:]+$', '', candidate)
-        # Remove trailing orphaned key ("key" with no colon/value)
-        candidate = re.sub(r',\s*"([^"\\]|\\.)*"$', '', candidate)
-        # Remove trailing comma
-        candidate = re.sub(r',\s*$', '', candidate)
+    base = text[first_obj:]
 
-        # Close open brackets/braces
+    def close_candidate(candidate):
+        stripped = candidate.rstrip()
+
+        # If we're mid-string, close it.
+        in_string = False
+        i = 0
+        while i < len(stripped):
+            ch = stripped[i]
+            if ch == '\\' and in_string:
+                i += 2
+                continue
+            if ch == '"':
+                in_string = not in_string
+            i += 1
+        if in_string:
+            stripped += '"'
+
+        # Drop dangling key/value fragments and trailing commas.
+        stripped = re.sub(r',\s*"[^"]*"\s*:\s*$', '', stripped)
+        stripped = re.sub(r',\s*"[^"]*$', '', stripped)
+        stripped = stripped.rstrip().rstrip(',')
+
+        # Close open brackets/braces.
         stack = []
         in_str = False
-        j = 0
-        while j < len(candidate):
-            ch = candidate[j]
+        i = 0
+        while i < len(stripped):
+            ch = stripped[i]
             if ch == '\\' and in_str:
-                j += 2
+                i += 2
                 continue
             if ch == '"':
                 in_str = not in_str
@@ -224,37 +228,25 @@ def _try_repair_json(text):
                     stack.append('}' if ch == '{' else ']')
                 elif ch in ('}', ']') and stack:
                     stack.pop()
-            j += 1
+            i += 1
 
-        closed = candidate
+        result = stripped
         while stack:
-            closed += stack.pop()
+            result += stack.pop()
+        return result
 
+    # Progressive trim from the end to recover from trailing garbage.
+    max_trim = min(1500, len(base) - 1)
+    for trim in range(0, max_trim + 1):
+        candidate = base[: len(base) - trim]
+        repaired = close_candidate(candidate)
         try:
-            json.loads(closed)
-            return closed
-        except (json.JSONDecodeError, ValueError):
-            pass
+            json.loads(repaired)
+            return repaired
+        except json.JSONDecodeError:
+            continue
 
-        # Strip back to last comma outside a string
-        last_comma = -1
-        in_str = False
-        j = 0
-        while j < len(s):
-            ch = s[j]
-            if ch == '\\' and in_str:
-                j += 2
-                continue
-            if ch == '"':
-                in_str = not in_str
-            elif not in_str and ch == ',':
-                last_comma = j
-            j += 1
-        if last_comma <= 0:
-            break
-        s = s[:last_comma]
-
-    return text  # give up, return original
+    return text
 
 
 def summarize_with_claude(transcript_text, duration_minutes, language="svenska", detail_level="medium"):
