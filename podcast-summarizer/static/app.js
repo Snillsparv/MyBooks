@@ -631,13 +631,25 @@ function seekTo(timeStr) {
 
 // ===== Render result =====
 
+function extractJSON(text) {
+  let s = text.trim();
+  // Strip markdown code fences
+  s = s.replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/, '');
+  // Try parsing directly
+  try { return JSON.parse(s); } catch {}
+  // Try to find the outermost { ... } object
+  const first = s.indexOf('{');
+  const last = s.lastIndexOf('}');
+  if (first !== -1 && last > first) {
+    try { return JSON.parse(s.substring(first, last + 1)); } catch {}
+  }
+  return null;
+}
+
 function renderResult(jsonText, doneInfo) {
   try {
-    let cleaned = jsonText.trim();
-    if (cleaned.startsWith('```')) {
-      cleaned = cleaned.replace(/^```(?:json)?\s*/, '').replace(/```\s*$/, '');
-    }
-    const data = JSON.parse(cleaned);
+    const data = extractJSON(jsonText);
+    if (!data) throw new Error('No valid JSON found');
     summaryData = data;
 
     // Also save to localStorage for quick access
