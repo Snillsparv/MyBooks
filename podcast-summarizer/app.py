@@ -162,6 +162,73 @@ def build_prompt(transcript_text, duration_minutes, language="svenska", detail_l
     )
 
 
+def _try_repair_json(text):
+    """Attempt to close truncated JSON so it can be parsed."""
+    text = text.rstrip()
+    # Strip trailing incomplete string (find last complete quote)
+    # Simple heuristic: if the text doesn't end with } or ], try to close it
+    try:
+        json.loads(text)
+        return text  # already valid
+    except json.JSONDecodeError:
+        pass
+
+    # Try progressively closing brackets
+    # First, strip any trailing incomplete string value
+    import re
+    # Remove trailing partial string (unmatched quote)
+    stripped = text
+    # Count unescaped quotes to see if we're mid-string
+    in_string = False
+    last_good = 0
+    i = 0
+    while i < len(stripped):
+        ch = stripped[i]
+        if ch == '\\' and in_string:
+            i += 2
+            continue
+        if ch == '"':
+            in_string = not in_string
+            if not in_string:
+                last_good = i
+        i += 1
+
+    if in_string:
+        # We're inside an unclosed string – close it
+        stripped = stripped + '"'
+
+    # Now close any open brackets/braces
+    stack = []
+    in_str = False
+    i = 0
+    while i < len(stripped):
+        ch = stripped[i]
+        if ch == '\\' and in_str:
+            i += 2
+            continue
+        if ch == '"':
+            in_str = not in_str
+        elif not in_str:
+            if ch in ('{', '['):
+                stack.append('}' if ch == '{' else ']')
+            elif ch in ('}', ']'):
+                if stack:
+                    stack.pop()
+        i += 1
+
+    # Remove trailing comma before closing
+    result = stripped.rstrip().rstrip(',')
+    # Close all open brackets
+    while stack:
+        result += stack.pop()
+
+    try:
+        json.loads(result)
+        return result
+    except json.JSONDecodeError:
+        return text  # give up, return original
+
+
 def summarize_with_claude(transcript_text, duration_minutes, language="svenska", detail_level="medium"):
     client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
     prompt = build_prompt(transcript_text, duration_minutes, language, detail_level)
@@ -179,6 +246,7 @@ def summarize_with_claude(transcript_text, duration_minutes, language="svenska",
             "type": "usage",
             "input_tokens": final.usage.input_tokens,
             "output_tokens": final.usage.output_tokens,
+            "stop_reason": final.stop_reason,
         }
 
 
@@ -475,7 +543,18 @@ def api_summarize():
 
             input_tokens = usage_info["input_tokens"] if usage_info else 0
             output_tokens = usage_info["output_tokens"] if usage_info else 0
+            stop_reason = usage_info.get("stop_reason") if usage_info else None
             cost = calc_cost_sek(input_tokens, output_tokens)
+
+            # If the model hit max_tokens, the JSON is likely truncated.
+            # Try to repair by closing open brackets.
+            if stop_reason == "max_tokens":
+                repaired = _try_repair_json(full_text)
+                if repaired != full_text:
+                    # Send the repair diff as a final chunk so frontend has complete JSON
+                    extra = repaired[len(full_text):]
+                    yield json.dumps({"type": "chunk", "text": extra}) + "\n"
+                    full_text = repaired
 
             # Save to DB if user is logged in
             share_token = None
@@ -503,6 +582,7 @@ def api_summarize():
                 "cost_sek": cost,
                 "share_token": share_token,
                 "fold_id": fold_id,
+                "stop_reason": stop_reason,
             }) + "\n"
 
         except anthropic.BadRequestError as e:

@@ -457,27 +457,28 @@ async function handleSubmit() {
 
       for (const line of lines) {
         if (!line.trim()) continue;
+        let msg;
         try {
-          const msg = JSON.parse(line);
-          if (msg.type === 'meta') {
-            videoMeta = msg;
-            rawSegments = msg.segments || [];
-            showLoading('Claude is folding the transcript...');
-            setStep('analyze');
-          } else if (msg.type === 'chunk') {
-            fullText += msg.text;
-            updateStreamProgress(fullText.length);
-          } else if (msg.type === 'done') {
-            doneInfo = msg;
-            setStep('done');
-            renderResult(fullText, doneInfo);
-            fetchUser(); // Refresh remaining count
-          } else if (msg.type === 'error') {
-            throw new Error(msg.error);
-          }
+          msg = JSON.parse(line);
         } catch (e) {
-          if (e instanceof SyntaxError) continue;
-          throw e;
+          console.warn('Skipped unparseable NDJSON line:', line.substring(0, 200));
+          continue;
+        }
+        if (msg.type === 'meta') {
+          videoMeta = msg;
+          rawSegments = msg.segments || [];
+          showLoading('Claude is folding the transcript...');
+          setStep('analyze');
+        } else if (msg.type === 'chunk') {
+          fullText += msg.text;
+          updateStreamProgress(fullText.length);
+        } else if (msg.type === 'done') {
+          doneInfo = msg;
+          setStep('done');
+          renderResult(fullText, doneInfo);
+          fetchUser(); // Refresh remaining count
+        } else if (msg.type === 'error') {
+          throw new Error(msg.error);
         }
       }
     }
