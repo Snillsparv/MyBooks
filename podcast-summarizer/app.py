@@ -21,6 +21,7 @@ app.secret_key = os.environ.get("SECRET_KEY", "dev-secret-change-in-prod")
 
 ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
 GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "")
+PROXY_URL = os.environ.get("PROXY_URL", "")  # e.g. http://user:pass@proxy:8080
 
 FREE_DAILY_LIMIT = 2
 
@@ -61,8 +62,17 @@ def get_video_title(video_id: str) -> str:
         return "Unknown title"
 
 
+def _build_ytt_api():
+    """Build YouTubeTranscriptApi with optional proxy support."""
+    if PROXY_URL:
+        import httpx
+        client = httpx.Client(proxy=PROXY_URL)
+        return YouTubeTranscriptApi(http_client=client)
+    return YouTubeTranscriptApi()
+
+
 def get_transcript(video_id: str) -> tuple[str, list[dict]]:
-    ytt_api = YouTubeTranscriptApi()
+    ytt_api = _build_ytt_api()
     transcript = ytt_api.fetch(video_id)
 
     segments = []
@@ -527,7 +537,15 @@ def api_summarize():
     try:
         transcript_text, segments = get_transcript(video_id)
     except Exception as e:
-        return jsonify({"error": f"Could not fetch transcript: {e}"}), 400
+        err_str = str(e)
+        if "blocked" in err_str.lower() or "too many requests" in err_str.lower() or "ip" in err_str.lower():
+            msg = ("YouTube is temporarily blocking transcript requests from this server. "
+                   "This usually resolves itself after a few minutes. Please try again later.")
+        elif "no transcript" in err_str.lower() or "subtitles" in err_str.lower():
+            msg = "No transcript available for this video. It may not have subtitles enabled."
+        else:
+            msg = f"Could not fetch transcript: {e}"
+        return jsonify({"error": msg}), 400
 
     duration = estimate_duration(segments)
 
