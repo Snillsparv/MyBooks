@@ -111,6 +111,7 @@ Givet följande transkription, gör följande:
 
 1. Ge en sammanfattning ({summary_length}) av hela innehållet. Skriv på {language}.
 2. Dela upp innehållet i logiska kapitel/sektioner ({chapter_count} beroende på längd).
+   Tidsintervallen ska tillsammans täcka hela videon från början till slut (även sista delen).
 3. Varje kapitel ska ha:
    - En kort, beskrivande rubrik på {language}
    - En tidsperiod (t.ex. "0:00\u20135:30") baserat på textens position i transkriptionen
@@ -155,7 +156,7 @@ Totallängd på videon: cirka {duration} minuter."""
 def build_prompt(transcript_text, duration_minutes, language="svenska", detail_level="medium"):
     config = DETAIL_CONFIGS.get(detail_level, DETAIL_CONFIGS["medium"])
     return SUMMARIZE_PROMPT.format(
-        transcript=transcript_text[:100000],
+        transcript=transcript_text,
         duration=duration_minutes,
         language=language,
         **config,
@@ -163,70 +164,80 @@ def build_prompt(transcript_text, duration_minutes, language="svenska", detail_l
 
 
 def _try_repair_json(text):
-    """Attempt to close truncated JSON so it can be parsed."""
-    text = text.rstrip()
-    # Strip trailing incomplete string (find last complete quote)
-    # Simple heuristic: if the text doesn't end with } or ], try to close it
+    """Attempt to recover valid JSON from truncated/garbled model output."""
+    text = (text or "").strip()
+    if not text:
+        return text
+
     try:
         json.loads(text)
-        return text  # already valid
+        return text
     except json.JSONDecodeError:
         pass
 
-    # Try progressively closing brackets
-    # First, strip any trailing incomplete string value
-    import re
-    # Remove trailing partial string (unmatched quote)
-    stripped = text
-    # Count unescaped quotes to see if we're mid-string
-    in_string = False
-    last_good = 0
-    i = 0
-    while i < len(stripped):
-        ch = stripped[i]
-        if ch == '\\' and in_string:
-            i += 2
-            continue
-        if ch == '"':
-            in_string = not in_string
-            if not in_string:
-                last_good = i
-        i += 1
+    first_obj = text.find("{")
+    if first_obj == -1:
+        return text
 
-    if in_string:
-        # We're inside an unclosed string – close it
-        stripped = stripped + '"'
+    base = text[first_obj:]
 
-    # Now close any open brackets/braces
-    stack = []
-    in_str = False
-    i = 0
-    while i < len(stripped):
-        ch = stripped[i]
-        if ch == '\\' and in_str:
-            i += 2
-            continue
-        if ch == '"':
-            in_str = not in_str
-        elif not in_str:
-            if ch in ('{', '['):
-                stack.append('}' if ch == '{' else ']')
-            elif ch in ('}', ']'):
-                if stack:
+    def close_candidate(candidate):
+        stripped = candidate.rstrip()
+
+        # If we're mid-string, close it.
+        in_string = False
+        i = 0
+        while i < len(stripped):
+            ch = stripped[i]
+            if ch == '\\' and in_string:
+                i += 2
+                continue
+            if ch == '"':
+                in_string = not in_string
+            i += 1
+        if in_string:
+            stripped += '"'
+
+        # Drop dangling key/value fragments and trailing commas.
+        stripped = re.sub(r',\s*"[^"]*"\s*:\s*$', '', stripped)
+        stripped = re.sub(r',\s*"[^"]*$', '', stripped)
+        stripped = stripped.rstrip().rstrip(',')
+
+        # Close open brackets/braces.
+        stack = []
+        in_str = False
+        i = 0
+        while i < len(stripped):
+            ch = stripped[i]
+            if ch == '\\' and in_str:
+                i += 2
+                continue
+            if ch == '"':
+                in_str = not in_str
+            elif not in_str:
+                if ch in ('{', '['):
+                    stack.append('}' if ch == '{' else ']')
+                elif ch in ('}', ']') and stack:
                     stack.pop()
-        i += 1
+            i += 1
 
-    # Remove trailing comma before closing
-    result = stripped.rstrip().rstrip(',')
-    # Close all open brackets
-    while stack:
-        result += stack.pop()
-
-    try:
-        json.loads(result)
+        result = stripped
+        while stack:
+            result += stack.pop()
         return result
-    except json.JSONDecodeError:
-        return text  # give up, return original
+
+    # Progressive trim from the end to recover from trailing garbage.
+    max_trim = min(1500, len(base) - 1)
+    for trim in range(0, max_trim + 1):
+        candidate = base[: len(base) - trim]
+        repaired = close_candidate(candidate)
+        try:
+            json.loads(repaired)
+            return repaired
+        except json.JSONDecodeError:
+            continue
+
+    return text
 
 
 def summarize_with_claude(transcript_text, duration_minutes, language="svenska", detail_level="medium"):
