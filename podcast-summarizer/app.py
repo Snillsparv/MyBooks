@@ -164,69 +164,87 @@ def build_prompt(transcript_text, duration_minutes, language="svenska", detail_l
 
 def _try_repair_json(text):
     """Attempt to close truncated JSON so it can be parsed."""
+    import re
+
     text = text.rstrip()
-    # Strip trailing incomplete string (find last complete quote)
-    # Simple heuristic: if the text doesn't end with } or ], try to close it
     try:
         json.loads(text)
         return text  # already valid
-    except json.JSONDecodeError:
+    except (json.JSONDecodeError, ValueError):
         pass
 
-    # Try progressively closing brackets
-    # First, strip any trailing incomplete string value
-    import re
-    # Remove trailing partial string (unmatched quote)
-    stripped = text
-    # Count unescaped quotes to see if we're mid-string
+    # Close unclosed string
+    s = text
     in_string = False
-    last_good = 0
     i = 0
-    while i < len(stripped):
-        ch = stripped[i]
+    while i < len(s):
+        ch = s[i]
         if ch == '\\' and in_string:
             i += 2
             continue
         if ch == '"':
             in_string = not in_string
-            if not in_string:
-                last_good = i
         i += 1
-
     if in_string:
-        # We're inside an unclosed string – close it
-        stripped = stripped + '"'
+        s += '"'
 
-    # Now close any open brackets/braces
-    stack = []
-    in_str = False
-    i = 0
-    while i < len(stripped):
-        ch = stripped[i]
-        if ch == '\\' and in_str:
-            i += 2
-            continue
-        if ch == '"':
-            in_str = not in_str
-        elif not in_str:
-            if ch in ('{', '['):
-                stack.append('}' if ch == '{' else ']')
-            elif ch in ('}', ']'):
-                if stack:
+    # Try closing brackets. If invalid, strip back to last comma and retry.
+    for _ in range(10):
+        candidate = s.rstrip()
+        # Strip trailing whitespace, commas, colons
+        candidate = re.sub(r'[\s,:]+$', '', candidate)
+        # Remove trailing orphaned key ("key" with no colon/value)
+        candidate = re.sub(r',\s*"([^"\\]|\\.)*"$', '', candidate)
+        # Remove trailing comma
+        candidate = re.sub(r',\s*$', '', candidate)
+
+        # Close open brackets/braces
+        stack = []
+        in_str = False
+        j = 0
+        while j < len(candidate):
+            ch = candidate[j]
+            if ch == '\\' and in_str:
+                j += 2
+                continue
+            if ch == '"':
+                in_str = not in_str
+            elif not in_str:
+                if ch in ('{', '['):
+                    stack.append('}' if ch == '{' else ']')
+                elif ch in ('}', ']') and stack:
                     stack.pop()
-        i += 1
+            j += 1
 
-    # Remove trailing comma before closing
-    result = stripped.rstrip().rstrip(',')
-    # Close all open brackets
-    while stack:
-        result += stack.pop()
+        closed = candidate
+        while stack:
+            closed += stack.pop()
 
-    try:
-        json.loads(result)
-        return result
-    except json.JSONDecodeError:
-        return text  # give up, return original
+        try:
+            json.loads(closed)
+            return closed
+        except (json.JSONDecodeError, ValueError):
+            pass
+
+        # Strip back to last comma outside a string
+        last_comma = -1
+        in_str = False
+        j = 0
+        while j < len(s):
+            ch = s[j]
+            if ch == '\\' and in_str:
+                j += 2
+                continue
+            if ch == '"':
+                in_str = not in_str
+            elif not in_str and ch == ',':
+                last_comma = j
+            j += 1
+        if last_comma <= 0:
+            break
+        s = s[:last_comma]
+
+    return text  # give up, return original
 
 
 def summarize_with_claude(transcript_text, duration_minutes, language="svenska", detail_level="medium"):

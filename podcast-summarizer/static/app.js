@@ -666,27 +666,46 @@ function repairTruncatedJSON(text) {
   }
   if (inString) s += '"';
 
-  // Remove trailing incomplete key-value (trailing colon without value, etc.)
-  s = s.replace(/,\s*"[^"]*"\s*:\s*$/, '');
-  // Remove trailing comma
-  s = s.replace(/,\s*$/, '');
+  // Try closing brackets and parsing. If invalid, strip back to last
+  // comma outside a string and retry (handles orphaned keys, partial values, etc.)
+  for (let attempts = 0; attempts < 10; attempts++) {
+    // Strip trailing whitespace, commas, colons
+    let candidate = s.replace(/[\s,:]+$/, '');
+    // Remove trailing orphaned key ("key" with no colon/value)
+    candidate = candidate.replace(/,\s*"([^"\\]|\\.)*"$/, '');
+    // Remove trailing comma again after stripping
+    candidate = candidate.replace(/,\s*$/, '');
 
-  // Close open brackets/braces
-  const stack = [];
-  let inStr = false;
-  for (let i = 0; i < s.length; i++) {
-    const ch = s[i];
-    if (ch === '\\' && inStr) { i++; continue; }
-    if (ch === '"') { inStr = !inStr; continue; }
-    if (inStr) continue;
-    if (ch === '{') stack.push('}');
-    else if (ch === '[') stack.push(']');
-    else if (ch === '}' || ch === ']') stack.pop();
+    // Close open brackets/braces
+    const stack = [];
+    let inStr = false;
+    for (let i = 0; i < candidate.length; i++) {
+      const ch = candidate[i];
+      if (ch === '\\' && inStr) { i++; continue; }
+      if (ch === '"') { inStr = !inStr; continue; }
+      if (inStr) continue;
+      if (ch === '{') stack.push('}');
+      else if (ch === '[') stack.push(']');
+      else if (ch === '}' || ch === ']') stack.pop();
+    }
+    let closed = candidate;
+    while (stack.length) closed += stack.pop();
+
+    try { JSON.parse(closed); return closed; } catch {}
+
+    // Strip back to the last comma outside a string and retry
+    let lastComma = -1;
+    inStr = false;
+    for (let i = 0; i < s.length; i++) {
+      const ch = s[i];
+      if (ch === '\\' && inStr) { i++; continue; }
+      if (ch === '"') { inStr = !inStr; continue; }
+      if (!inStr && ch === ',') lastComma = i;
+    }
+    if (lastComma <= 0) break;
+    s = s.substring(0, lastComma);
   }
-  // Remove any trailing comma before closing
-  s = s.replace(/,\s*$/, '');
-  while (stack.length) s += stack.pop();
-  return s;
+  return null;
 }
 
 function renderResult(jsonText, doneInfo) {
