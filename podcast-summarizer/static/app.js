@@ -11,9 +11,6 @@ const statusText = $('#status-text');
 const etaText = $('#eta-text');
 const progressTrack = $('#progress-track');
 const progressFill = $('#progress-fill');
-const stepTranscript = $('#step-transcript');
-const stepAnalyze = $('#step-analyze');
-const stepDone = $('#step-done');
 const resultEl = $('#result');
 const resultHeader = $('#result-header');
 const overallSummaryEl = $('#overall-summary');
@@ -334,14 +331,12 @@ function showLoading(msg, isError = false) {
   if (isError) {
     etaText.textContent = '';
     progressTrack.style.display = 'none';
-    $('#progress-steps').style.display = 'none';
     for (let i = 1; i <= CRANE_STAGES; i++) {
       const el = document.getElementById('crane-' + i);
       if (el) el.classList.remove('active');
     }
   } else {
     progressTrack.style.display = '';
-    $('#progress-steps').style.display = '';
   }
 }
 
@@ -349,34 +344,21 @@ function hideLoading() {
   loadingEl.classList.remove('visible', 'error');
   progressTrack.classList.remove('indeterminate');
   etaText.textContent = '';
-  [stepTranscript, stepAnalyze, stepDone].forEach(s => s.classList.remove('active', 'done'));
 }
 
 function setStep(step) {
   if (step === 'transcript') {
     progressTrack.classList.add('indeterminate');
     progressFill.style.width = '0%';
-    stepTranscript.classList.add('active');
-    stepAnalyze.classList.remove('active', 'done');
-    stepDone.classList.remove('active', 'done');
     setCraneStage(5);
   } else if (step === 'analyze') {
     progressTrack.classList.remove('indeterminate');
     progressFill.style.width = '15%';
-    stepTranscript.classList.remove('active');
-    stepTranscript.classList.add('done');
-    stepAnalyze.classList.add('active');
-    stepDone.classList.remove('active', 'done');
     streamStartTime = Date.now();
     setCraneStage(15);
   } else if (step === 'done') {
     progressTrack.classList.remove('indeterminate');
     progressFill.style.width = '100%';
-    stepTranscript.classList.remove('active');
-    stepTranscript.classList.add('done');
-    stepAnalyze.classList.remove('active');
-    stepAnalyze.classList.add('done');
-    stepDone.classList.add('done');
     setCraneStage(100);
     etaText.textContent = '';
   }
