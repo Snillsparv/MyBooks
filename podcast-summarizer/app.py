@@ -173,16 +173,19 @@ Givet följande transkription, gör följande:
 
 1. Ge en sammanfattning ({summary_length}) av hela innehållet. Skriv på {language}.
 2. Dela upp innehållet i logiska kapitel/sektioner ({chapter_count} beroende på längd).
-   Tidsintervallen ska tillsammans täcka hela videon från början till slut (även sista delen).
+   VIKTIGT: Kapitlen MÅSTE täcka HELA videon från 0:00 till slutet ({duration} min). \
+Sista kapitlets sluttid ska vara nära {duration}:00. Hoppa inte över några delar.
 3. Varje kapitel ska ha:
    - En kort, beskrivande rubrik på {language}
    - En tidsperiod (t.ex. "0:00\u20135:30") baserat på textens position i transkriptionen
    - En kategori (ett av: introduction, background, analysis, discussion, story, deep-dive, opinion, conclusion, practical, interview)
    - En sammanfattning på {chapter_summary_length} på {language}
-   - Den faktiska transkriptionstexten för det avsnittet, organiserad under underrubriker. \
-Inkludera de viktigaste delarna av transkriptionstexten \u2014 parafrasera och komprimera där det behövs, \
-men behåll viktiga citat ordagrant. Formatera som HTML-fragment med <h4> för underrubriker och <p> för stycken.
+   - {transcript_html_instruction}
 4. Plocka ut 3\u20135 av de mest intressanta eller viktiga citaten (ordagrant från transkriptionen).
+
+KRITISKT: Du MÅSTE täcka hela videon ({duration} minuter) från början till slut. \
+Planera dina kapitel så att de täcker hela tidslinjen INNAN du börjar skriva. \
+Det är bättre att vara kortfattad i transcript_html än att missa delar av videon.
 
 Svara ENBART med giltig JSON i följande format (ingen markdown, inga kodblock):
 {{
@@ -212,15 +215,36 @@ Här är transkriptionen:
 {transcript}
 ---
 
-Totallängd på videon: cirka {duration} minuter."""
+Totallängd på videon: cirka {duration} minuter. Täck HELA videon."""
+
+
+TRANSCRIPT_HTML_FULL = (
+    "Den faktiska transkriptionstexten för det avsnittet, organiserad under underrubriker. "
+    "Inkludera de viktigaste delarna av transkriptionstexten \u2014 parafrasera och komprimera "
+    "där det behövs, men behåll viktiga citat ordagrant. "
+    "Formatera som HTML-fragment med <h4> för underrubriker och <p> för stycken."
+)
+
+TRANSCRIPT_HTML_COMPACT = (
+    "En komprimerad version av transkriptionstexten: 1\u20132 underrubriker (<h4>) "
+    "med korta stycken (<p>) som fångar kärnpunkterna. Behåll viktiga citat ordagrant "
+    "men var kortfattad \u2014 max 3\u20134 stycken per kapitel. "
+    "Formatera som HTML-fragment."
+)
 
 
 def build_prompt(transcript_text, duration_minutes, language="svenska", detail_level="medium"):
     config = DETAIL_CONFIGS.get(detail_level, DETAIL_CONFIGS["medium"])
+    # For long videos, use compact transcript_html to avoid output token exhaustion
+    if duration_minutes > 45:
+        transcript_html_instruction = TRANSCRIPT_HTML_COMPACT
+    else:
+        transcript_html_instruction = TRANSCRIPT_HTML_FULL
     return SUMMARIZE_PROMPT.format(
         transcript=transcript_text,
         duration=duration_minutes,
         language=language,
+        transcript_html_instruction=transcript_html_instruction,
         **config,
     )
 
@@ -302,25 +326,53 @@ def _try_repair_json(text):
     return text
 
 
+MAX_CONTINUATION_ATTEMPTS = 2
+
+
 def summarize_with_claude(transcript_text, duration_minutes, language="svenska", detail_level="medium"):
     client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
     prompt = build_prompt(transcript_text, duration_minutes, language, detail_level)
+    messages = [{"role": "user", "content": prompt}]
 
-    with client.messages.stream(
-        model="claude-sonnet-4-20250514",
-        max_tokens=64000,
-        messages=[{"role": "user", "content": prompt}],
-    ) as stream:
-        for text in stream.text_stream:
-            yield {"type": "text", "text": text}
+    total_input_tokens = 0
+    total_output_tokens = 0
+    accumulated_text = ""
 
-        final = stream.get_final_message()
-        yield {
-            "type": "usage",
-            "input_tokens": final.usage.input_tokens,
-            "output_tokens": final.usage.output_tokens,
-            "stop_reason": final.stop_reason,
-        }
+    for attempt in range(1 + MAX_CONTINUATION_ATTEMPTS):
+        with client.messages.stream(
+            model="claude-sonnet-4-20250514",
+            max_tokens=64000,
+            messages=messages,
+        ) as stream:
+            for text in stream.text_stream:
+                accumulated_text += text
+                yield {"type": "text", "text": text}
+
+            final = stream.get_final_message()
+            total_input_tokens += final.usage.input_tokens
+            total_output_tokens += final.usage.output_tokens
+
+            if final.stop_reason != "max_tokens":
+                break
+
+            # Output was truncated — ask Claude to continue
+            app.logger.warning(
+                "Claude output truncated at %d chars (attempt %d/%d), requesting continuation",
+                len(accumulated_text), attempt + 1, 1 + MAX_CONTINUATION_ATTEMPTS,
+            )
+            if attempt < MAX_CONTINUATION_ATTEMPTS:
+                messages = [
+                    {"role": "user", "content": prompt},
+                    {"role": "assistant", "content": accumulated_text},
+                    {"role": "user", "content": "Ditt svar klipptes av. Fortsätt EXAKT där du slutade. Skriv bara den resterande JSON:en."},
+                ]
+
+    yield {
+        "type": "usage",
+        "input_tokens": total_input_tokens,
+        "output_tokens": total_output_tokens,
+        "stop_reason": final.stop_reason,
+    }
 
 
 # --------------- Auth helpers ---------------
