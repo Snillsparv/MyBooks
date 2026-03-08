@@ -22,14 +22,13 @@ app.secret_key = os.environ.get("SECRET_KEY", "dev-secret-change-in-prod")
 
 ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
 GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "")
+PROXY_URL = os.environ.get("PROXY_URL", "")  # e.g. http://user:pass@proxy:8080
 
 FREE_DAILY_LIMIT = 2
 
 TRANSCRIPT_CACHE_TTL_SECONDS = int(os.environ.get("TRANSCRIPT_CACHE_TTL_SECONDS", "21600"))
 TRANSCRIPT_FETCH_RETRIES = int(os.environ.get("TRANSCRIPT_FETCH_RETRIES", "3"))
 TRANSCRIPT_CACHE = {}
-ANON_FREE_FOLDS = int(os.environ.get("ANON_FREE_FOLDS", "1"))
-ANON_FREE_FOLD_WINDOW_SECONDS = int(os.environ.get("ANON_FREE_FOLD_WINDOW_SECONDS", "43200"))
 
 # Claude Sonnet 4 pricing
 COST_INPUT_PER_MTOK_USD = 3.0
@@ -68,53 +67,6 @@ def get_video_title(video_id: str) -> str:
         return "Unknown title"
 
 
-def _get_cached_transcript(video_id: str):
-    now = int(time.time())
-
-    mem = TRANSCRIPT_CACHE.get(video_id)
-    if mem and mem["expires_at"] > now:
-        return mem["full_text"], mem["segments"]
-
-    db = get_db()
-    row = db.execute(
-        "SELECT full_text, segments_json, expires_at FROM transcript_cache WHERE video_id = ?",
-        (video_id,),
-    ).fetchone()
-    db.close()
-
-    if row and row["expires_at"] > now:
-        segments = json.loads(row["segments_json"])
-        TRANSCRIPT_CACHE[video_id] = {
-            "full_text": row["full_text"],
-            "segments": segments,
-            "expires_at": row["expires_at"],
-        }
-        return row["full_text"], segments
-
-    return None
-
-
-def _set_cached_transcript(video_id: str, full_text: str, segments: list[dict]):
-    now = int(time.time())
-    expires_at = now + max(60, TRANSCRIPT_CACHE_TTL_SECONDS)
-
-    TRANSCRIPT_CACHE[video_id] = {
-        "full_text": full_text,
-        "segments": segments,
-        "expires_at": expires_at,
-    }
-
-    db = get_db()
-    db.execute(
-        "INSERT OR REPLACE INTO transcript_cache (video_id, full_text, segments_json, fetched_at, expires_at) VALUES (?, ?, ?, ?, ?)",
-        (video_id, full_text, json.dumps(segments), now, expires_at),
-    )
-    # opportunistic cleanup
-    db.execute("DELETE FROM transcript_cache WHERE expires_at < ?", (now,))
-    db.commit()
-    db.close()
-
-
 def _is_temporary_transcript_block(error_text: str) -> bool:
     text = (error_text or "").lower()
     markers = (
@@ -130,9 +82,10 @@ def _is_temporary_transcript_block(error_text: str) -> bool:
 
 
 def get_transcript(video_id: str) -> tuple[str, list[dict]]:
-    cached = _get_cached_transcript(video_id)
-    if cached:
-        return cached
+    now = time.time()
+    cached = TRANSCRIPT_CACHE.get(video_id)
+    if cached and cached["expires_at"] > now:
+        return cached["full_text"], cached["segments"]
 
     ytt_api = YouTubeTranscriptApi()
     last_error = None
@@ -151,7 +104,11 @@ def get_transcript(video_id: str) -> tuple[str, list[dict]]:
             formatter = TextFormatter()
             full_text = formatter.format_transcript(transcript)
 
-            _set_cached_transcript(video_id, full_text, segments)
+            TRANSCRIPT_CACHE[video_id] = {
+                "full_text": full_text,
+                "segments": segments,
+                "expires_at": now + max(60, TRANSCRIPT_CACHE_TTL_SECONDS),
+            }
             return full_text, segments
         except Exception as e:
             last_error = e
@@ -709,8 +666,6 @@ def api_summarize():
                 fold_id = cursor.lastrowid
                 db.commit()
                 db.close()
-
-            increment_usage(user["id"] if user else None)
 
             elapsed_s = round(time.time() - started_at, 2)
             yield json.dumps({
