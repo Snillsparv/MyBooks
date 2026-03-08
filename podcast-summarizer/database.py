@@ -46,6 +46,14 @@ def init_db():
         );
         CREATE INDEX IF NOT EXISTS idx_folds_user_id ON folds(user_id);
         CREATE INDEX IF NOT EXISTS idx_folds_share ON folds(share_token);
+        CREATE TABLE IF NOT EXISTS transcript_cache (
+            video_id TEXT PRIMARY KEY,
+            full_text TEXT NOT NULL,
+            segments_json TEXT NOT NULL,
+            fetched_at INTEGER NOT NULL,
+            expires_at INTEGER NOT NULL
+        );
+        CREATE INDEX IF NOT EXISTS idx_transcript_cache_expires ON transcript_cache(expires_at);
     """)
     # Migration: add google_id column if missing
     try:

@@ -2,6 +2,7 @@ import os
 import re
 import json
 import uuid
+import time
 from datetime import datetime, date
 from flask import (
     Flask, render_template, request, jsonify, Response,
@@ -10,6 +11,7 @@ from flask import (
 from youtube_transcript_api import YouTubeTranscriptApi
 from youtube_transcript_api.formatters import TextFormatter
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.exceptions import HTTPException
 import anthropic
 import urllib.parse
 import urllib.request
@@ -23,6 +25,12 @@ ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
 GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "")
 
 FREE_DAILY_LIMIT = 2
+
+TRANSCRIPT_CACHE_TTL_SECONDS = int(os.environ.get("TRANSCRIPT_CACHE_TTL_SECONDS", "21600"))
+TRANSCRIPT_FETCH_RETRIES = int(os.environ.get("TRANSCRIPT_FETCH_RETRIES", "3"))
+TRANSCRIPT_CACHE = {}
+ANON_FREE_FOLDS = int(os.environ.get("ANON_FREE_FOLDS", "1"))
+ANON_FREE_FOLD_WINDOW_SECONDS = int(os.environ.get("ANON_FREE_FOLD_WINDOW_SECONDS", "43200"))
 
 # Claude Sonnet 4 pricing
 COST_INPUT_PER_MTOK_USD = 3.0
@@ -61,20 +69,115 @@ def get_video_title(video_id: str) -> str:
         return "Unknown title"
 
 
+def _get_cached_transcript(video_id: str):
+    now = int(time.time())
+
+    mem = TRANSCRIPT_CACHE.get(video_id)
+    if mem and mem["expires_at"] > now:
+        return mem["full_text"], mem["segments"]
+
+    db = get_db()
+    row = db.execute(
+        "SELECT full_text, segments_json, expires_at FROM transcript_cache WHERE video_id = ?",
+        (video_id,),
+    ).fetchone()
+    db.close()
+
+    if row and row["expires_at"] > now:
+        segments = json.loads(row["segments_json"])
+        TRANSCRIPT_CACHE[video_id] = {
+            "full_text": row["full_text"],
+            "segments": segments,
+            "expires_at": row["expires_at"],
+        }
+        return row["full_text"], segments
+
+    return None
+
+
+def _set_cached_transcript(video_id: str, full_text: str, segments: list[dict]):
+    now = int(time.time())
+    expires_at = now + max(60, TRANSCRIPT_CACHE_TTL_SECONDS)
+
+    TRANSCRIPT_CACHE[video_id] = {
+        "full_text": full_text,
+        "segments": segments,
+        "expires_at": expires_at,
+    }
+
+    db = get_db()
+    db.execute(
+        "INSERT OR REPLACE INTO transcript_cache (video_id, full_text, segments_json, fetched_at, expires_at) VALUES (?, ?, ?, ?, ?)",
+        (video_id, full_text, json.dumps(segments), now, expires_at),
+    )
+    # opportunistic cleanup
+    db.execute("DELETE FROM transcript_cache WHERE expires_at < ?", (now,))
+    db.commit()
+    db.close()
+
+
+def _is_temporary_transcript_block(error_text: str) -> bool:
+    text = (error_text or "").lower()
+    markers = (
+        "too many requests",
+        "rate limit",
+        "requestblocked",
+        "ipblocked",
+        "forbidden",
+        "429",
+        "temporarily",
+    )
+    return any(m in text for m in markers)
+
+
 def get_transcript(video_id: str) -> tuple[str, list[dict]]:
+    cached = _get_cached_transcript(video_id)
+    if cached:
+        return cached
+
     ytt_api = YouTubeTranscriptApi()
-    transcript = ytt_api.fetch(video_id)
+    last_error = None
 
-    segments = []
-    for snippet in transcript:
-        segments.append({
-            "text": snippet.text,
-            "start": snippet.start,
-        })
+    for attempt in range(1, max(1, TRANSCRIPT_FETCH_RETRIES) + 1):
+        try:
+            transcript = ytt_api.fetch(video_id)
 
-    formatter = TextFormatter()
-    full_text = formatter.format_transcript(transcript)
-    return full_text, segments
+            segments = []
+            for snippet in transcript:
+                segments.append({
+                    "text": snippet.text,
+                    "start": snippet.start,
+                })
+
+            formatter = TextFormatter()
+            full_text = formatter.format_transcript(transcript)
+
+            _set_cached_transcript(video_id, full_text, segments)
+            return full_text, segments
+        except Exception as e:
+            last_error = e
+            message = str(e)
+            should_retry = _is_temporary_transcript_block(message)
+            if should_retry and attempt < max(1, TRANSCRIPT_FETCH_RETRIES):
+                backoff_s = min(5, attempt)
+                app.logger.warning(
+                    "YouTube transcript fetch blocked, retrying (%s/%s) in %ss for video %s",
+                    attempt,
+                    TRANSCRIPT_FETCH_RETRIES,
+                    backoff_s,
+                    video_id,
+                )
+                time.sleep(backoff_s)
+                continue
+            break
+
+    err_text = str(last_error or "Unknown transcript error")
+    if _is_temporary_transcript_block(err_text):
+        raise RuntimeError(
+            "YouTube is temporarily blocking transcript requests from this server. "
+            "Please retry in 1-5 minutes."
+        )
+    raise RuntimeError(err_text)
 
 
 def estimate_duration(segments: list[dict]) -> int:
@@ -111,6 +214,7 @@ Givet följande transkription, gör följande:
 
 1. Ge en sammanfattning ({summary_length}) av hela innehållet. Skriv på {language}.
 2. Dela upp innehållet i logiska kapitel/sektioner ({chapter_count} beroende på längd).
+   Tidsintervallen ska tillsammans täcka hela videon från början till slut (även sista delen).
 3. Varje kapitel ska ha:
    - En kort, beskrivande rubrik på {language}
    - En tidsperiod (t.ex. "0:00\u20135:30") baserat på textens position i transkriptionen
@@ -155,7 +259,7 @@ Totallängd på videon: cirka {duration} minuter."""
 def build_prompt(transcript_text, duration_minutes, language="svenska", detail_level="medium"):
     config = DETAIL_CONFIGS.get(detail_level, DETAIL_CONFIGS["medium"])
     return SUMMARIZE_PROMPT.format(
-        transcript=transcript_text[:100000],
+        transcript=transcript_text,
         duration=duration_minutes,
         language=language,
         **config,
@@ -163,70 +267,80 @@ def build_prompt(transcript_text, duration_minutes, language="svenska", detail_l
 
 
 def _try_repair_json(text):
-    """Attempt to close truncated JSON so it can be parsed."""
-    text = text.rstrip()
-    # Strip trailing incomplete string (find last complete quote)
-    # Simple heuristic: if the text doesn't end with } or ], try to close it
+    """Attempt to recover valid JSON from truncated/garbled model output."""
+    text = (text or "").strip()
+    if not text:
+        return text
+
     try:
         json.loads(text)
-        return text  # already valid
+        return text
     except json.JSONDecodeError:
         pass
 
-    # Try progressively closing brackets
-    # First, strip any trailing incomplete string value
-    import re
-    # Remove trailing partial string (unmatched quote)
-    stripped = text
-    # Count unescaped quotes to see if we're mid-string
-    in_string = False
-    last_good = 0
-    i = 0
-    while i < len(stripped):
-        ch = stripped[i]
-        if ch == '\\' and in_string:
-            i += 2
-            continue
-        if ch == '"':
-            in_string = not in_string
-            if not in_string:
-                last_good = i
-        i += 1
+    first_obj = text.find("{")
+    if first_obj == -1:
+        return text
 
-    if in_string:
-        # We're inside an unclosed string – close it
-        stripped = stripped + '"'
+    base = text[first_obj:]
 
-    # Now close any open brackets/braces
-    stack = []
-    in_str = False
-    i = 0
-    while i < len(stripped):
-        ch = stripped[i]
-        if ch == '\\' and in_str:
-            i += 2
-            continue
-        if ch == '"':
-            in_str = not in_str
-        elif not in_str:
-            if ch in ('{', '['):
-                stack.append('}' if ch == '{' else ']')
-            elif ch in ('}', ']'):
-                if stack:
+    def close_candidate(candidate):
+        stripped = candidate.rstrip()
+
+        # If we're mid-string, close it.
+        in_string = False
+        i = 0
+        while i < len(stripped):
+            ch = stripped[i]
+            if ch == '\\' and in_string:
+                i += 2
+                continue
+            if ch == '"':
+                in_string = not in_string
+            i += 1
+        if in_string:
+            stripped += '"'
+
+        # Drop dangling key/value fragments and trailing commas.
+        stripped = re.sub(r',\s*"[^"]*"\s*:\s*$', '', stripped)
+        stripped = re.sub(r',\s*"[^"]*$', '', stripped)
+        stripped = stripped.rstrip().rstrip(',')
+
+        # Close open brackets/braces.
+        stack = []
+        in_str = False
+        i = 0
+        while i < len(stripped):
+            ch = stripped[i]
+            if ch == '\\' and in_str:
+                i += 2
+                continue
+            if ch == '"':
+                in_str = not in_str
+            elif not in_str:
+                if ch in ('{', '['):
+                    stack.append('}' if ch == '{' else ']')
+                elif ch in ('}', ']') and stack:
                     stack.pop()
-        i += 1
+            i += 1
 
-    # Remove trailing comma before closing
-    result = stripped.rstrip().rstrip(',')
-    # Close all open brackets
-    while stack:
-        result += stack.pop()
-
-    try:
-        json.loads(result)
+        result = stripped
+        while stack:
+            result += stack.pop()
         return result
-    except json.JSONDecodeError:
-        return text  # give up, return original
+
+    # Progressive trim from the end to recover from trailing garbage.
+    max_trim = min(1500, len(base) - 1)
+    for trim in range(0, max_trim + 1):
+        candidate = base[: len(base) - trim]
+        repaired = close_candidate(candidate)
+        try:
+            json.loads(repaired)
+            return repaired
+        except json.JSONDecodeError:
+            continue
+
+    return text
 
 
 def summarize_with_claude(transcript_text, duration_minutes, language="svenska", detail_level="medium"):
@@ -235,7 +349,7 @@ def summarize_with_claude(transcript_text, duration_minutes, language="svenska",
 
     with client.messages.stream(
         model="claude-sonnet-4-20250514",
-        max_tokens=32000,
+        max_tokens=64000,
         messages=[{"role": "user", "content": prompt}],
     ) as stream:
         for text in stream.text_stream:
@@ -263,9 +377,18 @@ def get_current_user():
 
 
 def check_rate_limit(user):
-    """Returns (allowed, remaining). None user = not logged in."""
+    """Returns (allowed, remaining)."""
     if user is None:
-        return False, 0
+        now = int(time.time())
+        window_start = session.get("anon_fold_window_start", 0)
+        used = session.get("anon_folds_used", 0)
+        if (not window_start) or now - int(window_start) > ANON_FREE_FOLD_WINDOW_SECONDS:
+            session["anon_fold_window_start"] = now
+            session["anon_folds_used"] = 0
+            used = 0
+        remaining = max(0, ANON_FREE_FOLDS - int(used))
+        return remaining > 0, remaining
+
     if user["is_subscriber"]:
         return True, 999
     today = date.today().isoformat()
@@ -282,7 +405,17 @@ def check_rate_limit(user):
     return remaining > 0, remaining
 
 
-def increment_usage(user_id):
+def increment_usage(user_id=None):
+    if user_id is None:
+        now = int(time.time())
+        window_start = session.get("anon_fold_window_start", 0)
+        if (not window_start) or now - int(window_start) > ANON_FREE_FOLD_WINDOW_SECONDS:
+            session["anon_fold_window_start"] = now
+            session["anon_folds_used"] = 1
+        else:
+            session["anon_folds_used"] = int(session.get("anon_folds_used", 0)) + 1
+        return
+
     today = date.today().isoformat()
     db = get_db()
     db.execute(
@@ -294,6 +427,22 @@ def increment_usage(user_id):
 
 
 # --------------- Routes ---------------
+
+
+@app.errorhandler(Exception)
+def handle_unexpected_error(e):
+    if request.path.startswith("/api/"):
+        if isinstance(e, HTTPException):
+            return jsonify({"error": e.description}), e.code
+        app.logger.exception("Unhandled API error: %s", e)
+        return jsonify({"error": "Server error. Please try again in a minute."}), 500
+
+    if isinstance(e, HTTPException):
+        return e
+
+    app.logger.exception("Unhandled non-API error: %s", e)
+    return "Internal Server Error", 500
+
 
 @app.route("/")
 def index():
@@ -505,7 +654,7 @@ def api_summarize():
     user = get_current_user()
     allowed, remaining = check_rate_limit(user)
     if not allowed:
-        msg = "Sign in to use Foldly." if user is None else \
+        msg = "You've used your free fold. Sign in to continue." if user is None else \
               "You've reached today's limit. Upgrade to Foldly Pro for unlimited folds."
         return jsonify({"error": msg}), 429
 
@@ -517,11 +666,14 @@ def api_summarize():
     try:
         transcript_text, segments = get_transcript(video_id)
     except Exception as e:
-        return jsonify({"error": f"Could not fetch transcript: {e}"}), 400
+        message = str(e)
+        status = 503 if "temporarily blocking transcript requests" in message.lower() else 400
+        return jsonify({"error": f"Could not fetch transcript: {message}"}), status
 
     duration = estimate_duration(segments)
 
     def generate():
+        started_at = time.time()
         yield json.dumps({
             "type": "meta",
             "video_title": video_title,
@@ -574,8 +726,10 @@ def api_summarize():
                 fold_id = cursor.lastrowid
                 db.commit()
                 db.close()
-                increment_usage(user["id"])
 
+            increment_usage(user["id"] if user else None)
+
+            elapsed_s = round(time.time() - started_at, 2)
             yield json.dumps({
                 "type": "done",
                 "input_tokens": input_tokens,
@@ -584,6 +738,13 @@ def api_summarize():
                 "share_token": share_token,
                 "fold_id": fold_id,
                 "stop_reason": stop_reason,
+                "debug": {
+                    "duration_minutes": duration,
+                    "segments_count": len(segments),
+                    "transcript_chars": len(transcript_text),
+                    "response_chars": len(full_text),
+                    "elapsed_seconds": elapsed_s,
+                },
             }) + "\n"
 
         except anthropic.BadRequestError as e:
@@ -600,6 +761,7 @@ def api_summarize():
                 if repaired != full_text:
                     extra = repaired[len(full_text):]
                     yield json.dumps({"type": "chunk", "text": extra}) + "\n"
+                elapsed_s = round(time.time() - started_at, 2)
                 yield json.dumps({
                     "type": "done",
                     "input_tokens": 0,
@@ -609,6 +771,13 @@ def api_summarize():
                     "fold_id": None,
                     "stop_reason": f"error: {type(e).__name__}",
                     "warning": f"Stream interrupted: {e}",
+                    "debug": {
+                        "duration_minutes": duration,
+                        "segments_count": len(segments),
+                        "transcript_chars": len(transcript_text),
+                        "response_chars": len(repaired),
+                        "elapsed_seconds": elapsed_s,
+                    },
                 }) + "\n"
             else:
                 yield json.dumps({"type": "error", "error": f"Unexpected error: {e}"}) + "\n"

@@ -21,6 +21,7 @@ const sectionsEl = $('#sections');
 const playerContainer = $('#player-container');
 const keyQuotesEl = $('#key-quotes');
 const resultMetaBar = $('#result-meta-bar');
+const resultDebugEl = $('#result-debug');
 const searchInput = $('#search-input');
 const searchCount = $('#search-count');
 const toastEl = $('#toast');
@@ -412,11 +413,6 @@ async function handleSubmit() {
   const url = urlInput.value.trim();
   if (!url) return;
 
-  if (!currentUser) {
-    openModal('login');
-    return;
-  }
-
   btn.disabled = true;
   resultEl.classList.remove('visible');
   playerContainer.classList.remove('visible');
@@ -437,8 +433,29 @@ async function handleSubmit() {
     });
 
     if (!resp.ok) {
-      const err = await resp.json();
-      throw new Error(err.error || 'Something went wrong');
+      const contentType = resp.headers.get('content-type') || '';
+      let message = `Request failed (${resp.status})`;
+
+      try {
+        if (contentType.includes('application/json')) {
+          const err = await resp.json();
+          message = err?.error || message;
+        } else {
+          const raw = await resp.text();
+          const cleaned = raw.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+          if (cleaned) {
+            message = cleaned.substring(0, 240);
+          } else if (resp.status >= 500) {
+            message = 'Server error on Railway. Please try again in a minute.';
+          }
+        }
+      } catch {
+        if (resp.status >= 500) {
+          message = 'Server error on Railway. Please try again in a minute.';
+        }
+      }
+
+      throw new Error(message);
     }
 
     const reader = resp.body.getReader();
@@ -635,24 +652,32 @@ function seekTo(timeStr) {
 // ===== Render result =====
 
 function extractJSON(text) {
-  let s = text.trim();
+  let s = (text || '').trim();
   // Strip markdown code fences
   s = s.replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/, '');
+
   // Try parsing directly
   try { return JSON.parse(s); } catch {}
+
   // Try to find the outermost { ... } object
   const first = s.indexOf('{');
   const last = s.lastIndexOf('}');
   if (first !== -1 && last > first) {
     try { return JSON.parse(s.substring(first, last + 1)); } catch {}
   }
-  // Try to repair truncated JSON
+
+  // Repair with progressive trimming to handle trailing garbage/truncation.
   if (first !== -1) {
-    const repaired = repairTruncatedJSON(s.substring(first));
-    if (repaired) {
+    const base = s.substring(first);
+    const maxTrim = Math.min(500, Math.max(0, base.length - 2));
+    for (let trim = 0; trim <= maxTrim; trim++) {
+      const candidate = base.substring(0, base.length - trim);
+      const repaired = repairTruncatedJSON(candidate);
+      if (!repaired) continue;
       try { return JSON.parse(repaired); } catch {}
     }
   }
+
   return null;
 }
 
@@ -666,8 +691,9 @@ function repairTruncatedJSON(text) {
   }
   if (inString) s += '"';
 
-  // Remove trailing incomplete key-value (trailing colon without value, etc.)
+  // Remove trailing incomplete key-value / dangling property fragments
   s = s.replace(/,\s*"[^"]*"\s*:\s*$/, '');
+  s = s.replace(/,\s*"[^"]*$/, '');
   // Remove trailing comma
   s = s.replace(/,\s*$/, '');
 
@@ -689,11 +715,59 @@ function repairTruncatedJSON(text) {
   return s;
 }
 
+function chapterCoverageMinutes(chapters) {
+  if (!Array.isArray(chapters) || chapters.length === 0) return null;
+  let maxEnd = 0;
+  chapters.forEach((ch) => {
+    const time = ch?.time || ch?.timestamp || '';
+    const [start, end] = parseTimeRange(time);
+    if (end !== null && end !== undefined) maxEnd = Math.max(maxEnd, end / 60);
+    else if (start !== null && start !== undefined) maxEnd = Math.max(maxEnd, start / 60);
+  });
+  return maxEnd || null;
+}
+
+function renderDebugInfo(data, doneInfo) {
+  if (!resultDebugEl) return;
+  const duration = Number(videoMeta.duration || doneInfo?.debug?.duration_minutes || 0);
+  const covered = chapterCoverageMinutes(data?.chapters || []);
+  const coveragePct = (duration > 0 && covered !== null) ? Math.round((covered / duration) * 100) : null;
+
+  const warnings = [];
+  if (doneInfo?.stop_reason && doneInfo.stop_reason !== 'end_turn') {
+    warnings.push(`Stop reason: <code>${escapeHtml(doneInfo.stop_reason)}</code>`);
+  }
+  if (coveragePct !== null && coveragePct < 90) {
+    warnings.push(`Tidslinjen täcker bara ~<strong>${coveragePct}%</strong> (${covered.toFixed(1)} av ${duration.toFixed(1)} min).`);
+  }
+  if (doneInfo?.warning) {
+    warnings.push(escapeHtml(doneInfo.warning));
+  }
+
+  if (warnings.length === 0) {
+    resultDebugEl.style.display = 'none';
+    resultDebugEl.innerHTML = '';
+    return;
+  }
+
+  const dbg = doneInfo?.debug || {};
+  resultDebugEl.innerHTML = `
+    <strong>Debug info (hjälper felsökning)</strong><br>
+    ${warnings.join('<br>')}<br>
+    Transcript: <code>${Number(dbg.transcript_chars || 0).toLocaleString()}</code> chars,
+    Response: <code>${Number(dbg.response_chars || 0).toLocaleString()}</code> chars,
+    Segments: <code>${Number(dbg.segments_count || 0).toLocaleString()}</code>,
+    Tid: <code>${Number(dbg.elapsed_seconds || 0).toFixed(1)}s</code>
+  `;
+  resultDebugEl.style.display = 'block';
+}
+
 function renderResult(jsonText, doneInfo) {
   try {
     const data = extractJSON(jsonText);
     if (!data) throw new Error('No valid JSON found');
     summaryData = data;
+    renderDebugInfo(data, doneInfo);
 
     // Also save to localStorage for quick access
     saveToLocalHistory(data, doneInfo);
@@ -809,6 +883,10 @@ function renderResult(jsonText, doneInfo) {
     resultEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
   } catch (e) {
+    if (resultDebugEl) {
+      resultDebugEl.style.display = 'none';
+      resultDebugEl.innerHTML = '';
+    }
     console.error('Parse error:', e, jsonText);
     const preview = jsonText
       ? `First 300 chars:\n${jsonText.substring(0, 300)}\n\n…Last 200 chars:\n${jsonText.substring(jsonText.length - 200)}`
