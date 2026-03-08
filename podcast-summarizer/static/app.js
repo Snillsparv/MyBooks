@@ -356,8 +356,8 @@ function stopProgressTimer() {
 function startProgressTimer() {
   stopProgressTimer();
   const durationMin = videoMeta.duration || 30;
-  // Rough estimate: ~8s per minute of video for short, ~12s for long (chunked)
-  estimatedTotalSeconds = Math.max(15, durationMin * (durationMin > 20 ? 12 : 8));
+  // Rough estimate: ~1s per minute of video for short, ~1.5s for long (chunked)
+  estimatedTotalSeconds = Math.max(10, durationMin * (durationMin > 20 ? 1.5 : 1));
   streamStartTime = Date.now();
 
   progressTimer = setInterval(() => {
@@ -367,7 +367,9 @@ function startProgressTimer() {
     progressFill.style.width = progress + '%';
     setCraneStage(progress);
 
-    const etaSeconds = Math.max(0, Math.round(estimatedTotalSeconds - elapsed));
+    // ETA based on the same asymptotic curve — estimate when we'd reach ~95%
+    const remaining = Math.max(0, estimatedTotalSeconds - elapsed);
+    const etaSeconds = Math.round(remaining * (1 - (progress - 15) / 80));
     if (etaSeconds > 2) {
       const min = Math.floor(etaSeconds / 60);
       const sec = etaSeconds % 60;
@@ -408,8 +410,8 @@ function updateStreamProgress(charCount) {
     const rate = charCount / elapsed;
     const remaining = Math.max(0, estimatedChars - charCount);
     const newEstimate = elapsed + (remaining / rate);
-    // Smoothly adjust the total estimate
-    estimatedTotalSeconds = estimatedTotalSeconds * 0.7 + newEstimate * 0.3;
+    // Smoothly adjust the total estimate (favor actual data)
+    estimatedTotalSeconds = estimatedTotalSeconds * 0.4 + newEstimate * 0.6;
 
     // Also update progress based on actual char data
     const progress = Math.min(95, 15 + (charCount / estimatedChars) * 80);
