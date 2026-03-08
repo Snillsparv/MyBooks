@@ -26,6 +26,8 @@ GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "")
 PROXY_URL = os.environ.get("PROXY_URL", "")  # e.g. http://user:pass@proxy:8080
 
 FREE_DAILY_LIMIT = 2
+ANON_FREE_FOLDS = 1
+ANON_FREE_FOLD_WINDOW_SECONDS = 86400  # 24 hours
 
 TRANSCRIPT_CACHE_TTL_SECONDS = int(os.environ.get("TRANSCRIPT_CACHE_TTL_SECONDS", "21600"))
 TRANSCRIPT_FETCH_RETRIES = int(os.environ.get("TRANSCRIPT_FETCH_RETRIES", "3"))
@@ -683,6 +685,8 @@ def api_summarize():
                 fold_id = cursor.lastrowid
                 db.commit()
                 db.close()
+
+            increment_usage(user["id"] if user else None)
 
             elapsed_s = round(time.time() - started_at, 2)
             yield json.dumps({
