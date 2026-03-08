@@ -219,17 +219,6 @@ header .subtitle { color: var(--text-secondary); font-size: 0.95rem; }
 }
 @keyframes indeterminate { 0% { transform: translateX(-100%); } 100% { transform: translateX(430%); } }
 
-.progress-steps {
-  display: flex; gap: 0.5rem; font-size: 0.75rem; color: var(--text-muted);
-  flex-wrap: wrap; justify-content: center;
-}
-.progress-step { transition: color 0.3s; }
-.progress-step.active { color: var(--accent); font-weight: 600; }
-.progress-step.done { color: var(--sage); }
-.progress-step.done::before { content: '\2713 '; }
-.progress-step + .progress-step::before { content: ' \203A  '; color: var(--border); margin-right: 0.3rem; }
-.progress-step.done + .progress-step::before { content: ' \203A  '; }
-
 /* ===== Result ===== */
 .result { display: none; }
 .result.visible { display: block; animation: fadeUp 0.4s ease; }
