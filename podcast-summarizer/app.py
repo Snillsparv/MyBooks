@@ -2,6 +2,7 @@ import os
 import re
 import json
 import uuid
+import time
 from datetime import datetime, date
 from flask import (
     Flask, render_template, request, jsonify, Response,
@@ -256,7 +257,7 @@ def summarize_with_claude(transcript_text, duration_minutes, language="svenska",
 
     with client.messages.stream(
         model="claude-sonnet-4-20250514",
-        max_tokens=32000,
+        max_tokens=64000,
         messages=[{"role": "user", "content": prompt}],
     ) as stream:
         for text in stream.text_stream:
@@ -551,6 +552,7 @@ def api_summarize():
     duration = estimate_duration(segments)
 
     def generate():
+        started_at = time.time()
         yield json.dumps({
             "type": "meta",
             "video_title": video_title,
@@ -605,6 +607,7 @@ def api_summarize():
                 db.close()
                 increment_usage(user["id"])
 
+            elapsed_s = round(time.time() - started_at, 2)
             yield json.dumps({
                 "type": "done",
                 "input_tokens": input_tokens,
@@ -613,6 +616,13 @@ def api_summarize():
                 "share_token": share_token,
                 "fold_id": fold_id,
                 "stop_reason": stop_reason,
+                "debug": {
+                    "duration_minutes": duration,
+                    "segments_count": len(segments),
+                    "transcript_chars": len(transcript_text),
+                    "response_chars": len(full_text),
+                    "elapsed_seconds": elapsed_s,
+                },
             }) + "\n"
 
         except anthropic.BadRequestError as e:
@@ -629,6 +639,7 @@ def api_summarize():
                 if repaired != full_text:
                     extra = repaired[len(full_text):]
                     yield json.dumps({"type": "chunk", "text": extra}) + "\n"
+                elapsed_s = round(time.time() - started_at, 2)
                 yield json.dumps({
                     "type": "done",
                     "input_tokens": 0,
@@ -638,6 +649,13 @@ def api_summarize():
                     "fold_id": None,
                     "stop_reason": f"error: {type(e).__name__}",
                     "warning": f"Stream interrupted: {e}",
+                    "debug": {
+                        "duration_minutes": duration,
+                        "segments_count": len(segments),
+                        "transcript_chars": len(transcript_text),
+                        "response_chars": len(repaired),
+                        "elapsed_seconds": elapsed_s,
+                    },
                 }) + "\n"
             else:
                 yield json.dumps({"type": "error", "error": f"Unexpected error: {e}"}) + "\n"
