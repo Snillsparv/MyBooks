@@ -3,6 +3,7 @@ import re
 import json
 import uuid
 import time
+import math
 from datetime import datetime, date
 from flask import (
     Flask, render_template, request, jsonify, Response,
@@ -37,6 +38,10 @@ TRANSCRIPT_CACHE = {}
 COST_INPUT_PER_MTOK_USD = 3.0
 COST_OUTPUT_PER_MTOK_USD = 15.0
 USD_TO_SEK = 10.5
+
+# Chunking threshold: videos longer than this get split into chunks
+CHUNK_THRESHOLD_MINUTES = 40
+CHUNK_SIZE_MINUTES = 30
 
 
 def calc_cost_sek(input_tokens, output_tokens):
@@ -146,6 +151,34 @@ def estimate_duration(segments: list[dict]) -> int:
     return int((last["start"] + 30) / 60)
 
 
+def split_segments_into_chunks(segments: list[dict], chunk_minutes: int = CHUNK_SIZE_MINUTES) -> list[dict]:
+    """Split segments into time-based chunks. Returns list of {start_min, end_min, text}."""
+    if not segments:
+        return []
+
+    total_seconds = segments[-1]["start"] + 30
+    total_minutes = total_seconds / 60
+    num_chunks = max(1, math.ceil(total_minutes / chunk_minutes))
+    chunk_duration = total_seconds / num_chunks
+
+    chunks = []
+    for i in range(num_chunks):
+        start_s = i * chunk_duration
+        end_s = (i + 1) * chunk_duration
+        chunk_segs = [s for s in segments if s["start"] >= start_s and s["start"] < end_s]
+        if not chunk_segs and i == num_chunks - 1:
+            # Last chunk: grab remaining
+            chunk_segs = [s for s in segments if s["start"] >= start_s]
+        if chunk_segs:
+            text = " ".join(s["text"] for s in chunk_segs)
+            chunks.append({
+                "start_min": round(start_s / 60, 1),
+                "end_min": round(end_s / 60, 1),
+                "text": text,
+            })
+    return chunks
+
+
 # --------------- Prompt builder ---------------
 
 DETAIL_CONFIGS = {
@@ -166,6 +199,7 @@ DETAIL_CONFIGS = {
     },
 }
 
+# Single-pass prompt for short videos
 SUMMARIZE_PROMPT = """\
 Du \u00e4r en expert p\u00e5 att sammanfatta podcast-avsnitt och videoinneh\u00e5ll.
 
@@ -173,17 +207,16 @@ Givet f\u00f6ljande transkription, g\u00f6r f\u00f6ljande:
 
 1. Ge en sammanfattning ({summary_length}) av hela inneh\u00e5llet. Skriv p\u00e5 {language}.
 2. Dela upp inneh\u00e5llet i logiska kapitel/sektioner ({chapter_count} beroende p\u00e5 l\u00e4ngd).
-   VIKTIGT: Kapitlen M\u00c5STE t\u00e4cka HELA videon fr\u00e5n 0:00 till slutet (~{duration} min). \
-Sista kapitlets sluttid ska vara n\u00e4ra {duration}:00. Hoppa inte \u00f6ver n\u00e5gra delar.
+   Tidsintervallen ska tillsammans t\u00e4cka hela videon fr\u00e5n b\u00f6rjan till slut.
 3. Varje kapitel ska ha:
    - En kort, beskrivande rubrik p\u00e5 {language}
    - En tidsperiod (t.ex. "0:00\u20135:30") baserat p\u00e5 textens position i transkriptionen
    - En kategori (ett av: introduction, background, analysis, discussion, story, deep-dive, opinion, conclusion, practical, interview)
    - En sammanfattning p\u00e5 {chapter_summary_length} p\u00e5 {language}
-   - {transcript_html_instruction}
+   - Den faktiska transkriptionstexten f\u00f6r det avsnittet, organiserad under underrubriker. \
+Inkludera de viktigaste delarna av transkriptionstexten \u2014 parafrasera och komprimera d\u00e4r det beh\u00f6vs, \
+men beh\u00e5ll viktiga citat ordagrant. Formatera som HTML-fragment med <h4> f\u00f6r underrubriker och <p> f\u00f6r stycken.
 4. Plocka ut 3\u20135 av de mest intressanta eller viktiga citaten (ordagrant fr\u00e5n transkriptionen).
-
-{budget_instruction}
 
 Svara ENBART med giltig JSON i f\u00f6ljande format (ingen markdown, inga kodblock):
 {{
@@ -195,13 +228,13 @@ Svara ENBART med giltig JSON i f\u00f6ljande format (ingen markdown, inga kodblo
       "time": "0:00\u20135:30",
       "category": "analysis",
       "summary": "Sammanfattning av kapitlet...",
-      "transcript_html": "<h4>Underrubrik</h4><p>Text...</p>"
+      "transcript_html": "<h4>Underrubrik</h4><p>Text fr\u00e5n transkriptionen...</p>"
     }}
   ],
   "key_quotes": [
     {{
-      "text": "Det exakta citatet...",
-      "context": "Kort beskrivning",
+      "text": "Det exakta citatet fr\u00e5n transkriptionen...",
+      "context": "Kort beskrivning av kontexten",
       "time": "3:42"
     }}
   ]
@@ -213,66 +246,104 @@ H\u00e4r \u00e4r transkriptionen:
 {transcript}
 ---
 
-Totall\u00e4ngd p\u00e5 videon: cirka {duration} minuter. T\u00e4ck HELA videon fr\u00e5n b\u00f6rjan till slut."""
+Totall\u00e4ngd p\u00e5 videon: cirka {duration} minuter."""
 
 
-TRANSCRIPT_HTML_FULL = (
-    "transcript_html: den faktiska transkriptionstexten f\u00f6r det avsnittet, organiserad under "
-    "underrubriker. Inkludera de viktigaste delarna \u2014 parafrasera och komprimera d\u00e4r det "
-    "beh\u00f6vs, men beh\u00e5ll viktiga citat ordagrant. "
-    "Formatera som HTML-fragment med <h4> f\u00f6r underrubriker och <p> f\u00f6r stycken."
-)
+# Chunk prompt: summarize one part of a longer video
+CHUNK_PROMPT = """\
+Du \u00e4r en expert p\u00e5 att sammanfatta podcast-avsnitt och videoinneh\u00e5ll.
 
-TRANSCRIPT_HTML_COMPACT = (
-    "transcript_html: en KORT sammanfattande text (max {max_words} ord per kapitel). "
-    "Anv\u00e4nd 1 <h4>-underrubrik och 1\u20132 <p>-stycken. F\u00e5nga k\u00e4rnpunkterna och beh\u00e5ll "
-    "max 1 viktigt citat ordagrant. Var extremt kortfattad."
-)
+Detta \u00e4r del {chunk_num} av {total_chunks} fr\u00e5n en video som \u00e4r totalt {total_duration} minuter l\u00e5ng.
+Denna del t\u00e4cker tidsintervallet {start_time}\u2013{end_time}.
 
-BUDGET_SHORT = (
-    "KRITISKT: Du M\u00c5STE t\u00e4cka hela videon ({duration} minuter). "
-    "Planera kapitlens tidsintervall F\u00d6RST innan du skriver. "
-    "Det \u00e4r b\u00e4ttre att vara kortfattad i transcript_html \u00e4n att missa delar av videon."
-)
+Sammanfatta denna del i logiska kapitel. Skriv p\u00e5 {language}.
 
-BUDGET_LONG = (
-    "KRITISKT: Videon \u00e4r {duration} minuter l\u00e5ng. Du M\u00c5STE t\u00e4cka HELA videon.\n"
-    "STRATEGI: Planera ALLA kapitel med tidsintervall F\u00d6RST (fr\u00e5n 0:00 till ~{duration}:00), "
-    "och skriv sedan varje kapitel kortfattat.\n"
-    "H\u00c5RD GR\u00c4NS: Varje kapitels transcript_html f\u00e5r vara MAX {max_words} ord. "
-    "Totalt max ~{total_words} ord f\u00f6r alla transcript_html sammanlagt.\n"
-    "Det \u00e4r MYCKET viktigare att t\u00e4cka hela videon \u00e4n att ha detaljerad text per kapitel."
-)
+Varje kapitel ska ha:
+- En kort, beskrivande rubrik p\u00e5 {language}
+- En tidsperiod (t.ex. "{start_time}\u2013XX:XX") baserat p\u00e5 inneh\u00e5llet
+- En kategori (ett av: introduction, background, analysis, discussion, story, deep-dive, opinion, conclusion, practical, interview)
+- En sammanfattning p\u00e5 {chapter_summary_length} p\u00e5 {language}
+- transcript_html: de viktigaste delarna av transkriptionen, parafraserad och komprimerad. \
+Beh\u00e5ll viktiga citat ordagrant. Formatera som HTML med <h4> f\u00f6r underrubriker och <p> f\u00f6r stycken.
+
+Plocka ocks\u00e5 ut 1\u20132 av de mest intressanta citaten (ordagrant) fr\u00e5n denna del.
+
+Svara ENBART med giltig JSON (ingen markdown, inga kodblock):
+{{
+  "chapters": [
+    {{
+      "title": "Kapitelrubrik",
+      "time": "M:SS\u2013M:SS",
+      "category": "analysis",
+      "summary": "Sammanfattning...",
+      "transcript_html": "<h4>Underrubrik</h4><p>Text...</p>"
+    }}
+  ],
+  "key_quotes": [
+    {{
+      "text": "Citat...",
+      "context": "Kontext",
+      "time": "M:SS"
+    }}
+  ]
+}}
+
+H\u00e4r \u00e4r transkriptionen f\u00f6r denna del ({start_time}\u2013{end_time}):
+
+---
+{transcript}
+---"""
+
+
+# Merge prompt: combine chunk results into overall summary
+MERGE_PROMPT = """\
+Du har f\u00e5tt kapitelsammanfattningar fr\u00e5n olika delar av en {total_duration}-minuters video.
+
+Skapa en \u00f6vergripande titel och sammanfattning ({summary_length}) p\u00e5 {language}.
+
+Svara ENBART med giltig JSON:
+{{
+  "title": "Titel p\u00e5 hela avsnittet",
+  "summary": "\u00d6vergripande sammanfattning..."
+}}
+
+H\u00e4r \u00e4r kapitelrubrikerna och sammanfattningarna:
+
+{chapter_summaries}"""
 
 
 def build_prompt(transcript_text, duration_minutes, language="svenska", detail_level="medium"):
     config = DETAIL_CONFIGS.get(detail_level, DETAIL_CONFIGS["medium"])
-
-    if duration_minutes > 60:
-        max_words = 80
-        total_words = max_words * 15
-        transcript_html_instruction = TRANSCRIPT_HTML_COMPACT.format(max_words=max_words)
-        budget_instruction = BUDGET_LONG.format(
-            duration=duration_minutes, max_words=max_words, total_words=total_words,
-        )
-    elif duration_minutes > 30:
-        max_words = 150
-        total_words = max_words * 12
-        transcript_html_instruction = TRANSCRIPT_HTML_COMPACT.format(max_words=max_words)
-        budget_instruction = BUDGET_LONG.format(
-            duration=duration_minutes, max_words=max_words, total_words=total_words,
-        )
-    else:
-        transcript_html_instruction = TRANSCRIPT_HTML_FULL
-        budget_instruction = BUDGET_SHORT.format(duration=duration_minutes)
-
     return SUMMARIZE_PROMPT.format(
         transcript=transcript_text,
         duration=duration_minutes,
         language=language,
-        transcript_html_instruction=transcript_html_instruction,
-        budget_instruction=budget_instruction,
         **config,
+    )
+
+
+def build_chunk_prompt(chunk_text, chunk_num, total_chunks, start_time, end_time,
+                       total_duration, language="svenska", detail_level="medium"):
+    config = DETAIL_CONFIGS.get(detail_level, DETAIL_CONFIGS["medium"])
+    return CHUNK_PROMPT.format(
+        transcript=chunk_text,
+        chunk_num=chunk_num,
+        total_chunks=total_chunks,
+        start_time=start_time,
+        end_time=end_time,
+        total_duration=total_duration,
+        language=language,
+        chapter_summary_length=config["chapter_summary_length"],
+    )
+
+
+def build_merge_prompt(chapter_summaries_text, total_duration, language="svenska", detail_level="medium"):
+    config = DETAIL_CONFIGS.get(detail_level, DETAIL_CONFIGS["medium"])
+    return MERGE_PROMPT.format(
+        chapter_summaries=chapter_summaries_text,
+        total_duration=total_duration,
+        language=language,
+        summary_length=config["summary_length"],
     )
 
 
@@ -353,52 +424,155 @@ def _try_repair_json(text):
     return text
 
 
-MAX_CONTINUATION_ATTEMPTS = 2
+def _extract_json(text):
+    """Extract valid JSON from text, repairing if needed."""
+    text = (text or "").strip()
+    text = text.lstrip("`").rstrip("`")
+    if text.startswith("json"):
+        text = text[4:].strip()
+
+    try:
+        return json.loads(text)
+    except (json.JSONDecodeError, ValueError):
+        repaired = _try_repair_json(text)
+        try:
+            return json.loads(repaired)
+        except (json.JSONDecodeError, ValueError):
+            return None
+
+
+def _format_time(minutes):
+    """Format minutes as M:SS string."""
+    m = int(minutes)
+    s = int((minutes - m) * 60)
+    return f"{m}:{s:02d}"
+
+
+def _call_claude_streaming(client, prompt, max_tokens=16000):
+    """Call Claude and return (full_text, input_tokens, output_tokens, stop_reason)."""
+    messages = [{"role": "user", "content": prompt}]
+    accumulated = ""
+
+    with client.messages.stream(
+        model="claude-sonnet-4-20250514",
+        max_tokens=max_tokens,
+        messages=messages,
+    ) as stream:
+        for text in stream.text_stream:
+            accumulated += text
+
+        final = stream.get_final_message()
+
+    return accumulated, final.usage.input_tokens, final.usage.output_tokens, final.stop_reason
+
+
+def _call_claude_streaming_yielding(client, prompt, max_tokens=64000):
+    """Call Claude, yielding text chunks and finally a usage dict."""
+    messages = [{"role": "user", "content": prompt}]
+    accumulated = ""
+
+    with client.messages.stream(
+        model="claude-sonnet-4-20250514",
+        max_tokens=max_tokens,
+        messages=messages,
+    ) as stream:
+        for text in stream.text_stream:
+            accumulated += text
+            yield {"type": "text", "text": text}
+
+        final = stream.get_final_message()
+
+    yield {
+        "type": "usage",
+        "input_tokens": final.usage.input_tokens,
+        "output_tokens": final.usage.output_tokens,
+        "stop_reason": final.stop_reason,
+        "full_text": accumulated,
+    }
 
 
 def summarize_with_claude(transcript_text, duration_minutes, language="svenska", detail_level="medium"):
+    """Single-pass summarization for short videos."""
     client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
     prompt = build_prompt(transcript_text, duration_minutes, language, detail_level)
-    messages = [{"role": "user", "content": prompt}]
+
+    for item in _call_claude_streaming_yielding(client, prompt, max_tokens=64000):
+        yield item
+
+
+def summarize_with_claude_chunked(segments, duration_minutes, language="svenska", detail_level="medium"):
+    """Multi-pass chunked summarization for long videos.
+
+    Yields: status messages, then the final combined JSON text, then usage info.
+    """
+    client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
+    chunks = split_segments_into_chunks(segments, CHUNK_SIZE_MINUTES)
 
     total_input_tokens = 0
     total_output_tokens = 0
-    accumulated_text = ""
+    all_chapters = []
+    all_quotes = []
 
-    for attempt in range(1 + MAX_CONTINUATION_ATTEMPTS):
-        with client.messages.stream(
-            model="claude-sonnet-4-20250514",
-            max_tokens=64000,
-            messages=messages,
-        ) as stream:
-            for text in stream.text_stream:
-                accumulated_text += text
-                yield {"type": "text", "text": text}
+    for i, chunk in enumerate(chunks):
+        start_time = _format_time(chunk["start_min"])
+        end_time = _format_time(chunk["end_min"])
+        prompt = build_chunk_prompt(
+            chunk_text=chunk["text"],
+            chunk_num=i + 1,
+            total_chunks=len(chunks),
+            start_time=start_time,
+            end_time=end_time,
+            total_duration=duration_minutes,
+            language=language,
+            detail_level=detail_level,
+        )
 
-            final = stream.get_final_message()
-            total_input_tokens += final.usage.input_tokens
-            total_output_tokens += final.usage.output_tokens
+        yield {"type": "status", "message": f"Analyzing part {i + 1}/{len(chunks)} ({start_time}\u2013{end_time})..."}
 
-            if final.stop_reason != "max_tokens":
-                break
+        text, inp_tok, out_tok, stop = _call_claude_streaming(client, prompt, max_tokens=16000)
+        total_input_tokens += inp_tok
+        total_output_tokens += out_tok
 
-            # Output was truncated \u2014 ask Claude to continue
-            app.logger.warning(
-                "Claude output truncated at %d chars (attempt %d/%d), requesting continuation",
-                len(accumulated_text), attempt + 1, 1 + MAX_CONTINUATION_ATTEMPTS,
-            )
-            if attempt < MAX_CONTINUATION_ATTEMPTS:
-                messages = [
-                    {"role": "user", "content": prompt},
-                    {"role": "assistant", "content": accumulated_text},
-                    {"role": "user", "content": "Ditt svar klipptes av. Forts\u00e4tt EXAKT d\u00e4r du slutade. Skriv bara den resterande JSON:en."},
-                ]
+        chunk_data = _extract_json(text)
+        if chunk_data:
+            all_chapters.extend(chunk_data.get("chapters", []))
+            all_quotes.extend(chunk_data.get("key_quotes", []))
+        else:
+            app.logger.warning("Failed to parse chunk %d/%d response", i + 1, len(chunks))
 
+    # Now generate overall title + summary
+    yield {"type": "status", "message": "Creating overall summary..."}
+
+    chapter_summaries_text = "\n".join(
+        f"- [{ch.get('time', '')}] {ch.get('title', '')}: {ch.get('summary', '')}"
+        for ch in all_chapters
+    )
+    merge_prompt = build_merge_prompt(chapter_summaries_text, duration_minutes, language, detail_level)
+
+    merge_text, inp_tok, out_tok, _ = _call_claude_streaming(client, merge_prompt, max_tokens=2000)
+    total_input_tokens += inp_tok
+    total_output_tokens += out_tok
+
+    merge_data = _extract_json(merge_text) or {}
+
+    # Build final combined JSON
+    combined = {
+        "title": merge_data.get("title", "Untitled"),
+        "summary": merge_data.get("summary", ""),
+        "chapters": all_chapters,
+        "key_quotes": all_quotes[:5],
+    }
+
+    combined_text = json.dumps(combined, ensure_ascii=False)
+
+    # Yield the combined result as text chunks (for the frontend)
+    yield {"type": "text", "text": combined_text}
     yield {
         "type": "usage",
         "input_tokens": total_input_tokens,
         "output_tokens": total_output_tokens,
-        "stop_reason": final.stop_reason,
+        "stop_reason": "end_turn",
+        "full_text": combined_text,
     }
 
 
@@ -709,6 +883,7 @@ def api_summarize():
         return jsonify({"error": f"Could not fetch transcript: {message}"}), status
 
     duration = estimate_duration(segments)
+    use_chunked = duration > CHUNK_THRESHOLD_MINUTES
 
     def generate():
         started_at = time.time()
@@ -724,12 +899,25 @@ def api_summarize():
             full_text = ""
             usage_info = None
 
-            for item in summarize_with_claude(transcript_text, duration, language, detail_level):
-                if item["type"] == "text":
-                    full_text += item["text"]
-                    yield json.dumps({"type": "chunk", "text": item["text"]}) + "\n"
-                elif item["type"] == "usage":
-                    usage_info = item
+            if use_chunked:
+                # Chunked approach for long videos
+                for item in summarize_with_claude_chunked(segments, duration, language, detail_level):
+                    if item["type"] == "text":
+                        full_text += item["text"]
+                        yield json.dumps({"type": "chunk", "text": item["text"]}) + "\n"
+                    elif item["type"] == "status":
+                        yield json.dumps({"type": "status", "message": item["message"]}) + "\n"
+                    elif item["type"] == "usage":
+                        usage_info = item
+                        full_text = item.get("full_text", full_text)
+            else:
+                # Single-pass for short videos
+                for item in summarize_with_claude(transcript_text, duration, language, detail_level):
+                    if item["type"] == "text":
+                        full_text += item["text"]
+                        yield json.dumps({"type": "chunk", "text": item["text"]}) + "\n"
+                    elif item["type"] == "usage":
+                        usage_info = item
 
             input_tokens = usage_info["input_tokens"] if usage_info else 0
             output_tokens = usage_info["output_tokens"] if usage_info else 0
@@ -737,7 +925,6 @@ def api_summarize():
             cost = calc_cost_sek(input_tokens, output_tokens)
 
             # Always try to repair JSON if it's not valid
-            # (handles max_tokens, network interruptions, malformed output)
             try:
                 json.loads(full_text)
             except (json.JSONDecodeError, ValueError):
@@ -782,6 +969,7 @@ def api_summarize():
                     "transcript_chars": len(transcript_text),
                     "response_chars": len(full_text),
                     "elapsed_seconds": elapsed_s,
+                    "chunked": use_chunked,
                 },
             }) + "\n"
 
@@ -792,8 +980,6 @@ def api_summarize():
         except anthropic.APIError as e:
             yield json.dumps({"type": "error", "error": f"API-fel: {e.message}"}) + "\n"
         except Exception as e:
-            # Catch-all for network errors, timeouts, etc.
-            # If we have partial text, try to repair and send it
             if full_text:
                 repaired = _try_repair_json(full_text)
                 if repaired != full_text:
@@ -815,6 +1001,7 @@ def api_summarize():
                         "transcript_chars": len(transcript_text),
                         "response_chars": len(repaired),
                         "elapsed_seconds": elapsed_s,
+                        "chunked": use_chunked,
                     },
                 }) + "\n"
             else:

@@ -486,6 +486,8 @@ async function handleSubmit() {
           rawSegments = msg.segments || [];
           showLoading('Claude is folding the transcript...');
           setStep('analyze');
+        } else if (msg.type === 'status') {
+          showLoading(msg.message || 'Processing...');
         } else if (msg.type === 'chunk') {
           fullText += msg.text;
           updateStreamProgress(fullText.length);
