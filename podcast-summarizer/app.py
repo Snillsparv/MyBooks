@@ -580,8 +580,6 @@ def summarize_with_claude_chunked(segments, duration_minutes, language="svenska"
     merge_text = merge_result["text"] if merge_result else ""
     total_input_tokens += merge_result["input_tokens"] if merge_result else 0
     total_output_tokens += merge_result["output_tokens"] if merge_result else 0
-    total_input_tokens += inp_tok
-    total_output_tokens += out_tok
 
     merge_data = _extract_json(merge_text) or {}
 
