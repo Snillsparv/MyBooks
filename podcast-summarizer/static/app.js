@@ -433,8 +433,29 @@ async function handleSubmit() {
     });
 
     if (!resp.ok) {
-      const err = await resp.json();
-      throw new Error(err.error || 'Something went wrong');
+      const contentType = resp.headers.get('content-type') || '';
+      let message = `Request failed (${resp.status})`;
+
+      try {
+        if (contentType.includes('application/json')) {
+          const err = await resp.json();
+          message = err?.error || message;
+        } else {
+          const raw = await resp.text();
+          const cleaned = raw.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+          if (cleaned) {
+            message = cleaned.substring(0, 240);
+          } else if (resp.status >= 500) {
+            message = 'Server error on Railway. Please try again in a minute.';
+          }
+        }
+      } catch {
+        if (resp.status >= 500) {
+          message = 'Server error on Railway. Please try again in a minute.';
+        }
+      }
+
+      throw new Error(message);
     }
 
     const reader = resp.body.getReader();

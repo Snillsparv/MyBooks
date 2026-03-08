@@ -11,6 +11,7 @@ from flask import (
 from youtube_transcript_api import YouTubeTranscriptApi
 from youtube_transcript_api.formatters import TextFormatter
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.exceptions import HTTPException
 import anthropic
 import urllib.parse
 import urllib.request
@@ -383,6 +384,22 @@ def increment_usage(user_id=None):
 
 
 # --------------- Routes ---------------
+
+
+@app.errorhandler(Exception)
+def handle_unexpected_error(e):
+    if request.path.startswith("/api/"):
+        if isinstance(e, HTTPException):
+            return jsonify({"error": e.description}), e.code
+        app.logger.exception("Unhandled API error: %s", e)
+        return jsonify({"error": "Server error. Please try again in a minute."}), 500
+
+    if isinstance(e, HTTPException):
+        return e
+
+    app.logger.exception("Unhandled non-API error: %s", e)
+    return "Internal Server Error", 500
+
 
 @app.route("/")
 def index():
