@@ -41,6 +41,8 @@ const CATEGORY_LABELS = {
 };
 let allOpen = false;
 let streamStartTime = 0;
+let progressTimer = null;
+let estimatedTotalSeconds = 0;
 let currentUser = null;
 
 // --- Init ---
@@ -344,6 +346,38 @@ function hideLoading() {
   loadingEl.classList.remove('visible', 'error');
   progressTrack.classList.remove('indeterminate');
   etaText.textContent = '';
+  stopProgressTimer();
+}
+
+function stopProgressTimer() {
+  if (progressTimer) { clearInterval(progressTimer); progressTimer = null; }
+}
+
+function startProgressTimer() {
+  stopProgressTimer();
+  const durationMin = videoMeta.duration || 30;
+  // Rough estimate: ~8s per minute of video for short, ~12s for long (chunked)
+  estimatedTotalSeconds = Math.max(15, durationMin * (durationMin > 20 ? 12 : 8));
+  streamStartTime = Date.now();
+
+  progressTimer = setInterval(() => {
+    const elapsed = (Date.now() - streamStartTime) / 1000;
+    // Asymptotic progress: approaches 95% but never reaches it
+    const progress = Math.min(95, 15 + 80 * (1 - Math.exp(-1.5 * elapsed / estimatedTotalSeconds)));
+    progressFill.style.width = progress + '%';
+    setCraneStage(progress);
+
+    const etaSeconds = Math.max(0, Math.round(estimatedTotalSeconds - elapsed));
+    if (etaSeconds > 2) {
+      const min = Math.floor(etaSeconds / 60);
+      const sec = etaSeconds % 60;
+      etaText.textContent = min > 0
+        ? `Estimated time left: ~${min} min ${sec}s`
+        : `Estimated time left: ~${sec}s`;
+    } else {
+      etaText.textContent = 'Almost done...';
+    }
+  }, 500);
 }
 
 function setStep(step) {
@@ -354,9 +388,10 @@ function setStep(step) {
   } else if (step === 'analyze') {
     progressTrack.classList.remove('indeterminate');
     progressFill.style.width = '15%';
-    streamStartTime = Date.now();
+    startProgressTimer();
     setCraneStage(15);
   } else if (step === 'done') {
+    stopProgressTimer();
     progressTrack.classList.remove('indeterminate');
     progressFill.style.width = '100%';
     setCraneStage(100);
@@ -365,26 +400,21 @@ function setStep(step) {
 }
 
 function updateStreamProgress(charCount) {
-  const durationMin = videoMeta.duration || 30;
-  const estimatedChars = Math.max(4000, durationMin * 200);
-  const progress = Math.min(95, 15 + (charCount / estimatedChars) * 80);
-  progressFill.style.width = progress + '%';
-  setCraneStage(progress);
-
+  // If chunks are streaming (single-pass mode), refine the estimate based on actual data
   if (streamStartTime && charCount > 200) {
+    const durationMin = videoMeta.duration || 30;
+    const estimatedChars = Math.max(4000, durationMin * 200);
     const elapsed = (Date.now() - streamStartTime) / 1000;
     const rate = charCount / elapsed;
     const remaining = Math.max(0, estimatedChars - charCount);
-    const etaSeconds = Math.round(remaining / rate);
-    if (etaSeconds > 2) {
-      const min = Math.floor(etaSeconds / 60);
-      const sec = etaSeconds % 60;
-      etaText.textContent = min > 0
-        ? `Estimated time left: ~${min} min ${sec}s`
-        : `Estimated time left: ~${sec}s`;
-    } else {
-      etaText.textContent = 'Almost done...';
-    }
+    const newEstimate = elapsed + (remaining / rate);
+    // Smoothly adjust the total estimate
+    estimatedTotalSeconds = estimatedTotalSeconds * 0.7 + newEstimate * 0.3;
+
+    // Also update progress based on actual char data
+    const progress = Math.min(95, 15 + (charCount / estimatedChars) * 80);
+    progressFill.style.width = progress + '%';
+    setCraneStage(progress);
   }
 }
 
