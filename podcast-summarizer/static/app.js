@@ -312,7 +312,7 @@ function updateThemeIcon() {
 
 // ===== Origami crane animation =====
 
-const CRANE_STAGES = 7;
+const CRANE_STAGES = 12;
 function setCraneStage(progress) {
   const stage = Math.min(CRANE_STAGES, Math.max(1, Math.ceil((progress / 100) * CRANE_STAGES)));
   for (let i = 1; i <= CRANE_STAGES; i++) {
