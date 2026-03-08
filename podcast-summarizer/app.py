@@ -22,6 +22,7 @@ app.secret_key = os.environ.get("SECRET_KEY", "dev-secret-change-in-prod")
 
 ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
 GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "")
+PROXY_URL = os.environ.get("PROXY_URL", "")  # e.g. http://user:pass@proxy:8080
 
 FREE_DAILY_LIMIT = 2
 
