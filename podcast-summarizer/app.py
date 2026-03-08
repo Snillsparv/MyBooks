@@ -26,6 +26,10 @@ PROXY_URL = os.environ.get("PROXY_URL", "")  # e.g. http://user:pass@proxy:8080
 
 FREE_DAILY_LIMIT = 2
 
+TRANSCRIPT_CACHE_TTL_SECONDS = int(os.environ.get("TRANSCRIPT_CACHE_TTL_SECONDS", "21600"))
+TRANSCRIPT_FETCH_RETRIES = int(os.environ.get("TRANSCRIPT_FETCH_RETRIES", "3"))
+TRANSCRIPT_CACHE = {}
+
 # Claude Sonnet 4 pricing
 COST_INPUT_PER_MTOK_USD = 3.0
 COST_OUTPUT_PER_MTOK_USD = 15.0
@@ -63,29 +67,73 @@ def get_video_title(video_id: str) -> str:
         return "Unknown title"
 
 
-def _build_ytt_api():
-    """Build YouTubeTranscriptApi with optional proxy support."""
-    if PROXY_URL:
-        import httpx
-        client = httpx.Client(proxy=PROXY_URL)
-        return YouTubeTranscriptApi(http_client=client)
-    return YouTubeTranscriptApi()
+def _is_temporary_transcript_block(error_text: str) -> bool:
+    text = (error_text or "").lower()
+    markers = (
+        "too many requests",
+        "rate limit",
+        "requestblocked",
+        "ipblocked",
+        "forbidden",
+        "429",
+        "temporarily",
+    )
+    return any(m in text for m in markers)
 
 
 def get_transcript(video_id: str) -> tuple[str, list[dict]]:
-    ytt_api = _build_ytt_api()
-    transcript = ytt_api.fetch(video_id)
+    now = time.time()
+    cached = TRANSCRIPT_CACHE.get(video_id)
+    if cached and cached["expires_at"] > now:
+        return cached["full_text"], cached["segments"]
 
-    segments = []
-    for snippet in transcript:
-        segments.append({
-            "text": snippet.text,
-            "start": snippet.start,
-        })
+    ytt_api = YouTubeTranscriptApi()
+    last_error = None
 
-    formatter = TextFormatter()
-    full_text = formatter.format_transcript(transcript)
-    return full_text, segments
+    for attempt in range(1, max(1, TRANSCRIPT_FETCH_RETRIES) + 1):
+        try:
+            transcript = ytt_api.fetch(video_id)
+
+            segments = []
+            for snippet in transcript:
+                segments.append({
+                    "text": snippet.text,
+                    "start": snippet.start,
+                })
+
+            formatter = TextFormatter()
+            full_text = formatter.format_transcript(transcript)
+
+            TRANSCRIPT_CACHE[video_id] = {
+                "full_text": full_text,
+                "segments": segments,
+                "expires_at": now + max(60, TRANSCRIPT_CACHE_TTL_SECONDS),
+            }
+            return full_text, segments
+        except Exception as e:
+            last_error = e
+            message = str(e)
+            should_retry = _is_temporary_transcript_block(message)
+            if should_retry and attempt < max(1, TRANSCRIPT_FETCH_RETRIES):
+                backoff_s = min(5, attempt)
+                app.logger.warning(
+                    "YouTube transcript fetch blocked, retrying (%s/%s) in %ss for video %s",
+                    attempt,
+                    TRANSCRIPT_FETCH_RETRIES,
+                    backoff_s,
+                    video_id,
+                )
+                time.sleep(backoff_s)
+                continue
+            break
+
+    err_text = str(last_error or "Unknown transcript error")
+    if _is_temporary_transcript_block(err_text):
+        raise RuntimeError(
+            "YouTube is temporarily blocking transcript requests from this server. "
+            "Please retry in 1-5 minutes."
+        )
+    raise RuntimeError(err_text)
 
 
 def estimate_duration(segments: list[dict]) -> int:
@@ -539,15 +587,9 @@ def api_summarize():
     try:
         transcript_text, segments = get_transcript(video_id)
     except Exception as e:
-        err_str = str(e)
-        if "blocked" in err_str.lower() or "too many requests" in err_str.lower() or "ip" in err_str.lower():
-            msg = ("YouTube is temporarily blocking transcript requests from this server. "
-                   "This usually resolves itself after a few minutes. Please try again later.")
-        elif "no transcript" in err_str.lower() or "subtitles" in err_str.lower():
-            msg = "No transcript available for this video. It may not have subtitles enabled."
-        else:
-            msg = f"Could not fetch transcript: {e}"
-        return jsonify({"error": msg}), 400
+        message = str(e)
+        status = 503 if "temporarily blocking transcript requests" in message.lower() else 400
+        return jsonify({"error": f"Could not fetch transcript: {message}"}), status
 
     duration = estimate_duration(segments)
 
