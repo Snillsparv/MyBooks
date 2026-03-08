@@ -150,101 +150,128 @@ def estimate_duration(segments: list[dict]) -> int:
 
 DETAIL_CONFIGS = {
     "short": {
-        "summary_length": "2–3 meningar",
-        "chapter_count": "3–7 stycken",
+        "summary_length": "2\u20133 meningar",
+        "chapter_count": "3\u20137 stycken",
         "chapter_summary_length": "1 mening",
     },
     "medium": {
-        "summary_length": "3–5 meningar",
-        "chapter_count": "5–15 stycken",
-        "chapter_summary_length": "1–3 meningar",
+        "summary_length": "3\u20135 meningar",
+        "chapter_count": "5\u201315 stycken",
+        "chapter_summary_length": "1\u20133 meningar",
     },
     "detailed": {
-        "summary_length": "5–8 meningar",
-        "chapter_count": "10–20 stycken",
-        "chapter_summary_length": "2–4 meningar",
+        "summary_length": "5\u20138 meningar",
+        "chapter_count": "10\u201320 stycken",
+        "chapter_summary_length": "2\u20134 meningar",
     },
 }
 
 SUMMARIZE_PROMPT = """\
-Du är en expert på att sammanfatta podcast-avsnitt och videoinnehåll.
+Du \u00e4r en expert p\u00e5 att sammanfatta podcast-avsnitt och videoinneh\u00e5ll.
 
-Givet följande transkription, gör följande:
+Givet f\u00f6ljande transkription, g\u00f6r f\u00f6ljande:
 
-1. Ge en sammanfattning ({summary_length}) av hela innehållet. Skriv på {language}.
-2. Dela upp innehållet i logiska kapitel/sektioner ({chapter_count} beroende på längd).
-   VIKTIGT: Kapitlen MÅSTE täcka HELA videon från 0:00 till slutet ({duration} min). \
-Sista kapitlets sluttid ska vara nära {duration}:00. Hoppa inte över några delar.
+1. Ge en sammanfattning ({summary_length}) av hela inneh\u00e5llet. Skriv p\u00e5 {language}.
+2. Dela upp inneh\u00e5llet i logiska kapitel/sektioner ({chapter_count} beroende p\u00e5 l\u00e4ngd).
+   VIKTIGT: Kapitlen M\u00c5STE t\u00e4cka HELA videon fr\u00e5n 0:00 till slutet (~{duration} min). \
+Sista kapitlets sluttid ska vara n\u00e4ra {duration}:00. Hoppa inte \u00f6ver n\u00e5gra delar.
 3. Varje kapitel ska ha:
-   - En kort, beskrivande rubrik på {language}
-   - En tidsperiod (t.ex. "0:00\u20135:30") baserat på textens position i transkriptionen
+   - En kort, beskrivande rubrik p\u00e5 {language}
+   - En tidsperiod (t.ex. "0:00\u20135:30") baserat p\u00e5 textens position i transkriptionen
    - En kategori (ett av: introduction, background, analysis, discussion, story, deep-dive, opinion, conclusion, practical, interview)
-   - En sammanfattning på {chapter_summary_length} på {language}
+   - En sammanfattning p\u00e5 {chapter_summary_length} p\u00e5 {language}
    - {transcript_html_instruction}
-4. Plocka ut 3\u20135 av de mest intressanta eller viktiga citaten (ordagrant från transkriptionen).
+4. Plocka ut 3\u20135 av de mest intressanta eller viktiga citaten (ordagrant fr\u00e5n transkriptionen).
 
-KRITISKT: Du MÅSTE täcka hela videon ({duration} minuter) från början till slut. \
-Planera dina kapitel så att de täcker hela tidslinjen INNAN du börjar skriva. \
-Det är bättre att vara kortfattad i transcript_html än att missa delar av videon.
+{budget_instruction}
 
-Svara ENBART med giltig JSON i följande format (ingen markdown, inga kodblock):
+Svara ENBART med giltig JSON i f\u00f6ljande format (ingen markdown, inga kodblock):
 {{
-  "title": "Titel på avsnittet",
-  "summary": "Övergripande sammanfattning...",
+  "title": "Titel p\u00e5 avsnittet",
+  "summary": "\u00d6vergripande sammanfattning...",
   "chapters": [
     {{
       "title": "Kapitelrubrik",
       "time": "0:00\u20135:30",
       "category": "analysis",
       "summary": "Sammanfattning av kapitlet...",
-      "transcript_html": "<h4>Underrubrik</h4><p>Text från transkriptionen...</p>"
+      "transcript_html": "<h4>Underrubrik</h4><p>Text...</p>"
     }}
   ],
   "key_quotes": [
     {{
-      "text": "Det exakta citatet från transkriptionen...",
-      "context": "Kort beskrivning av kontexten",
+      "text": "Det exakta citatet...",
+      "context": "Kort beskrivning",
       "time": "3:42"
     }}
   ]
 }}
 
-Här är transkriptionen:
+H\u00e4r \u00e4r transkriptionen:
 
 ---
 {transcript}
 ---
 
-Totallängd på videon: cirka {duration} minuter. Täck HELA videon."""
+Totall\u00e4ngd p\u00e5 videon: cirka {duration} minuter. T\u00e4ck HELA videon fr\u00e5n b\u00f6rjan till slut."""
 
 
 TRANSCRIPT_HTML_FULL = (
-    "Den faktiska transkriptionstexten för det avsnittet, organiserad under underrubriker. "
-    "Inkludera de viktigaste delarna av transkriptionstexten \u2014 parafrasera och komprimera "
-    "där det behövs, men behåll viktiga citat ordagrant. "
-    "Formatera som HTML-fragment med <h4> för underrubriker och <p> för stycken."
+    "transcript_html: den faktiska transkriptionstexten f\u00f6r det avsnittet, organiserad under "
+    "underrubriker. Inkludera de viktigaste delarna \u2014 parafrasera och komprimera d\u00e4r det "
+    "beh\u00f6vs, men beh\u00e5ll viktiga citat ordagrant. "
+    "Formatera som HTML-fragment med <h4> f\u00f6r underrubriker och <p> f\u00f6r stycken."
 )
 
 TRANSCRIPT_HTML_COMPACT = (
-    "En komprimerad version av transkriptionstexten: 1\u20132 underrubriker (<h4>) "
-    "med korta stycken (<p>) som fångar kärnpunkterna. Behåll viktiga citat ordagrant "
-    "men var kortfattad \u2014 max 3\u20134 stycken per kapitel. "
-    "Formatera som HTML-fragment."
+    "transcript_html: en KORT sammanfattande text (max {max_words} ord per kapitel). "
+    "Anv\u00e4nd 1 <h4>-underrubrik och 1\u20132 <p>-stycken. F\u00e5nga k\u00e4rnpunkterna och beh\u00e5ll "
+    "max 1 viktigt citat ordagrant. Var extremt kortfattad."
+)
+
+BUDGET_SHORT = (
+    "KRITISKT: Du M\u00c5STE t\u00e4cka hela videon ({duration} minuter). "
+    "Planera kapitlens tidsintervall F\u00d6RST innan du skriver. "
+    "Det \u00e4r b\u00e4ttre att vara kortfattad i transcript_html \u00e4n att missa delar av videon."
+)
+
+BUDGET_LONG = (
+    "KRITISKT: Videon \u00e4r {duration} minuter l\u00e5ng. Du M\u00c5STE t\u00e4cka HELA videon.\n"
+    "STRATEGI: Planera ALLA kapitel med tidsintervall F\u00d6RST (fr\u00e5n 0:00 till ~{duration}:00), "
+    "och skriv sedan varje kapitel kortfattat.\n"
+    "H\u00c5RD GR\u00c4NS: Varje kapitels transcript_html f\u00e5r vara MAX {max_words} ord. "
+    "Totalt max ~{total_words} ord f\u00f6r alla transcript_html sammanlagt.\n"
+    "Det \u00e4r MYCKET viktigare att t\u00e4cka hela videon \u00e4n att ha detaljerad text per kapitel."
 )
 
 
 def build_prompt(transcript_text, duration_minutes, language="svenska", detail_level="medium"):
     config = DETAIL_CONFIGS.get(detail_level, DETAIL_CONFIGS["medium"])
-    # For long videos, use compact transcript_html to avoid output token exhaustion
-    if duration_minutes > 45:
-        transcript_html_instruction = TRANSCRIPT_HTML_COMPACT
+
+    if duration_minutes > 60:
+        max_words = 80
+        total_words = max_words * 15
+        transcript_html_instruction = TRANSCRIPT_HTML_COMPACT.format(max_words=max_words)
+        budget_instruction = BUDGET_LONG.format(
+            duration=duration_minutes, max_words=max_words, total_words=total_words,
+        )
+    elif duration_minutes > 30:
+        max_words = 150
+        total_words = max_words * 12
+        transcript_html_instruction = TRANSCRIPT_HTML_COMPACT.format(max_words=max_words)
+        budget_instruction = BUDGET_LONG.format(
+            duration=duration_minutes, max_words=max_words, total_words=total_words,
+        )
     else:
         transcript_html_instruction = TRANSCRIPT_HTML_FULL
+        budget_instruction = BUDGET_SHORT.format(duration=duration_minutes)
+
     return SUMMARIZE_PROMPT.format(
         transcript=transcript_text,
         duration=duration_minutes,
         language=language,
         transcript_html_instruction=transcript_html_instruction,
+        budget_instruction=budget_instruction,
         **config,
     )
 
@@ -355,7 +382,7 @@ def summarize_with_claude(transcript_text, duration_minutes, language="svenska",
             if final.stop_reason != "max_tokens":
                 break
 
-            # Output was truncated — ask Claude to continue
+            # Output was truncated \u2014 ask Claude to continue
             app.logger.warning(
                 "Claude output truncated at %d chars (attempt %d/%d), requesting continuation",
                 len(accumulated_text), attempt + 1, 1 + MAX_CONTINUATION_ATTEMPTS,
@@ -364,7 +391,7 @@ def summarize_with_claude(transcript_text, duration_minutes, language="svenska",
                 messages = [
                     {"role": "user", "content": prompt},
                     {"role": "assistant", "content": accumulated_text},
-                    {"role": "user", "content": "Ditt svar klipptes av. Fortsätt EXAKT där du slutade. Skriv bara den resterande JSON:en."},
+                    {"role": "user", "content": "Ditt svar klipptes av. Forts\u00e4tt EXAKT d\u00e4r du slutade. Skriv bara den resterande JSON:en."},
                 ]
 
     yield {
