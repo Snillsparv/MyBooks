@@ -535,6 +535,14 @@ function parseTimeToSeconds(str) {
   return parts[0] || 0;
 }
 
+function parseTimeRange(timeStr) {
+  if (!timeStr) return [null, null];
+  const parts = timeStr.split(/[–\-—]/);
+  const start = parseTimeToSeconds(parts[0]);
+  const end = parts.length >= 2 ? parseTimeToSeconds(parts[1]) : null;
+  return [start, end];
+}
+
 function getSegmentsForChapter(timeStr) {
   if (!timeStr || !rawSegments.length) return [];
   const parts = timeStr.split(/[–\-—]/);
