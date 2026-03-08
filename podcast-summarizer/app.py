@@ -448,10 +448,15 @@ def _format_time(minutes):
     return f"{m}:{s:02d}"
 
 
-def _call_claude_streaming(client, prompt, max_tokens=16000):
-    """Call Claude and return (full_text, input_tokens, output_tokens, stop_reason)."""
+def _call_claude_with_keepalive(client, prompt, max_tokens=16000):
+    """Call Claude, yielding keepalive pings every few seconds, then the result.
+
+    Yields: {"type": "keepalive"} periodically, then {"type": "result", ...} at the end.
+    This prevents Railway/proxy timeouts during long blocking calls.
+    """
     messages = [{"role": "user", "content": prompt}]
     accumulated = ""
+    last_yield_time = time.time()
 
     with client.messages.stream(
         model="claude-sonnet-4-20250514",
@@ -460,10 +465,20 @@ def _call_claude_streaming(client, prompt, max_tokens=16000):
     ) as stream:
         for text in stream.text_stream:
             accumulated += text
+            now = time.time()
+            if now - last_yield_time > 5:
+                yield {"type": "keepalive"}
+                last_yield_time = now
 
         final = stream.get_final_message()
 
-    return accumulated, final.usage.input_tokens, final.usage.output_tokens, final.stop_reason
+    yield {
+        "type": "result",
+        "text": accumulated,
+        "input_tokens": final.usage.input_tokens,
+        "output_tokens": final.usage.output_tokens,
+        "stop_reason": final.stop_reason,
+    }
 
 
 def _call_claude_streaming_yielding(client, prompt, max_tokens=64000):
@@ -529,16 +544,22 @@ def summarize_with_claude_chunked(segments, duration_minutes, language="svenska"
 
         yield {"type": "status", "message": f"Analyzing part {i + 1}/{len(chunks)} ({start_time}\u2013{end_time})..."}
 
-        text, inp_tok, out_tok, stop = _call_claude_streaming(client, prompt, max_tokens=16000)
-        total_input_tokens += inp_tok
-        total_output_tokens += out_tok
+        chunk_result = None
+        for item in _call_claude_with_keepalive(client, prompt, max_tokens=16000):
+            if item["type"] == "keepalive":
+                yield {"type": "keepalive"}
+            elif item["type"] == "result":
+                chunk_result = item
 
-        chunk_data = _extract_json(text)
-        if chunk_data:
-            all_chapters.extend(chunk_data.get("chapters", []))
-            all_quotes.extend(chunk_data.get("key_quotes", []))
-        else:
-            app.logger.warning("Failed to parse chunk %d/%d response", i + 1, len(chunks))
+        if chunk_result:
+            total_input_tokens += chunk_result["input_tokens"]
+            total_output_tokens += chunk_result["output_tokens"]
+            chunk_data = _extract_json(chunk_result["text"])
+            if chunk_data:
+                all_chapters.extend(chunk_data.get("chapters", []))
+                all_quotes.extend(chunk_data.get("key_quotes", []))
+            else:
+                app.logger.warning("Failed to parse chunk %d/%d response", i + 1, len(chunks))
 
     # Now generate overall title + summary
     yield {"type": "status", "message": "Creating overall summary..."}
@@ -549,7 +570,16 @@ def summarize_with_claude_chunked(segments, duration_minutes, language="svenska"
     )
     merge_prompt = build_merge_prompt(chapter_summaries_text, duration_minutes, language, detail_level)
 
-    merge_text, inp_tok, out_tok, _ = _call_claude_streaming(client, merge_prompt, max_tokens=2000)
+    merge_result = None
+    for item in _call_claude_with_keepalive(client, merge_prompt, max_tokens=2000):
+        if item["type"] == "keepalive":
+            yield {"type": "keepalive"}
+        elif item["type"] == "result":
+            merge_result = item
+
+    merge_text = merge_result["text"] if merge_result else ""
+    total_input_tokens += merge_result["input_tokens"] if merge_result else 0
+    total_output_tokens += merge_result["output_tokens"] if merge_result else 0
     total_input_tokens += inp_tok
     total_output_tokens += out_tok
 
@@ -907,6 +937,8 @@ def api_summarize():
                         yield json.dumps({"type": "chunk", "text": item["text"]}) + "\n"
                     elif item["type"] == "status":
                         yield json.dumps({"type": "status", "message": item["message"]}) + "\n"
+                    elif item["type"] == "keepalive":
+                        yield json.dumps({"type": "keepalive"}) + "\n"
                     elif item["type"] == "usage":
                         usage_info = item
                         full_text = item.get("full_text", full_text)
