@@ -14,6 +14,7 @@ from youtube_transcript_api.formatters import TextFormatter
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.exceptions import HTTPException
 import anthropic
+import httpx
 import urllib.parse
 import urllib.request
 
@@ -95,7 +96,12 @@ def get_transcript(video_id: str) -> tuple[str, list[dict]]:
     if cached and cached["expires_at"] > now:
         return cached["full_text"], cached["segments"]
 
-    ytt_api = YouTubeTranscriptApi()
+    # Use proxy if configured to avoid YouTube IP blocks on datacenter IPs
+    if PROXY_URL:
+        http_client = httpx.Client(proxy=PROXY_URL)
+        ytt_api = YouTubeTranscriptApi(http_client=http_client)
+    else:
+        ytt_api = YouTubeTranscriptApi()
     last_error = None
 
     for attempt in range(1, max(1, TRANSCRIPT_FETCH_RETRIES) + 1):
