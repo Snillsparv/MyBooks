@@ -333,9 +333,18 @@ def get_current_user():
 
 
 def check_rate_limit(user):
-    """Returns (allowed, remaining). None user = not logged in."""
+    """Returns (allowed, remaining)."""
     if user is None:
-        return False, 0
+        now = int(time.time())
+        window_start = session.get("anon_fold_window_start", 0)
+        used = session.get("anon_folds_used", 0)
+        if (not window_start) or now - int(window_start) > ANON_FREE_FOLD_WINDOW_SECONDS:
+            session["anon_fold_window_start"] = now
+            session["anon_folds_used"] = 0
+            used = 0
+        remaining = max(0, ANON_FREE_FOLDS - int(used))
+        return remaining > 0, remaining
+
     if user["is_subscriber"]:
         return True, 999
     today = date.today().isoformat()
@@ -352,7 +361,17 @@ def check_rate_limit(user):
     return remaining > 0, remaining
 
 
-def increment_usage(user_id):
+def increment_usage(user_id=None):
+    if user_id is None:
+        now = int(time.time())
+        window_start = session.get("anon_fold_window_start", 0)
+        if (not window_start) or now - int(window_start) > ANON_FREE_FOLD_WINDOW_SECONDS:
+            session["anon_fold_window_start"] = now
+            session["anon_folds_used"] = 1
+        else:
+            session["anon_folds_used"] = int(session.get("anon_folds_used", 0)) + 1
+        return
+
     today = date.today().isoformat()
     db = get_db()
     db.execute(
@@ -575,7 +594,7 @@ def api_summarize():
     user = get_current_user()
     allowed, remaining = check_rate_limit(user)
     if not allowed:
-        msg = "Sign in to use Foldly." if user is None else \
+        msg = "You've used your free fold. Sign in to continue." if user is None else \
               "You've reached today's limit. Upgrade to Foldly Pro for unlimited folds."
         return jsonify({"error": msg}), 429
 
@@ -647,7 +666,6 @@ def api_summarize():
                 fold_id = cursor.lastrowid
                 db.commit()
                 db.close()
-                increment_usage(user["id"])
 
             elapsed_s = round(time.time() - started_at, 2)
             yield json.dumps({

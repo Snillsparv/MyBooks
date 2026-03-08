@@ -413,11 +413,6 @@ async function handleSubmit() {
   const url = urlInput.value.trim();
   if (!url) return;
 
-  if (!currentUser) {
-    openModal('login');
-    return;
-  }
-
   btn.disabled = true;
   resultEl.classList.remove('visible');
   playerContainer.classList.remove('visible');
