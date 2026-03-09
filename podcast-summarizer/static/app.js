@@ -54,6 +54,12 @@ document.addEventListener('DOMContentLoaded', () => {
   searchInput.addEventListener('input', debounce(handleSearch, 200));
   document.addEventListener('keydown', handleKeyboard);
 
+  // Show upgrade success toast
+  if (new URLSearchParams(window.location.search).get('upgraded') === '1') {
+    showToast('Welcome to Foldly Pro! Unlimited folds unlocked.');
+    window.history.replaceState({}, '', '/');
+  }
+
   // Check for shared fold data
   const sharedData = $('#shared-fold-data');
   if (sharedData) {
@@ -91,10 +97,21 @@ function updateAuthUI() {
     if (currentUser.is_subscriber) {
       badges += ` <span class="remaining-badge" style="background:var(--sage-light);color:var(--sage)">Pro</span>`;
     }
+    const stripeEnabled = window.FOLDLY_CONFIG?.stripeEnabled;
+    let upgradeBtn = '';
+    if (stripeEnabled && !currentUser.is_subscriber) {
+      upgradeBtn = `<button class="btn-sm upgrade-btn" onclick="startUpgrade()">Upgrade to Pro</button>`;
+    }
+    let manageBtn = '';
+    if (stripeEnabled && currentUser.is_subscriber && currentUser.has_stripe) {
+      manageBtn = `<button class="btn-sm ghost" onclick="manageSubscription()">Manage plan</button>`;
+    }
     authArea.innerHTML = `
       <div class="top-bar-left">
         <div class="user-badge">${badges}</div>
       </div>
+      ${upgradeBtn}
+      ${manageBtn}
       <button class="btn-sm ghost" onclick="openHistory()">History</button>
       <button class="btn-sm ghost" onclick="doLogout()">Sign out</button>
     `;
@@ -223,6 +240,28 @@ async function doLogout() {
   await fetch('/api/logout', { method: 'POST' });
   currentUser = null;
   updateAuthUI();
+}
+
+async function startUpgrade() {
+  try {
+    const resp = await fetch('/api/create-checkout-session', { method: 'POST' });
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data.error);
+    window.location.href = data.url;
+  } catch (err) {
+    showToast(err.message || 'Could not start checkout');
+  }
+}
+
+async function manageSubscription() {
+  try {
+    const resp = await fetch('/api/create-portal-session', { method: 'POST' });
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data.error);
+    window.location.href = data.url;
+  } catch (err) {
+    showToast(err.message || 'Could not open billing portal');
+  }
 }
 
 
@@ -535,6 +574,13 @@ async function handleSubmit() {
 
   } catch (err) {
     showLoading(err.message, true);
+    // Show upgrade button if rate limited and logged in
+    if (err.message && err.message.includes('Upgrade to Foldly Pro') && window.FOLDLY_CONFIG?.stripeEnabled) {
+      const upgradeHint = document.createElement('div');
+      upgradeHint.style.marginTop = '16px';
+      upgradeHint.innerHTML = `<button class="btn-primary" onclick="startUpgrade()" style="font-size:0.9rem">Upgrade to Pro – $9/month</button>`;
+      statusText.appendChild(upgradeHint);
+    }
   } finally {
     btn.disabled = false;
   }

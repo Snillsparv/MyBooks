@@ -208,7 +208,8 @@
 <!-- Config -->
 <script>
   window.FOLDLY_CONFIG = {
-    googleClientId: {{ (google_client_id or '') | tojson }}
+    googleClientId: {{ (google_client_id or '') | tojson }},
+    stripeEnabled: {{ ('true' if stripe_enabled else 'false') }}
   };
 </script>
 

@@ -17,6 +17,7 @@ import anthropic
 import httpx
 import urllib.parse
 import urllib.request
+import stripe
 
 from database import get_db, init_db
 
@@ -26,6 +27,13 @@ app.secret_key = os.environ.get("SECRET_KEY", "dev-secret-change-in-prod")
 ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
 GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "")
 PROXY_URL = os.environ.get("PROXY_URL", "")  # e.g. http://user:pass@proxy:8080
+
+# Stripe config
+STRIPE_SECRET_KEY = os.environ.get("STRIPE_SECRET_KEY", "")
+STRIPE_PRICE_ID = os.environ.get("STRIPE_PRICE_ID", "")
+STRIPE_WEBHOOK_SECRET = os.environ.get("STRIPE_WEBHOOK_SECRET", "")
+if STRIPE_SECRET_KEY:
+    stripe.api_key = STRIPE_SECRET_KEY
 
 FREE_DAILY_LIMIT = 2
 ANON_FREE_FOLDS = 1
@@ -693,7 +701,8 @@ def handle_unexpected_error(e):
 @app.route("/")
 def index():
     user = get_current_user()
-    return render_template("index.html", user=user, google_client_id=GOOGLE_CLIENT_ID)
+    return render_template("index.html", user=user, google_client_id=GOOGLE_CLIENT_ID,
+                           stripe_enabled=bool(STRIPE_SECRET_KEY and STRIPE_PRICE_ID))
 
 
 @app.route("/fold/<share_token>")
@@ -704,7 +713,8 @@ def shared_fold(share_token):
     if not fold:
         return "Fold not found", 404
     user = get_current_user()
-    return render_template("index.html", user=user, shared_fold=dict(fold), google_client_id=GOOGLE_CLIENT_ID)
+    return render_template("index.html", user=user, shared_fold=dict(fold), google_client_id=GOOGLE_CLIENT_ID,
+                           stripe_enabled=bool(STRIPE_SECRET_KEY and STRIPE_PRICE_ID))
 
 
 @app.route("/api/register", methods=["POST"])
@@ -846,6 +856,7 @@ def api_me():
             "avatar": user["avatar_url"] or "",
             "is_subscriber": bool(user["is_subscriber"]),
             "folds_remaining": remaining if not user["is_subscriber"] else None,
+            "has_stripe": bool(user["stripe_customer_id"]),
         }
     })
 
@@ -1047,6 +1058,110 @@ def api_summarize():
         stream_with_context(generate()),
         content_type="application/x-ndjson",
     )
+
+
+# --------------- Stripe ---------------
+
+
+@app.route("/api/create-checkout-session", methods=["POST"])
+def api_create_checkout_session():
+    user = get_current_user()
+    if not user:
+        return jsonify({"error": "You must be signed in to upgrade"}), 401
+    if not STRIPE_SECRET_KEY or not STRIPE_PRICE_ID:
+        return jsonify({"error": "Stripe is not configured"}), 500
+
+    # Reuse existing Stripe customer or create new one
+    customer_id = user["stripe_customer_id"]
+    if not customer_id:
+        customer = stripe.Customer.create(email=user["email"])
+        customer_id = customer.id
+        db = get_db()
+        db.execute("UPDATE users SET stripe_customer_id = ? WHERE id = ?",
+                   (customer_id, user["id"]))
+        db.commit()
+        db.close()
+
+    checkout_session = stripe.checkout.Session.create(
+        customer=customer_id,
+        mode="subscription",
+        line_items=[{"price": STRIPE_PRICE_ID, "quantity": 1}],
+        success_url=request.host_url.rstrip("/") + "/?upgraded=1",
+        cancel_url=request.host_url.rstrip("/") + "/",
+    )
+    return jsonify({"url": checkout_session.url})
+
+
+@app.route("/api/create-portal-session", methods=["POST"])
+def api_create_portal_session():
+    user = get_current_user()
+    if not user:
+        return jsonify({"error": "Not signed in"}), 401
+    if not user["stripe_customer_id"]:
+        return jsonify({"error": "No subscription found"}), 400
+
+    portal_session = stripe.billing_portal.Session.create(
+        customer=user["stripe_customer_id"],
+        return_url=request.host_url.rstrip("/") + "/",
+    )
+    return jsonify({"url": portal_session.url})
+
+
+@app.route("/api/webhook", methods=["POST"])
+def stripe_webhook():
+    payload = request.get_data()
+    sig_header = request.headers.get("Stripe-Signature", "")
+
+    if STRIPE_WEBHOOK_SECRET:
+        try:
+            event = stripe.Webhook.construct_event(payload, sig_header, STRIPE_WEBHOOK_SECRET)
+        except (ValueError, stripe.SignatureVerificationError):
+            return "Invalid signature", 400
+    else:
+        try:
+            event = json.loads(payload)
+        except (ValueError, json.JSONDecodeError):
+            return "Invalid payload", 400
+
+    event_type = event.get("type", "")
+    data_obj = event.get("data", {}).get("object", {})
+
+    if event_type in ("checkout.session.completed",):
+        customer_id = data_obj.get("customer")
+        subscription_id = data_obj.get("subscription")
+        if customer_id:
+            db = get_db()
+            db.execute(
+                "UPDATE users SET is_subscriber = 1, stripe_customer_id = ? WHERE stripe_customer_id = ?",
+                (customer_id, customer_id),
+            )
+            db.commit()
+            db.close()
+            app.logger.info("Activated subscription for customer %s", customer_id)
+
+    elif event_type in ("customer.subscription.updated",):
+        customer_id = data_obj.get("customer")
+        status = data_obj.get("status")
+        is_active = 1 if status in ("active", "trialing") else 0
+        if customer_id:
+            db = get_db()
+            db.execute("UPDATE users SET is_subscriber = ? WHERE stripe_customer_id = ?",
+                       (is_active, customer_id))
+            db.commit()
+            db.close()
+            app.logger.info("Subscription %s for customer %s: %s", status, customer_id, is_active)
+
+    elif event_type in ("customer.subscription.deleted",):
+        customer_id = data_obj.get("customer")
+        if customer_id:
+            db = get_db()
+            db.execute("UPDATE users SET is_subscriber = 0 WHERE stripe_customer_id = ?",
+                       (customer_id,))
+            db.commit()
+            db.close()
+            app.logger.info("Cancelled subscription for customer %s", customer_id)
+
+    return "ok", 200
 
 
 # --------------- Init ---------------
