@@ -698,6 +698,16 @@ def handle_unexpected_error(e):
     return "Internal Server Error", 500
 
 
+@app.route("/debug/env")
+def debug_env():
+    """Temporary debug endpoint – remove after verifying."""
+    return jsonify({
+        "GOOGLE_CLIENT_ID_set": bool(os.environ.get("GOOGLE_CLIENT_ID")),
+        "GOOGLE_CLIENT_ID_length": len(os.environ.get("GOOGLE_CLIENT_ID", "")),
+        "GOOGLE_CLIENT_ID_value": os.environ.get("GOOGLE_CLIENT_ID", "")[:20] + "...",
+    })
+
+
 @app.route("/")
 def index():
     user = get_current_user()
